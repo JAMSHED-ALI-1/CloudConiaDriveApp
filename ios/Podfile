@@ -22,7 +22,7 @@ target 'ConiaCloudDrive' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
+pod 'RNSound', :path => '../node_modules/react-native-sound'
   target 'ConiaCloudDriveTests' do
     inherit! :complete
     # Pods for testing
@@ -38,3 +38,4 @@ target 'ConiaCloudDrive' do
     )
   end
 end
+RNVideoUseVideoCaching = true
