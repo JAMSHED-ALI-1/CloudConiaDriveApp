@@ -20,6 +20,10 @@ import ActionModal from '../../Modaals/ActionModal';
 import ProgressBar from '../../components/ProgressBar';
 import strings from '../../helper/Language/LocalizedStrings';
 import WorkspaceModal from '../../Modaals/WorkspaceModal';
+import getItemIcon from '../../constants/GetItemIcon';
+import DropdownComp from '../../components/DropdownComp';
+import ShortingModal from '../../Modaals/ShortingModal';
+import { tuple } from 'yup';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const MyDrive = () => {
@@ -27,7 +31,7 @@ const MyDrive = () => {
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
-  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Root' }]);
+  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Drive' }]);
   const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,6 +41,12 @@ const MyDrive = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [actionModal,setactionModal]=useState(false)
   const [workspacemodal,setshowworkspacemodal]=useState(false)
+  const [showDrodown,setshowdropdown]=useState(false)
+  const [sortingInfo, setSortingInfo] = useState({
+    sortBy: 'updated_at',
+    sortDir: 'desc',        
+  });
+  
 
   const handleGridListToggle = () => {
     setIsGrid(!isGrid);
@@ -48,20 +58,26 @@ const MyDrive = () => {
     { id: 3, Image: imageIcon, title: strings.Image, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoiaW1hZ2UiLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNSJ9XQ%3D%3D' },
     { id: 4, Image: video, title:strings.Video, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidmlkZW8iLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNCJ9XQ%3D%3D' },
   ];
-
-
+ 
+  const sortByOptions = [
+    { key: 'Size', value: 'file_size' },
+    { key: 'Name', value: 'name' },
+    { key: 'Last modified', value: 'updated_at' },
+    { key: 'Upload date', value: 'created_at' },
+  ];
+  
 
 
 
   const currentFolderId = folderStack[folderStack.length - 1].id;
 
-  const fetchData = useCallback(async (filter = null) => {
+  const fetchData = useCallback(async (filter = null,sortBy = 'updated_at', sortDir = 'desc') => {
     try {
       setIsLoading(true);
       const response = await axios.get(`${baseURL}/drive/file-entries?timestamp=${new Date().getTime()}`, {
         headers: { Authorization: `Bearer ${user?.access_token}` },
         params: {
-          pageId: search?search:0,
+          pageId: 0,
           filters: filter,
           folderId: currentFolderId, 
           page: 1,
@@ -71,24 +87,31 @@ const MyDrive = () => {
           recentOnly: false,
           sharedOnly: false,
           per_page: 100,
-          orderBy: 'updated_at',
-          orderDir: 'desc',
+          orderBy: sortingInfo.sortBy,
+          orderDir: sortingInfo.sortDir,
+  
         },
       });
       setAllData(response.data.data);
-      if(response.status===403){
-        navigation.replace('Login')
-      }
+  
+      // if(response.status===403){
+      //   navigation.replace('Login')
+      // }
     } catch (error) {
       console.log('Got Error', error);
-      if (error.response && error.response.status === 403) {
-        navigation.replace('Login') // Redirect to login page
-      }
+      // if (error.response && error.response.status === 403) {
+      //   navigation.replace('Login') // Redirect to login page
+      // }
     } finally {
       setIsLoading(false);
     }
   }, [user, currentFolderId, workspaces, search]);
-
+  const handleSortApply = ({ sortBy, sortDir }) => {
+    setSortingInfo({ sortBy, sortDir }); // Update the state
+    fetchData(currentFilter, sortBy, sortDir); // Fetch data with new sort options
+    console.log('Sort applied:', sortBy, sortDir);
+  };
+  
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -99,7 +122,7 @@ const MyDrive = () => {
   
   useEffect(() => {
     fetchData();
-  }, [fetchData, currentFolderId, user]);
+  }, [fetchData, currentFolderId, user,sortingInfo,]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -184,85 +207,7 @@ const MyDrive = () => {
     }
   }, [folderStack]);
 
-  const getItemIcon = (item) => {
-    if (item.type === 'folder') return 'folder';
-  
-    // Extract file extension from the item name
-    const extension = item.name.split('.').pop().toLowerCase();
-  
-    switch (extension) {
-      // Images
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-      case 'bmp':
-      case 'tiff':
-      case 'webp':
-      case 'svg':
-        return 'image';
-  
-      // Documents
-      case 'doc':
-      case 'docx':
-        return 'wordpress'; // Consider using a different icon for Word documents
-      case 'pdf':
-        return 'picture-as-pdf';
-      case 'odt':
-      case 'rtf':
-      case 'txt':
-      case 'md':
-        return 'my-library-books';
-  
-      // Presentations
-      case 'ppt':
-      case 'pptx':
-      case 'odp':
-      case 'key':
-        return 'slideshow';
-  
-      // Spreadsheets
-      case 'xls':
-      case 'xlsx':
-      case 'ods':
-      case 'csv':
-        return 'table_chart';
-  
-      // Audio
-      case 'mp3':
-      case 'wav':
-      case 'flac':
-      case 'aac':
-      case 'ogg':
-        return 'audiotrack';
-  
-      // Video
-      case 'mp4':
-      case 'avi':
-      case 'mov':
-      case 'mkv':
-      case 'webm':
-        return 'videocam';
-  
-      // Archives
-      case 'zip':
-      case 'rar':
-      case 'tar':
-      case 'gz':
-        return 'archive';
-  
-      // Executables and Apps
-      case 'exe':
-      case 'app':
-      case 'apk':
-        return 'developer_mode';
-  
-      // Default
-      default:
-        return 'insert-drive-file';
-    }
-  };
-
+ 
   const renderItemList = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
  
@@ -312,8 +257,7 @@ const MyDrive = () => {
    
     <View style={styles.container}>
         <CustomHeader
-          back={true}
-          left={true}
+         
           right={true}
           grid={true}
           title={strings.MyFiles}
@@ -337,38 +281,47 @@ const MyDrive = () => {
     </View>
   ))}
 </View>
-
+     <View style={{ borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+          <View>
       {folderStack.length > 1 && (
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Icon name="arrow-back" size={24} color={COLORS.black} />
           <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
       )}
-      <Text style={styles.currentFolderText}>{strings.CurrentFolder}: {folderStack[folderStack.length - 1].name}</Text>
+      <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text>
+      </View>
+      <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
+        <Text style={styles.currentFolderText}>Sort</Text>
+        <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
+      </TouchableOpacity>
+      </View>
       {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
         <FlatList
           data={organizedData}
-          renderItem={isGrid ?  renderItemGrid : renderItemList}
+          renderItem={isGrid ?    renderItemList:renderItemGrid}
           keyExtractor={item => item.id.toString()}
           ListEmptyComponent={<View style={{flex:1,alignItems:'center'}}>
           <Text style={styles.emptyText}>This folder is empty|| or API Problem From BackEnd Token Expired</Text>
         </View>}
-            numColumns={isGrid ? 2 : 1}// Number of columns for grid or list view
+            numColumns={isGrid ? 1 : 2}// Number of columns for grid or list view
           onRefresh={onRefresh}
           refreshing={refreshing}
-          key={isGrid ? 'grid' : 'list'} // Key to re-render FlatList on viewType change
+          key={isGrid ?  'list':'grid'} // Key to re-render FlatList on viewType change
         />
         
        
       )}
-      <TouchableOpacity style={styles.btn} 
+      {/*  */}
+      {/* <TouchableOpacity style={styles.btn} 
       onPress={()=>setshowworkspacemodal(true)}
-      >
+      > */}
             {/* <Text style={styles.text}>+</Text> */}
-            <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white}/>
-          </TouchableOpacity>
+            {/* <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white}/> */}
+          {/* </TouchableOpacity> */}
           <WorkspaceModal
           visible={workspacemodal}
           user={user}
@@ -379,6 +332,13 @@ const MyDrive = () => {
             onClose={()=>setactionModal(false)}
             user={user}
             item={selectedItem}/>
+            <ShortingModal
+            isVisible={showDrodown} 
+            onClose={()=>setshowdropdown(false)}
+            onApply={handleSortApply}
+            sortingOptions={sortByOptions}
+            initialSorting={sortingInfo}
+/>
     </View>
     </SafeAreaView>
   );
@@ -409,7 +369,8 @@ const styles = StyleSheet.create({
   currentFolderText: {
     padding: 10,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color:COLORS.black
   },
   item: {
     flexDirection: 'row',

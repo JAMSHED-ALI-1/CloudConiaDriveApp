@@ -18,6 +18,7 @@ import imageIcon from '../../assets/icon/image.png';
 import ProgressBar from '../../constants/Userinfo';
 import ActionModal from '../../Modaals/ActionModal';
 import strings from '../../helper/Language/LocalizedStrings';
+import getItemIcon from '../../constants/GetItemIcon';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Stared = () => {
@@ -25,7 +26,7 @@ const Stared = () => {
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
-  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Root' }]);
+  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Stared' }]);
   const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,50 +111,7 @@ const Stared = () => {
     });
   }, [allData]);
 
-  // const handleItemPress = useCallback((item) => {
-  //   if (item.type === 'folder') {
-  //     setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
-  //   } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
-  //     // Navigate to ImageViewer if the item is an image
-  //     navigation.navigate('ImageViewer',{
-  //       filePath: item,
-  //       user: user,
-  //     });
-      
-  //   } 
-  //   else if (item.type === 'pdf') {
-  //     // Navigate to ImageViewer if the item is an image
-  //     navigation.navigate('PdfView',{
-  //       filePath: item,
-  //       user: user,
-  //     });
-      
-  //   } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)){
-  //     navigation.navigate('VideoPreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)){
-  //     navigation.navigate('AudioPreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   }
-  //   else if (['doc', 'docx'].includes(item.extension)){
-  //     navigation.navigate('WordPreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   }
-  //   else if (['txt'].includes(item.extension)){
-  //     navigation.navigate('TextFilePreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   }else {
-  //     console.log('File clicked:',);
-  //   }
-  // }, [navigation, user, folderStack]);
+
   const handleItemPress = useCallback(async (item) => {
     if (item.type === 'folder') {
       try {
@@ -182,7 +140,7 @@ const Stared = () => {
   
         // Handle the successful response
         const data = response.data.data;
-        console.log('Fetched folder contents:', data);
+        // console.log('Fetched folder contents:', data);
         setAllData(data); // Update state with the new folder data
   
       } catch (error) {
@@ -237,84 +195,7 @@ const Stared = () => {
 
 
 
-  const getItemIcon = (item) => {
-    if (item.type === 'folder') return 'folder';
-  
-    // Extract file extension from the item name
-    const extension = item.name.split('.').pop().toLowerCase();
-  
-    switch (extension) {
-      // Images
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-      case 'bmp':
-      case 'tiff':
-      case 'webp':
-      case 'svg':
-        return 'image';
-  
-      // Documents
-      case 'doc':
-      case 'docx':
-        return 'wordpress'; // Consider using a different icon for Word documents
-      case 'pdf':
-        return 'picture-as-pdf';
-      case 'odt':
-      case 'rtf':
-      case 'txt':
-      case 'md':
-        return 'my-library-books';
-  
-      // Presentations
-      case 'ppt':
-      case 'pptx':
-      case 'odp':
-      case 'key':
-        return 'slideshow';
-  
-      // Spreadsheets
-      case 'xls':
-      case 'xlsx':
-      case 'ods':
-      case 'csv':
-        return 'table_chart';
-  
-      // Audio
-      case 'mp3':
-      case 'wav':
-      case 'flac':
-      case 'aac':
-      case 'ogg':
-        return 'audiotrack';
-  
-      // Video
-      case 'mp4':
-      case 'avi':
-      case 'mov':
-      case 'mkv':
-      case 'webm':
-        return 'videocam';
-  
-      // Archives
-      case 'zip':
-      case 'rar':
-      case 'tar':
-      case 'gz':
-        return 'archive';
-  
-      // Executables and Apps
-      case 'exe':
-      case 'app':
-      case 'apk':
-        return 'developer_mode';
-  
-      // Default
-      default:
-        return 'insert-drive-file';
-    }
-  };
+
 
   const renderItemList = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
@@ -360,15 +241,14 @@ const Stared = () => {
    
     <View style={styles.container}>
         <CustomHeader
-          back={true}
-          left={true}
+          
           right={true}
           grid={true}
           title={strings.STARED_FILES}
           ViewType={isGrid}  // Pass the view type state
           hadleGidList={handleGridListToggle}
         />
-         <View style={styles.inputContainer}>
+         {/* <View style={styles.inputContainer}>
             <TouchableOpacity>
               <Image source={require('../../assets/Search.png')} style={styles.leftImage} />
             </TouchableOpacity>
@@ -376,7 +256,7 @@ const Stared = () => {
             <TouchableOpacity>
               <Image source={require('../../assets/Filter.png')} style={styles.rightImage} />
             </TouchableOpacity>
-          </View>
+          </View> */}
 <View style={styles.folderContainer}>
   {FilderData.map(item => (
     <View key={item.id} style={styles.folderItem}>
@@ -394,28 +274,37 @@ const Stared = () => {
   ))}
 </View>
 
+<View style={{ borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+          <View>
       {folderStack.length > 1 && (
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Icon name="arrow-back" size={24} color={COLORS.black} />
           <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
       )}
-      <Text style={styles.currentFolderText}>{strings.CurrentFolder}: {folderStack[folderStack.length - 1].name}</Text>
+      <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text>
+      </View>
+      {/* <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
+        <Text style={styles.currentFolderText}>Sort</Text>
+        <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
+      </TouchableOpacity> */}
+      </View>
       {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
         <FlatList
-          data={organizedData}
-          renderItem={isGrid ?  renderItemGrid : renderItemList}
-          keyExtractor={item => item.id.toString()}
-          ListEmptyComponent={<View style={{flex:1,alignItems:'center'}}>
-          <Text style={styles.emptyText}>This folder is empty|| or API Problem From BackEnd Token Expired</Text>
-        </View>}
-            numColumns={isGrid ? 2 : 1}// Number of columns for grid or list view
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-          key={isGrid ? 'grid' : 'list'} // Key to re-render FlatList on viewType change
-        />
+        data={organizedData}
+        renderItem={isGrid ?   renderItemList: renderItemGrid}
+        keyExtractor={item => item.id.toString()}
+        ListEmptyComponent={<View style={{flex:1,alignItems:'center'}}>
+        <Text style={styles.emptyText}>This folder is empty|| or API Problem From BackEnd Token Expired</Text>
+      </View>}
+          numColumns={isGrid ? 1 : 2}// Number of columns for grid or list view
+        onRefresh={onRefresh}
+        refreshing={refreshing}
+        key={isGrid ?  'list':'grid' } // Key to re-render FlatList on viewType change
+      />
        
       )}
       <ActionModal 
@@ -453,6 +342,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 18,
     fontWeight: 'bold',
+    color:COLORS.black
   },
   item: {
     flexDirection: 'row',

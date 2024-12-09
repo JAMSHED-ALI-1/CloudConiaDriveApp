@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, FlatList, Image, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, FlatList, Image, SafeAreaView, ScrollView } from 'react-native';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { COLORS } from '../../utils/Colors';
 import { useSelector } from 'react-redux';
@@ -16,6 +16,9 @@ import ActionModal from '../../Modaals/ActionModal';
 import { useNavigation } from '@react-navigation/native';
 import ProgressBar from '../../components/ProgressBar';
 import strings from '../../helper/Language/LocalizedStrings';
+import { makeApiCall } from '../../helper/apiHelper';
+import getItemIcon from '../../constants/GetItemIcon';
+import ShortingModal from '../../Modaals/ShortingModal';
 
 const Home = () => {
   const user = useSelector((state) => state.auth.user);
@@ -31,7 +34,20 @@ const Home = () => {
   const [actionModal,setactionModal]=useState(false)
   const currentFolderId = folderStack[folderStack.length - 1].id;
   const [selectedItem, setSelectedItem] = useState(null);
+  const [showDrodown,setshowdropdown]=useState(false)
+  const [sortingInfo, setSortingInfo] = useState({
+    sortBy: 'updated_at',
+    sortDir: 'desc',        
+  });
+  
   const navigation=useNavigation()
+
+  const sortByOptions = [
+    { key: 'Size', value: 'file_size' },
+    { key: 'Name', value: 'name' },
+    { key: 'Last modified', value: 'updated_at' },
+    { key: 'Upload date', value: 'created_at' },
+  ];
   // console.log('---',workspaces)
   const fetchData = useCallback(async () => {
     try {
@@ -48,24 +64,29 @@ const Home = () => {
           recentOnly: false,
           sharedOnly: false,
           per_page: 100,
-          orderBy: 'updated_at',
-          orderDir: 'desc',
+          orderBy: sortingInfo.sortBy,
+          orderDir: sortingInfo.sortDir,
         },
       });
       setAllData(response.data.data);
       console.log(response.status)
-      if(response.status===403){
-        navigation.replace('Login')
-      }
+      // if(response.status===403){
+      //   navigation.replace('Login')
+      // }
     } catch (error) {
       console.log('Got Error', error);
-      if (error.response && error.response.status === 403) {
-        navigation.replace('Login') // Redirect to login page
-      }
+      // if (error.response && error.response.status === 403) {
+      //   navigation.replace('Login') // Redirect to login page
+      // }
     } finally {
       setIsLoading(false);
     }
   }, [user, currentFolderId,workspaces]);
+  const handleSortApply = ({ sortBy, sortDir }) => {
+    setSortingInfo({ sortBy, sortDir }); // Update the state
+    fetchData( sortBy, sortDir); // Fetch data with new sort options
+    console.log('Sort applied:', sortBy, sortDir);
+  };
 
   useEffect(() => {
     fetchData();
@@ -171,103 +192,6 @@ const Home = () => {
 
 
 
-  // const getItemIcon = (item) => {
-  //   if (item.type === 'folder') return 'folder';
-  //   switch (item.mime) {
-  //     case 'image/jpeg':
-  //     case 'image/png':
-  //     case 'image/gif':
-  //       return 'image';
-  //     case 'video/mp4':
-  //       return 'videocam';
-  //     case 'application/pdf':
-  //       return 'picture-as-pdf';
-  //     case 'text/plain':
-  //       return 'description';
-  //     default:
-  //       return 'insert-drive-file';
-  //   }
-  // };
-  const getItemIcon = (item) => {
-    if (item.type === 'folder') return 'folder';
-  
-    // Extract file extension from the item name
-    const extension = item.name.split('.').pop().toLowerCase();
-  
-    switch (extension) {
-      // Images
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-      case 'bmp':
-      case 'tiff':
-      case 'webp':
-      case 'svg':
-        return 'image';
-  
-      // Documents
-      case 'doc':
-      case 'docx':
-        return 'wordpress'; // Consider using a different icon for Word documents
-      case 'pdf':
-        return 'picture-as-pdf';
-      case 'odt':
-      case 'rtf':
-      case 'txt':
-      case 'md':
-        return 'my-library-books';
-  
-      // Presentations
-      case 'ppt':
-      case 'pptx':
-      case 'odp':
-      case 'key':
-        return 'slideshow';
-  
-      // Spreadsheets
-      case 'xls':
-      case 'xlsx':
-      case 'ods':
-      case 'csv':
-        return 'table_chart';
-  
-      // Audio
-      case 'mp3':
-      case 'wav':
-      case 'flac':
-      case 'aac':
-      case 'ogg':
-        return 'audiotrack';
-  
-      // Video
-      case 'mp4':
-      case 'avi':
-      case 'mov':
-      case 'mkv':
-      case 'webm':
-        return 'videocam';
-  
-      // Archives
-      case 'zip':
-      case 'rar':
-      case 'tar':
-      case 'gz':
-        return 'archive';
-  
-      // Executables and Apps
-      case 'exe':
-      case 'app':
-      case 'apk':
-        return 'developer_mode';
-  
-      // Default
-      default:
-        return 'insert-drive-file';
-    }
-  };
-  
-
   const renderItemList = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
  
@@ -312,9 +236,12 @@ const Home = () => {
   
     <View style={styles.container}>
       <HomeHeader user={user} handleIconPress={() => setshowmodalAi(true)} />
+       
+
+      <ProgressBar/>
       <View style={styles.statusContainer}>
           {/* <StorageStatus user={user} usertoken={user?.access_token} /> */}
-          <ProgressBar/>
+          {/* <ProgressBar/> */}
         </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between',paddingVertical:8 }}>
         <Text style={styles.heading}>{strings.RECENTLY_EDITED}</Text>
@@ -327,13 +254,22 @@ const Home = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <View style={{ borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+          <View>
       {folderStack.length > 1 && (
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Icon name="arrow-back" size={24} color={COLORS.black} />
-          <Text style={styles.backButtonText}>{strings.Backto}{folderStack[folderStack.length - 2].name}</Text>
+          <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
       )}
-      <Text style={styles.currentFolderText}>{strings.CurrentFolder}: {folderStack[folderStack.length - 1].name}</Text>
+      <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text>
+      </View>
+      <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
+        <Text style={styles.currentFolderText}>Sort</Text>
+        <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
+      </TouchableOpacity>
+      </View>
       {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
@@ -366,6 +302,13 @@ const Home = () => {
             onClose={()=>setactionModal(false)}
             user={user}
             item={selectedItem}/>
+             <ShortingModal
+            isVisible={showDrodown} 
+            onClose={()=>setshowdropdown(false)}
+            onApply={handleSortApply}
+            sortingOptions={sortByOptions}
+            initialSorting={sortingInfo}
+/>
     </View>
     </SafeAreaView>
   );
@@ -391,15 +334,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   backButtonText: {
-    // marginLeft: 10,
+     marginLeft: 10,
     color: COLORS.primary,
     fontSize: 16,
   },
   currentFolderText: {
     //  paddingHorizontal: 10,
-    fontSize: 16,
-    // fontWeight: 'bold',
-    color:COLORS.boldText
+    fontSize: 18,
+    fontWeight: '600',
+    color:COLORS.black
   },
   item: {
     flexDirection: 'row',

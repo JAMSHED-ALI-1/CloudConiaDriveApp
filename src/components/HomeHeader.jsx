@@ -26,9 +26,9 @@ const HomeHeader = ({ user, handleIconPress }) => {
         <TouchableOpacity style={styles.iconButton} onPress={handleIconPress}>
           <Image source={require('../assets/ConiaSoft_AI_Icon.png')} style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton} onPress={()=>navigation.navigate('Notification')}>
+        {/* <TouchableOpacity style={styles.iconButton} onPress={()=>navigation.navigate('Notification')}>
           <Image source={require('../assets/noti.png')} style={styles.icon} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

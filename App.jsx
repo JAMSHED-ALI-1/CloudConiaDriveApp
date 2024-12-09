@@ -1,18 +1,27 @@
-import { StatusBar, StyleSheet, View } from 'react-native';
-import React from 'react';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
 import StackNavigation from './src/navigation/StackNavigation';
 import FlashMessage from "react-native-flash-message";
+import { useSelector } from 'react-redux';
+import { APIServiceProvider } from './src/context/APIServiceContext';
+import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const App = () => {
+  const user = useSelector((state) => state.auth.user);
+  console.log('apna user',user)
+ 
   return (
     <>
-      <StatusBar 
-        barStyle="light-content"  
-        backgroundColor="#0071BC" 
-      />
-      <View style={styles.container}>
-        <StackNavigation />
-        <FlashMessage position="top" />
-      </View>
+    
+    <NavigationContainer> 
+      <APIServiceProvider>
+        <StatusBar barStyle="light-content" backgroundColor="#0071BC" />
+        <View style={styles.container}>
+          <StackNavigation />
+          <FlashMessage position="top" />
+        </View>
+      </APIServiceProvider>
+    </NavigationContainer>
     </>
   );
 };

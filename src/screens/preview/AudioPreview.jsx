@@ -1,51 +1,103 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   StyleSheet,
   View,
-  ActivityIndicator,
   Text,
   TouchableOpacity,
-  // Slider,
   Alert,
-  Platform
+  Platform,
+  SafeAreaView,
 } from 'react-native';
-import { makeApiCall } from '../../helper/apiHelper';
-import { AppSettings } from '../../utils/Settings';
 import Sound from 'react-native-sound';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+
 import CustomHeader from '../../components/CustomHeader';
+import { baseURL } from '../../utils/constant/settings';
+import { AppSettings } from '../../utils/Settings';
+
 const AudioPreview = ({ route, navigation }) => {
   const { user, filePath } = route.params;
   const accesstoken = user?.access_token;
   const audioId = filePath?.id;
 
-  const [previewToken, setPreviewToken] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [audioUrl, setAudioUrl] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [previewToken, setPreviewToken] = useState('');
   const [sound, setSound] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  const workspaces = useSelector(state => state.workspace.workspace);
   const progressInterval = useRef(null);
 
+  // Fetch preview token
   useEffect(() => {
-    // Initialize Sound
-    Sound.setCategory('Playback');
-    
-    return () => {
-      if (sound) {
-        sound.release();
-      }
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current);
+    const fetchPreviewToken = async () => {
+      if (!accesstoken || !audioId) return;
+
+      try {
+        setLoading(true);
+        const response = await axios.post(
+          `${baseURL}/file-entries/${audioId}/add-preview-token`, 
+          {}, 
+          {
+            headers: {
+              Authorization: `Bearer ${accesstoken}`,
+              'Content-Type': 'application/json',
+            },
+            params: {
+              workspaceId: workspaces || 0,
+            }
+          }
+        );
+        
+        setPreviewToken(response.data.preview_token);
+      } catch (error) {
+        console.error('Error fetching preview token:', error);
+        setError('Failed to load preview token');
+        Alert.alert(
+          'Error',
+          'Failed to load the audio. Please try again later.'
+        );
+      } finally {
+        setLoading(false);
       }
     };
-  }, []);
 
-  const showFormatError = () => {
+    fetchPreviewToken();
+  }, [accesstoken, audioId, workspaces]);
+
+  // Initialize audio when preview token is available
+  useEffect(() => {
+    if (!previewToken) return;
+
+    const audioUrl = `${AppSettings.base_url}${filePath.url}?preview_token=${previewToken}`;
+    
+    const newSound = new Sound(audioUrl, null, (error) => {
+      if (error) {
+        console.error('Error loading sound:', error);
+        showFormatError();
+        return;
+      }
+
+      setSound(newSound);
+      setDuration(newSound.getDuration());
+    });
+
+    // Cleanup function
+    return () => {
+      if (newSound) {
+        newSound.release();
+      }
+    };
+  }, [previewToken, filePath]);
+
+  // Show format error alert
+  const showFormatError = useCallback(() => {
     Alert.alert(
       'Unsupported Format',
       'This audio format is not supported for preview. Please try downloading the file instead.',
@@ -56,69 +108,10 @@ const AudioPreview = ({ route, navigation }) => {
         }
       ]
     );
-  };
+  }, [navigation]);
 
-  useEffect(() => {
-    const fetchPreviewToken = async () => {
-      if (!accesstoken || !audioId) {
-        setError('Invalid audio credentials');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const response = await makeApiCall(
-          `/api/v1/file-entries/${audioId}/add-preview-token`,
-          accesstoken,
-          'post'
-        );
-
-        if (!response?.preview_token) {
-          throw new Error('Preview token not received');
-        }
-
-        setPreviewToken(response.preview_token);
-      } catch (error) {
-        console.error('Error fetching preview token:', error);
-        setError('Failed to load preview token');
-        showFormatError();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPreviewToken();
-  }, [accesstoken, audioId]);
-
-  useEffect(() => {
-    if (previewToken && filePath?.url) {
-      try {
-        const audioUri = `${AppSettings.base_url}${filePath.url}?preview_token=${previewToken}`;
-        setAudioUrl(audioUri);
-        initializeAudio(audioUri);
-      } catch (error) {
-        console.error('Error setting audio URL:', error);
-        showFormatError();
-      }
-    }
-  }, [previewToken, filePath]);
-
-  const initializeAudio = (uri) => {
-    const newSound = new Sound(uri, null, (error) => {
-      if (error) {
-        console.error('Error loading sound:', error);
-        showFormatError();
-        return;
-      }
-
-      setSound(newSound);
-      setDuration(newSound.getDuration());
-      setLoading(false);
-    });
-  };
-
-  const startProgressTracking = () => {
+  // Progress tracking
+  const startProgressTracking = useCallback(() => {
     progressInterval.current = setInterval(() => {
       if (sound) {
         sound.getCurrentTime((seconds) => {
@@ -126,15 +119,16 @@ const AudioPreview = ({ route, navigation }) => {
         });
       }
     }, 100);
-  };
+  }, [sound]);
 
-  const stopProgressTracking = () => {
+  const stopProgressTracking = useCallback(() => {
     if (progressInterval.current) {
       clearInterval(progressInterval.current);
     }
-  };
+  }, []);
 
-  const togglePlayPause = () => {
+  // Play/Pause toggle
+  const togglePlayPause = useCallback(() => {
     if (!sound) return;
 
     if (isPlaying) {
@@ -153,49 +147,57 @@ const AudioPreview = ({ route, navigation }) => {
       setIsPlaying(true);
       startProgressTracking();
     }
-  };
+  }, [sound, isPlaying, startProgressTracking, stopProgressTracking]);
 
-  const onSliderChange = (value) => {
+  // Slider change handler
+  const onSliderChange = useCallback((value) => {
     if (sound) {
       sound.setCurrentTime(value);
       setCurrentTime(value);
     }
-  };
+  }, [sound]);
 
+  // Time formatting utility
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
-    seconds = Math.floor(seconds % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
-  const renderLoader = () => (
-    <View style={styles.loaderContainer}>
-      <ActivityIndicator size="large" color="#0000ff" />
-    </View>
-  );
-
+  // Loading state
   if (loading) {
-    return renderLoader();
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
+  // Error state
   if (error) {
     return (
-      <View style={styles.errorContainer}>
+      <View style={styles.container}>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
 
   return (
+    <SafeAreaView style={{flex:1}}>
+
+    
     <View style={styles.container}>
+      {/* Custom Header */}
+      <CustomHeader 
+        back={true} 
+        left={true} 
+        OnPress={() => navigation.goBack()} 
+        title={'Audio Play'} 
+      />
+
       {/* Audio Visualization */}
-      <CustomHeader back={true} left={true} OnPress={() => navigation.goBack()}  title={'Audio Play'}/>
       <View style={styles.visualizerContainer}>
-        <Icon 
-          name="audiotrack" 
-          size={100} 
-          color="#4A90E2"
-        />
+        <Icon name="audiotrack" size={100} color="#4A90E2" />
       </View>
 
       {/* Controls */}
@@ -224,7 +226,7 @@ const AudioPreview = ({ route, navigation }) => {
             <Icon 
               name={isPlaying ? 'pause' : 'play-arrow'} 
               size={40} 
-              color="#4A90E2"
+              color="#4A90E2" 
             />
           </TouchableOpacity>
         </View>
@@ -235,6 +237,7 @@ const AudioPreview = ({ route, navigation }) => {
         <Text style={styles.fileName}>{filePath?.name || 'Audio File'}</Text>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -243,22 +246,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     padding: 20,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    fontSize: 16,
   },
   visualizerContainer: {
     flex: 1,
@@ -300,7 +287,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     textAlign: 'center',
-  }
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
 
 export default AudioPreview;

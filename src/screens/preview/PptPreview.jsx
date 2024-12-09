@@ -15,13 +15,16 @@ import { AppSettings } from '../../utils/Settings';
 import { useNavigation } from '@react-navigation/native';
 import CustomHeader from '../../components/CustomHeader';
 import { COLORS } from '../../utils/Colors';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { baseURL } from '../../utils/constant/settings';
 
 const PptPreview = ({ route }) => {
   const navigation = useNavigation();
   const { user, filePath } = route.params;
   const accesstoken = user?.access_token;
   const pdfId = filePath.id;
-
+  const workspaces = useSelector(state => state.workspace.workspace);
   const [previewToken, setPreviewToken] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,17 +33,21 @@ const PptPreview = ({ route }) => {
     const fetchPreviewToken = async () => {
       try {
         setLoading(true);
-        const response = await makeApiCall(
-          `/api/v1/file-entries/${pdfId}/add-preview-token`,
-          accesstoken,
-          'post'
+        const response = await axios.post(
+          `${baseURL}/file-entries/${pdfId}/add-preview-token`, 
+          {}, 
+          {
+            headers: {
+              Authorization: `Bearer ${accesstoken}`,
+              'Content-Type': 'application/json',
+            },
+            params:{
+              workspaceId: workspaces?workspaces:0,
+            }
+          }
         );
-        
-        if (!response?.preview_token) {
-          throw new Error('Preview token not received');
-        }
-        
-        setPreviewToken(response.preview_token);
+        // console.log(response.data)
+        setPreviewToken(response.data.preview_token);
       } catch (error) {
         console.error('Error fetching preview token:', error);
         setError('Failed to load preview token');

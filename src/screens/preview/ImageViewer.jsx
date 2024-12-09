@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet,Text ,ActivityIndicator } from 'react-native';
+import { View, Image, StyleSheet,Text ,ActivityIndicator, SafeAreaView } from 'react-native';
 import { AppSettings } from '../../utils/Settings';
 import { makeApiCall } from '../../helper/apiHelper';
 
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import CustomHeader from '../../components/CustomHeader';
+import { baseURL } from '../../utils/constant/settings';
 
 const ImageViewer = ({ route,navigation }) => {
   const { filePath, user, } = route.params;
   const accessToken = user?.access_token;
   const imageId = filePath?.id;
-  
+  const workspaces = useSelector(state => state.workspace.workspace);
   const [imageSource, setImageSource] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,9 +26,10 @@ const ImageViewer = ({ route,navigation }) => {
 
     const loadImage = async () => {
       try {
-        const previewUrl = `https://drive.coniacloud.com/api/v1/file-entries/${imageId}?workspaceId=0&thumbnail=true`;
+        const previewUrl = `${baseURL}/file-entries/${imageId}?workspaceId=${workspaces}&thumbnail=true`;
         
         // Create image source with authorization header
+        // console.log(previewUrl)
         setImageSource({
           uri: previewUrl,
           headers: {
@@ -41,7 +43,7 @@ const ImageViewer = ({ route,navigation }) => {
             'Authorization': `Bearer ${accessToken}`
           }
         });
-        
+       
         if (!response.ok) {
           throw new Error(`Failed to load image: ${response.status}`);
         }
@@ -65,6 +67,9 @@ const ImageViewer = ({ route,navigation }) => {
   }
 
   return (
+    <SafeAreaView style={{flex:1}}>
+
+ 
     <View style={styles.container}>
      
 
@@ -75,8 +80,10 @@ const ImageViewer = ({ route,navigation }) => {
           <ActivityIndicator size="large" color="#0000ff" />
           <Text style={styles.loadingText}>Loading image...</Text>
         </View>
-      ) : imageSource ? (
+      ) : 
+      !!imageSource ? (
         <Image
+        
           source={imageSource}
           style={styles.image}
           resizeMode="contain"
@@ -91,6 +98,7 @@ const ImageViewer = ({ route,navigation }) => {
         </View>
       )}
     </View>
+    </SafeAreaView>
   );
 };
 

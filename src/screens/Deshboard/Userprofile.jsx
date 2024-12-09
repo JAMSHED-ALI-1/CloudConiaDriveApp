@@ -1,17 +1,18 @@
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View, Image, Alert,ActivityIndicator, ScrollView, SafeAreaView } from 'react-native';
 import React, { useState, useCallback,useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import * as Progress from 'react-native-progress';
 import axios from 'axios';
 import { persistor } from '../../redux/store';
-import { logoutAsync,clearState } from '../../redux/reducers/authSlice';
+import { logoutAsync,clearState, logout } from '../../redux/reducers/authSlice';
 import { COLORS } from '../../utils/Colors';
 import CustomHeader from '../../components/CustomHeader';
 import strings from '../../helper/Language/LocalizedStrings';
 import { baseURL } from '../../utils/constant/settings';
 import Test from '../../../Test';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = '' }) => {
   const [isVisible,setVisible]=useState(false)
   const language = useSelector((state) => state.language.language);
@@ -50,13 +51,16 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
       
       setStorageInfo({ used: usedGB, available: availableGB, percentage });
       if(response.status===403){
-        navigation.replace('Login')
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+          })
+        );
       }
     } catch (error) {
       console.error('Storage fetch error:', error);
-      if (error.response && error.response.status === 403) {
-        navigation.navigate('Login'); 
-      }
+      
     } finally {
       setLoading(false);
     }
@@ -69,60 +73,36 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   }, [fetchStorageData, user]);
 
 
-  const handleLogoutError = useCallback(async (error) => {
-    console.error('Logout error:', error);
-    
-    // Show error message to user
-    Alert.alert(
-      'Logout Error',
-      'There was a problem logging out. You will be redirected to the login screen.',
-      [{ text: 'OK' }]
-    );
 
-    // Clean up regardless of error
-    try {
-      await dispatch(clearState());
-      await persistor.purge();
-    } catch (cleanupError) {
-      console.error('Cleanup error:', cleanupError);
-    }
-    
-    navigation.replace('Login');
-  }, [dispatch, navigation]);
-
-  const logoutHandler = useCallback(async () => {
-    if (loggingOut) return;
-
+  const logoutHandler = async () => {
     setLoggingOut(true);
     try {
-      console.log('Starting logout process...');
-
-      // Check authentication status
-      if (!user?.access_token) {
-        console.log('No active session found');
-        throw new Error('No active session');
-      }
-
-      // Attempt to logout
-      await dispatch(logoutAsync()).unwrap();
-      console.log('Logout API call successful');
-
-      // Clear local state
-      await dispatch(clearState());
-      console.log('Redux state cleared');
-
-      // Clear persistent storage
-      await persistor.purge();
-      console.log('Persistent storage cleared');
-
-      // Navigate to login
-      navigation.replace('Login');
+      // 1. Dispatch logout actions first
+      // dispatch(logout());
+      // dispatch(logoutAsync());
+      // dispatch(clearState());
+  
+      // 2. Clear AsyncStorage
+      await AsyncStorage.removeItem('user');
+  
+      // 3. Purge persisted store
+      // await persistor.purge();
+  
+      // 4. Reset navigation
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        })
+      );
     } catch (error) {
-      await handleLogoutError(error);
+      console.error('Logout Error:', error);
+      Alert.alert('Logout Failed', 'Please try again.');
     } finally {
       setLoggingOut(false);
     }
-  }, [dispatch, navigation, user, loggingOut, handleLogoutError]);
+  };
+  
  
   const LoadingView = () => (
     <View style={styles.container}>
@@ -192,7 +172,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   const navigationData = [
     { id: 1, ImagePath: require('../../assets/icon/fi_user-check.png'), text: strings.ACCOUNT_INFORMATION, navigate: "EditProfile" },
     { id: 2, ImagePath: require('../../assets/icon/Lock.png'), text: strings.CHANGE_PASSWORD, navigate: "UpdatePassword" },
-    { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, navigate: "ChoseLanguage" },
+    //  { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, navigate: "ChoseLanguage" },
   ];
 
   const renderNavigationItem = ({ id, ImagePath, text, navigate }) => (
@@ -214,7 +194,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   return (
    <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}> 
      <View style={styles.container}>
-      <CustomHeader back={true} left={true} title={strings.User} />
+      <CustomHeader title={strings.User} />
       <ScrollView showsVerticalScrollIndicator={false}>
 
       
@@ -222,7 +202,8 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
 
      
   <TouchableOpacity style={styles.upgrade}
-            onPress={()=>navigation.navigate('UpgradeScreen')}>
+            // onPress={()=>navigation.navigate('UpgradeScreen')}>
+            onPress={()=>navigation.navigate('Pricelist')}>
               <Text style={{padding:'5%',fontSize:16,color:COLORS.white}}>
                 {strings.UpgradeStorageSpace}
               </Text>
@@ -288,7 +269,7 @@ const styles = StyleSheet.create({
   profileContainer: {
  
     gap: 25,
-    marginTop: 20,
+    marginTop: 10,
     padding: 15,
     backgroundColor: COLORS.white,
     borderRadius: 10,

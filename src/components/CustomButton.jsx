@@ -7,10 +7,11 @@ const CustomButton = ({
   onPress,
   isLoading, // Pass isLoading as a prop
   disabled,  // Keep the disabled prop
+  backgroundColor,
 }) => {
   return (
     <SafeAreaView>
-      <TouchableOpacity onPress={onPress} disabled={disabled || isLoading}>
+      <TouchableOpacity onPress={onPress} disabled={disabled || isLoading} >
         <View style={[styles.mainContainer, disabled && styles.disabledContainer]}>
           {/* Show ActivityIndicator when loading, otherwise show the button title */}
           {isLoading ? (
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
       ios: 30,
       android: 30,
     }),
-    paddingVertical: 15,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },

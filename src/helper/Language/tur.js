@@ -49,10 +49,29 @@ export default {
     UPLOAD_DOC: "Belge Yükle",
     UPLOAD_FILE: "Dosya Yükle",
     TRASH_FILE:'Çöp Dosyası',
-    ACCOUNT_DETAILS :"Şifre Güncelle",
+    ACCOUNT_SETTINGS: "Account settings ",
     UPDATE_PASSWORD:"Passwort aktualisieren",
     UpgradeStorageSpace:'Depolama Alanını Yükseltme',
     Backto:'Geri dön',
-    CurrentFolder:'Geçerli Klasör'     
+    CurrentFolder:'Geçerli Klasör' ,
+
+
+
+
+
+    
+    PriceandfeaturListin$:'Price & feature List in $',
+  ConiaClouddrivebasic:'ConiaCloud Drive Basic',
+  STOREGESPACE25GB:'25 GB Depolama Alanı',
+  LICENCEINCLUDED:'Lisans Ücreti Dahildir ',
+  SHAREWITHULTIMATEDCONIAUSER:'Sınırsız ConiaCloud Kullanıcısıyla Paylaşım',
+  CONIACLUDFEATURES:'ConiaCloud Drive Özellikleri',
+  CONIAEXTRAMEMBER:'ConiaCloud Ekstra Üye Avantajları',
+  ACCESSTOCONIACLOUDEXPERTIES:'ConiaCloud Uzmanlığına Erişim',
+  FILEUPLADANDDOWNLOAD:'Dosya Yükleme Ve İndirme',
+  BASICFIELSYNCANDSHARING:'Temel Dosya Senkronizasyonu Ve Paylaşımı',
+  ACCESSFILESFROMANYDEVICE:'Dosyalara Herhangi Bir Cihazdan Erişim',
+  AUTOMATICBACKUP:'Otomatik Yedekleme',
+  FILEPREVIEFUNCTIONALITY:'Dosya Önizleme İşlevi',    
 };
 

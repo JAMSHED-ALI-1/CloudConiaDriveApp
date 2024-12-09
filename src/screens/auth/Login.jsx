@@ -59,7 +59,7 @@ const Login = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.loginMainContainer}
       >
-        <CustomHeader back={true} left={true} title={'Login'} />
+        <CustomHeader  title={'Login'} />
         <Text style={styles.title}>Welcome back!</Text>
         <Text style={styles.Description}>Let’s get to know each other, input personal details to begin</Text>
 
@@ -99,17 +99,20 @@ const Login = () => {
                 secure={true}
                 icon={require('../../assets/Lock.png')}
               />
-<TouchableOpacity 
+{/* <TouchableOpacity 
 onPress={()=>navigation.navigate('UpdatePassword')}
 // onPress={()=>navigation.navigate('BottomNavigation')}
 // onPress={()=>navigation.navigate('Test')}
 >
 
               <Text style={styles.forget} >Forget Password?</Text>
-</TouchableOpacity>
-<TouchableOpacity onPress={()=>navigation.navigate('PrivacyPolicy')}>
+</TouchableOpacity> */}
+<TouchableOpacity 
+// onPress={()=>navigation.navigate('PrivacyPolicy')}
+onPress={()=>navigation.navigate('Test')}
+>
   
-<Text style={styles.forget} >Term and conditions/Privacy Policy</Text>
+<Text style={styles.forget} >Privacy Policy?</Text>
 </TouchableOpacity>
 
               <CustomButton 
@@ -175,8 +178,8 @@ const styles = StyleSheet.create({
   },
 
   forget: {
-    color: COLORS.boldText,
-    fontSize: 14,
+    color: COLORS.blue,
+    fontSize: 16,
     textAlign: 'right',
     marginVertical: 10,
     paddingRight: 10,

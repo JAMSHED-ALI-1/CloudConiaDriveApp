@@ -26,35 +26,18 @@ import Notification from '../screens/settings/Notification';
 import { useSelector } from 'react-redux';
 import { selectIsLoggedIn } from '../redux/reducers/authSlice';
 import PrivacyPolicy from '../screens/settings/PrivacyPolicy';
+import Pricelist from '../screens/Price/Pricelist';
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   const isLoggedIn = useSelector(selectIsLoggedIn);
   const user = useSelector((state) => state.auth.user);
   const [isLoading, setIsLoading] = React.useState(true);
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        if (user?.access_token) {
-          // Add your token verification logic here
-          // If you're using JWT tokens, you can decode and check expiration
-          // For now, just logging the token
-          // console.log('Current token:', user.access_token);
-        }
-      } catch (error) {
-        console.error('Token verification failed:', error);
-      } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1500);
-      }
-    };
+  
 
-    checkAuth();
-  }, [user]);
   return (
-    <NavigationContainer>
+    <>
     {/* <Stack.Navigator initialRouteName='Test'> */}
-    <Stack.Navigator initialRouteName={isLoggedIn ? "BottomNavigation":"MainSplesh"}>
+    <Stack.Navigator initialRouteName={"MainSplesh"}>
       {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
       <Stack.Screen name="Splesh" component={Splesh}  options={{headerShown:false}}/>
       <Stack.Screen name="MainSplesh" component={MainSplesh}  options={{headerShown:false}}/>
@@ -88,13 +71,14 @@ const StackNavigation = () => {
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy}  options={{headerShown:false}}/>
 
 
-
+{/* Price      */}
+<Stack.Screen name="UpgradeScreen" component={UpgradeScreen}  options={{headerShown:false}}/>
+<Stack.Screen name="Pricelist" component={Pricelist}  options={{headerShown:false}}/>
 {/* Testing Purpose */}
 <Stack.Screen name="Test" component={Test}  options={{headerShown:false}}/>
-<Stack.Screen name="UpgradeScreen" component={UpgradeScreen}  options={{headerShown:false}}/>
 
     </Stack.Navigator>
-  </NavigationContainer>
+</>
   )
 }
 

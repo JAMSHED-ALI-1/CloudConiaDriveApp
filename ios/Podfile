@@ -23,6 +23,7 @@ target 'ConiaCloudDrive' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 pod 'RNSound', :path => '../node_modules/react-native-sound'
+
   target 'ConiaCloudDriveTests' do
     inherit! :complete
     # Pods for testing

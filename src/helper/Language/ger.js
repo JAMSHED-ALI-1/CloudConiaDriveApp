@@ -36,9 +36,26 @@ export default {
     UPLOAD_DOC: "Dokument hochladen",
     UPLOAD_FILE: "Datei hochladen",
     TRASH_FILE:'Papierkorb-Datei',
-    ACCOUNT_DETAILS :"Kontodetails",
+    ACCOUNT_SETTINGS: "Account settings ",
     UPDATE_PASSWORD:"Passwort aktualisieren",
     UpgradeStorageSpace:'Erweitern Sie den Speicherplatz',
     Backto:'Zurück zu',
-    CurrentFolder:'Aktueller Ordner'    
+    CurrentFolder:'Aktueller Ordner',
+
+
+
+
+    PriceandfeaturListin$:'Price & feature List in $',
+  ConiaClouddrivebasic:'ConiaCloud Drive Basic',
+  STOREGESPACE25GB:'Storage Space: 25GB',
+  LICENCEINCLUDED:'License Fee Included',
+  SHAREWITHULTIMATEDCONIAUSER:'Share With Unlimited ConiaCloud Users',
+  CONIACLUDFEATURES:'ConiaCloud Features',
+  CONIAEXTRAMEMBER:'ConiaCloud Extra Member Benefits',
+  ACCESSTOCONIACLOUDEXPERTIES:'Access To ConiaCloud Expertise',
+  FILEUPLADANDDOWNLOAD:'File Upload And Download',
+  BASICFIELSYNCANDSHARING:'Basic File Syncing And Sharing',
+  ACCESSFILESFROMANYDEVICE:'Access Files From Any Device',
+  AUTOMATICBACKUP:'Automatic Backup',
+  FILEPREVIEFUNCTIONALITY:'File Preview Functionality',    
 };

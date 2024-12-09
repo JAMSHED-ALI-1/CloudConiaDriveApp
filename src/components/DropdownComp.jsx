@@ -18,7 +18,7 @@ import React, { useState } from 'react';
       if (value || isFocus) {
         return (
           <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-            Dropdown label
+            access
           </Text>
         );
       }
@@ -39,7 +39,7 @@ import React, { useState } from 'react';
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder={!isFocus ? 'Select item' : '...'}
+          placeholder={!isFocus ? 'Can View' : '...'}
           searchPlaceholder="Search..."
           value={value}
           onFocus={() => setIsFocus(true)}
@@ -66,10 +66,10 @@ import React, { useState } from 'react';
   const styles = StyleSheet.create({
     container: {
       backgroundColor: 'white',
-      padding: 16,
+      // padding: 16,
     },
     dropdown: {
-      height: 50,
+      height: 40,
       borderColor: 'gray',
       borderWidth: 0.5,
       borderRadius: 8,

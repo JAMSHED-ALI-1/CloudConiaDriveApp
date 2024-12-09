@@ -35,6 +35,7 @@ const EditProfile = () => {
   const loading = useSelector((state) => state.auth.loading);
   const error = useSelector((state) => state.auth.error);
   const { user } = useSelector((state) => state.auth);
+  console.log(user)
   const [err , setErr] = useState('')
 
   useEffect(() => {
@@ -143,7 +144,7 @@ const EditProfile = () => {
       <ScrollView style={styles.container}>
         <CustomHeader back={true} OnPress={()=>{
           navigation.goBack()
-        }} left={true} title={strings.ACCOUNT_DETAILS} />
+        }} left={true} title={strings.ACCOUNT_SETTINGS} />
         <View style={styles.inputContainer}>
           <Formik
             enableReinitialize
@@ -163,6 +164,7 @@ const EditProfile = () => {
               
             }) => (
               <View style={{ marginTop: 20,width:'100%'}}>
+                <Text style={styles.normaltext}>First Name</Text>
                 <InputBox
                   placeholder="First Name"
                   onChangeText={(e) => handleChanges('first_name', e)}
@@ -171,6 +173,7 @@ const EditProfile = () => {
                   touched={touched.first_name}
                   errors={err.first_name}
                 />
+                <Text style={styles.normaltext}>Last Name</Text>
                 <InputBox
                   placeholder="Last Name"
                   onChangeText={(e) => handleChanges('last_name', e)}
@@ -179,6 +182,7 @@ const EditProfile = () => {
                   touched={err.last_name}
                   errors={err.last_name}
                 />
+                  <Text style={styles.normaltext}>Email</Text>
                 <InputBox
                   placeholder="Email"
                   value={values.email}
@@ -186,6 +190,7 @@ const EditProfile = () => {
                   editable={false}
                   errors={err.email}
                 />
+                   <Text style={styles.normaltext}>Companey Name</Text>
                 <InputBox
                   placeholder="Company"
                   onChangeText={(e) => handleChanges('company', e)}
@@ -194,6 +199,7 @@ const EditProfile = () => {
                   touched={err.company}
                   errors={err.company}
                 />
+                <Text style={styles.normaltext}>Designation</Text>
                 <InputBox
                   placeholder="Designation"
                   onChangeText={(e) => handleChanges('designation', e)}
@@ -202,6 +208,7 @@ const EditProfile = () => {
                   touched={err.designation}
                   errors={err.designation}
                 />
+                <Text style={styles.normaltext}>Mobile Number</Text>
                 <InputBox
                   placeholder="Mobile"
                   onChangeText={(e) => handleChanges('mobile', e)}
@@ -258,5 +265,10 @@ const styles = StyleSheet.create({
     flex: 0.2,
     marginBottom: 20,
     justifyContent: 'flex-end'
+  },
+  normaltext:{
+    fontSize:14,
+    color:COLORS.black,
+    bottom:5
   }
 });

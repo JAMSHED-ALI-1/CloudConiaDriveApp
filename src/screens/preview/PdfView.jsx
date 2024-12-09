@@ -1,99 +1,192 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  Text,
   View,
-  Dimensions,
   ActivityIndicator,
+  Linking,
   Platform,
+  Alert,
+  SafeAreaView,
+  Text
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { AppSettings } from '../../utils/Settings';
-import { makeApiCall } from '../../helper/apiHelper';
+import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+
 import CustomHeader from '../../components/CustomHeader';
 import { COLORS } from '../../utils/Colors';
+import { AppSettings } from '../../utils/Settings';
+import { baseURL } from '../../utils/constant/settings';
+import { useSelector } from 'react-redux';
 
 const PdfView = ({ route }) => {
   const navigation = useNavigation();
-  const accesstoken = route.params?.user?.access_token;
-  const pdfId = route.params.filePath.id;
+  const workspaces = useSelector(state => state.workspace.workspace);
+  const { user, filePath } = route.params;
+  const accessToken = user?.access_token;
+  const pdfId = filePath.id;
+
   const [previewToken, setPreviewToken] = useState('');
-  const [pdfSource, setPdfSource] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchPreviewToken = async () => {
+
+    const fetchPreviewToken = useCallback(async () => {
       try {
-        const token = await makeApiCall(`/api/v1/file-entries/${pdfId}/add-preview-token`, accesstoken, 'post');
-        setPreviewToken(token?.preview_token);
+        setLoading(true);
+        const response = await axios.post(
+          `${baseURL}/file-entries/${pdfId}/add-preview-token`, 
+          {}, 
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+            params:{
+              workspaceId: workspaces?workspaces:0,
+            }
+          }
+        );
+        // console.log(response.data)
+        setPreviewToken(response.data.preview_token);
       } catch (error) {
-        console.log('Error fetching preview token:', error);
+        console.error('Error fetching preview token:', error);
+        setError('Failed to load preview token');
+        Alert.alert(
+          'Error',
+          'Failed to load the presentation. Please try again later.'
+        );
+      } finally {
+        setLoading(false);
       }
-    };
+    },[accessToken, pdfId, workspaces]);
 
-    fetchPreviewToken();
-  }, [accesstoken, pdfId]);
+    useEffect(() => {
+      if (accessToken && pdfId) {
+        fetchPreviewToken();
+      }
+    }, [fetchPreviewToken]);
 
-  useEffect(() => {
-    if (previewToken) {
-      const pdfUri = route.params.filePath.url; // Use the correct file path
-      const previewUrl = `${AppSettings.base_url}${pdfUri}?preview_token=${previewToken}`;
-      setPdfSource({ uri: previewUrl });
-    }
-  }, [previewToken, route.params.filePath.url]);
+  const getPreviewUrl = useCallback(() => {
+    if (!previewToken || !filePath?.url) return null;
+    
+    const baseUrl = `${AppSettings.base_url}${filePath.url}?preview_token=${previewToken}`;
+    
+    return Platform.OS === 'android'
+      ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(baseUrl)}`
+      : baseUrl;
+  } , [previewToken, filePath]);
 
-  const source = pdfSource
-    ? Platform.OS === 'android'
-      ? { uri: `https://docs.google.com/gview?embedded=true&url=${pdfSource.uri}` }
-      : { uri: pdfSource.uri }
-    : null;
+  const handleError = useCallback(() => {
+    Alert.alert(
+      'Error',
+      'Cannot display the presentation. Would you like to open it in browser?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Open in Browser',
+          onPress: () => {
+            const url = getPreviewUrl();
+            if (url) {
+              Linking.openURL(url).catch(err => 
+                console.error('Error opening URL:', err)
+              );
+            }
+          }
+        }
+      ]
+    );
+  }, [getPreviewUrl]);
+
+  const renderLoader = () => (
+    <View style={styles.loaderContainer}>
+      <ActivityIndicator 
+        size="large" 
+        color={COLORS.primaryColor || "#0000ff"} 
+      />
+    </View>
+  );
+
+  if (loading) {
+    return renderLoader();
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  const previewUrl = getPreviewUrl();
+  if (!previewUrl) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Invalid presentation URL</Text>
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.container}>
-   <View style={{paddingHorizontal:10 , justifyContent: 'center',
-    alignItems: 'center',}}>
-
-  
-      <CustomHeader back={true} left={true} OnPress={() => navigation.goBack()}  title={'PDF Viewer'}/>
-      <View style={styles.pdfView}>
-        {source ? (
-          <WebView
-            source={source}
-            style={styles.pdf}
-            startInLoadingState={true}
-            renderLoading={() => <ActivityIndicator size="large" color="#0000ff" />}
-          />
-        ) : (
-          <ActivityIndicator size="large" color="#0000ff" />
-        )}
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <CustomHeader 
+          back={true} 
+          left={true} 
+          OnPress={() => navigation.goBack()}  
+          title={'PDF Viewer'}
+        />
+        <WebView
+          source={{ uri: previewUrl }}
+          style={styles.webview}
+          startInLoadingState={true}
+          renderLoading={renderLoader}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          onError={handleError}
+          onHttpError={handleError}
+          originWhitelist={['*']}
+          allowsInlineMediaPlayback={true}
+        />
       </View>
     </SafeAreaView>
   );
 };
 
-export default PdfView;
-
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.backgroundColor,
+  },
   container: {
     flex: 1,
-    backgroundColor:COLORS.backgroundColor,
+    backgroundColor: COLORS.backgroundColor,
+    paddingHorizontal: 15,
+  },
+  webview: {
+    flex: 1,
+    // height:'100%'
+  },
+  loaderContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  header: {
-    fontSize: 24,
-    margin: 20,
-  },
-  pdfView: {
+  errorContainer: {
     flex: 1,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-  pdf: {
-    flex: 1,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
+
+export default PdfView;

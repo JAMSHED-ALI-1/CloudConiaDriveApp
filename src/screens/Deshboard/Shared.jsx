@@ -1,3 +1,4 @@
+
 import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, FlatList, Image, SafeAreaView ,Dimensions, TextInput} from 'react-native';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { COLORS } from '../../utils/Colors';
@@ -15,25 +16,37 @@ import play from '../../assets/icons/pdf.png';
 import video from '../../assets/icon/video.png';
 import wordIcon from '../../assets/icon/word.png';
 import imageIcon from '../../assets/icon/image.png';
-import ProgressBar from '../../constants/Userinfo';
+
 import ActionModal from '../../Modaals/ActionModal';
 import strings from '../../helper/Language/LocalizedStrings';
+import getItemIcon from '../../constants/GetItemIcon';
+import ProgressBar from '../../components/ProgressBar';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Shared = () => {
   const user = useSelector((state) => state.auth.user);
   const workspaces = useSelector(state => state.workspace.workspace);
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [driveData, setDriveData] = useState([]);
+  const [currentFolder, setCurrentFolder] = useState({
+    pageId: 'shares',
+    folderId: null,
+    folderDetails: null,
+    breadcrumbs: []
+  });
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
   const [folderStack, setFolderStack] = useState([{ id: null, name: 'Root' }]);
-  const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isGrid, setIsGrid] = useState(true);
   const [currentFilter, setCurrentFilter] = useState(null);
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [actionModal,setactionModal]=useState(false)
+  // To track folder navigation
+// const [currentFolderId, setCurrentFolderId] = useState(null); // To track the active folder ID
+
   const handleGridListToggle = () => {
     setIsGrid(!isGrid);
   };
@@ -52,116 +65,114 @@ const Shared = () => {
 
 
 
-  const currentFolderId = folderStack[folderStack.length - 1].id;
+  const currentFolderId = useMemo(() => 
+    folderStack[folderStack.length - 1].id, 
+    [folderStack]
+  );
 
-  const fetchData = useCallback(async (filter = null) => {
+
+  const fetchDriveData = useCallback(async (folderParams = {},filter = null) => {
     try {
       setIsLoading(true);
-    //     const response = await axios.get(`${baseURL}/drive/file-entries?timestamp=${new Date().getTime()}${pageId}&folderId=${folderId}&workspaceId==${workspaces}&orderBy=updated_at&orderDir=desc&page=1&sharedOnly=true`, {
-      const response = await axios.get(`${baseURL}/drive/file-entries?timestamp=${new Date().getTime()}`, {
+      const { 
+        pageId = 'shares',
+        
+        folderId = null, 
+        workspaceId = workspaces || 0 
+      } = folderParams;
+
+      const { data } = await axios.get(`${baseURL}/drive/file-entries`, {
         headers: { Authorization: `Bearer ${user?.access_token}` },
         params: {
-          pageId: search?search:0,
-          filters: filter,
-          folderId: currentFolderId, // Use the current folder ID to fetch folder contents
-          page: 1,
-          workspaceId: workspaces?workspaces:0,
-          deletedOnly: false,
-          starredOnly: false,
-          recentOnly: false,
-          sharedOnly: true,
-          per_page: 100,
+          pageId: search?search:pageId,
+          ...(folderId && { folderId }),
+          filters: {...filter},
+          workspaceId,
           orderBy: 'updated_at',
           orderDir: 'desc',
-        },
+          page: 1,
+          per_page: 100,
+          sharedOnly: pageId === 'shares'
+        }
       });
-      setAllData(response.data.data);
-      if(response.status===403){
-        navigation.replace('Login')
-      }
+      setDriveData(data.data);
     } catch (error) {
-      console.log('Got Error', error);
-      if (error.response && error.response.status === 403) {
-        navigation.replace('Login') // Redirect to login page
-      }
+      console.error('Drive Fetch Error:', error);
+      // if()
     } finally {
       setIsLoading(false);
     }
-  }, [user, currentFolderId, workspaces, search]);
+  }, [user, workspaces,search,, currentFolderId, ]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchDriveData({
+      pageId: currentFolder.pageId,
+      folderId: currentFolder.folderId,
+    });
+  }, [fetchDriveData, currentFolder.pageId, currentFolder.folderId]);
+
+  const handleFolderClick = (folder) => {
+    setCurrentFolder(prevState => ({
+      pageId: folder.hash, 
+      folderId: folder.hash,
+      folderDetails: folder,
+      breadcrumbs: [...prevState.breadcrumbs, folder]
+    }));
+  };
+
+
   const handleFilterSelection = (filter) => {
     setCurrentFilter(filter); // Update the current filter
-    fetchData(filter); // Fetch data based on the selected filter
+    fetchDriveData(filter); // Fetch data based on the selected filter
   };
   
   useEffect(() => {
-    fetchData();
-  }, [fetchData, currentFolderId, user]);
+    fetchDriveData();
+  }, [ currentFolderId, user,workspaces]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await fetchData();
+    await fetchDriveData();
     setRefreshing(false);
-  }, [fetchData]);
+  }, [fetchDriveData]);
+  const handleGoBack = () => {
+    setCurrentFolder(prevState => {
+      const newBreadcrumbs = prevState.breadcrumbs.slice(0, -1);
+      const parentFolder = newBreadcrumbs[newBreadcrumbs.length - 1];
 
-  const organizedData = useMemo(() => {
-    return allData.sort((a, b) => {
-      if (a.type === 'folder' && b.type !== 'folder') return -1;
-      if (a.type !== 'folder' && b.type === 'folder') return 1;
-      return a.name.localeCompare(b.name);
+      return {
+        pageId: parentFolder ? parentFolder.hash : 'shares',
+        folderId: parentFolder ? parentFolder.hash : null,
+        folderDetails: parentFolder || null,
+        breadcrumbs: newBreadcrumbs
+      };
     });
-  }, [allData]);
+  };
+ 
+  const renderBreadcrumbs = () => {
+    return (
+      <View style={styles.breadcrumbContainer}>
+        {currentFolder.breadcrumbs.length > 0 && (
+          <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+            <Icon name="arrow-back" size={24} color="#000" />
+          </TouchableOpacity>
+        )}
+        <Text style={styles.breadcrumbText}>
+          {currentFolder.breadcrumbs.map(folder => folder.name).join(' > ') || 'Shared Files'}
+        </Text>
+      </View>
+    );
+  };
 
-  // const handleItemPress = useCallback((item) => {
-  //   if (item.type === 'folder') {
-  //     setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
-  //   } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
-  //     // Navigate to ImageViewer if the item is an image
-  //     navigation.navigate('ImageViewer',{
-  //       filePath: item,
-  //       user: user,
-  //     });
-      
-  //   } 
-  //   else if (item.type === 'pdf') {
-  //     // Navigate to ImageViewer if the item is an image
-  //     navigation.navigate('PdfView',{
-  //       filePath: item,
-  //       user: user,
-  //     });
-      
-  //   } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)){
-  //     navigation.navigate('VideoPreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)){
-  //     navigation.navigate('AudioPreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   }
-  //   else if (['doc', 'docx'].includes(item.extension)){
-  //     navigation.navigate('WordPreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   }
-  //   else if (['txt'].includes(item.extension)){
-  //     navigation.navigate('TextFilePreview', {
-  //       filePath: item,
-  //       user: user, 
-  //     });
-  //   }else {
-  //     console.log('File clicked:',);
-  //   }
-  // }, [navigation, user, folderStack]);
   const handleItemPress = useCallback((item) => {
     if (item.type === 'folder') {
-      setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
+      setCurrentFolder(prevState => ({
+        pageId: item.hash, // Dynamically use folder's hash as pageId
+        folderId: item.hash,
+        folderDetails: item,
+        breadcrumbs: [...prevState.breadcrumbs, item]
+      }));
+    
     } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
       // Navigate to ImageViewer if the item is an image
       navigation.navigate('ImageViewer',{
@@ -222,124 +233,8 @@ const Shared = () => {
     }
   }, [navigation, user, folderStack]);
 
-  const handleBackPress = useCallback(async () => {
-    if (folderStack.length > 1) {
-      try {
-        // Get the previous folder's information
-        const previousFolder = folderStack[folderStack.length - 2];
-        
-        // Remove the current folder from the stack
-        setFolderStack(prev => prev.slice(0, -1));
-
-        // Fetch the contents of the previous folder
-        const response = await axios.get(`${baseURL}/drive/file-entries`, {
-          headers: { Authorization: `Bearer ${user?.access_token}` },
-          params: {
-            pageId: search || 0,
-            filters: currentFilter,
-            folderId: previousFolder.id, // Use the previous folder's ID
-            page: 1,
-            workspaceId: workspaces,
-            deletedOnly: false,
-            starredOnly: false,
-            recentOnly: false,
-            sharedOnly: true,
-            per_page: 100,
-            orderBy: 'updated_at',
-            orderDir: 'desc',
-          },
-        });
-        setAllData(response.data.data);
-      } catch (error) {
-        console.error('Error fetching previous folder contents:', error);
-       
-      }
-    }
-  }, [folderStack, user, currentFilter, workspaces, search]);
-
-
-
-  const getItemIcon = (item) => {
-    if (item.type === 'folder') return 'folder';
-  
-    // Extract file extension from the item name
-    const extension = item.name.split('.').pop().toLowerCase();
-  
-    switch (extension) {
-      // Images
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-      case 'bmp':
-      case 'tiff':
-      case 'webp':
-      case 'svg':
-        return 'image';
-  
-      // Documents
-      case 'doc':
-      case 'docx':
-        return 'wordpress'; // Consider using a different icon for Word documents
-      case 'pdf':
-        return 'picture-as-pdf';
-      case 'odt':
-      case 'rtf':
-      case 'txt':
-      case 'md':
-        return 'my-library-books';
-  
-      // Presentations
-      case 'ppt':
-      case 'pptx':
-      case 'odp':
-      case 'key':
-        return 'slideshow';
-  
-      // Spreadsheets
-      case 'xls':
-      case 'xlsx':
-      case 'ods':
-      case 'csv':
-        return 'table_chart';
-  
-      // Audio
-      case 'mp3':
-      case 'wav':
-      case 'flac':
-      case 'aac':
-      case 'ogg':
-        return 'audiotrack';
-  
-      // Video
-      case 'mp4':
-      case 'avi':
-      case 'mov':
-      case 'mkv':
-      case 'webm':
-        return 'videocam';
-  
-      // Archives
-      case 'zip':
-      case 'rar':
-      case 'tar':
-      case 'gz':
-        return 'archive';
-  
-      // Executables and Apps
-      case 'exe':
-      case 'app':
-      case 'apk':
-        return 'developer_mode';
-  
-      // Default
-      default:
-        return 'insert-drive-file';
-    }
-  };
-
-  const renderItemList = ({ item }) => (
-    <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
+  const renderItemList = useCallback(({ item }) => (
+    <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item,navigation, user, folderStack)}>
  
       <View style={styles.iconContainer}>
         <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
@@ -354,9 +249,9 @@ const Shared = () => {
             <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
           </TouchableOpacity>
     </TouchableOpacity>
-  );
+  ),[handleItemPress]);
 
-  const renderItemGrid = ({ item }) => (
+  const renderItemGrid = useCallback(({ item }) => (
     
     <TouchableOpacity style={styles.grid} onPress={() => handleItemPress(item)}>
       <View>
@@ -374,7 +269,7 @@ const Shared = () => {
             <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
           </TouchableOpacity>
     </TouchableOpacity>
-  );
+  ),[handleItemPress]);
 
   return (
     <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}>
@@ -382,15 +277,14 @@ const Shared = () => {
    
     <View style={styles.container}>
         <CustomHeader
-          back={true}
-          left={true}
+          
           right={true}
           grid={true}
           title={strings.Shared}
           ViewType={isGrid}  // Pass the view type state
           hadleGidList={handleGridListToggle}
         />
-         <View style={styles.inputContainer}>
+         {/* <View style={styles.inputContainer}>
             <TouchableOpacity>
               <Image source={require('../../assets/Search.png')} style={styles.leftImage} />
             </TouchableOpacity>
@@ -414,29 +308,33 @@ const Shared = () => {
       <Text style={styles.folderTitle}>{item.title}</Text>
     </View>
   ))}
-</View>
+</View> */}
+<View style={{width:'95%',alignSelf:'center'}}>
 
-      {folderStack.length > 1 && (
+<ProgressBar/>
+</View>
+{renderBreadcrumbs()}
+      {/* {folderStack.length > 1 && (
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Icon name="arrow-back" size={24} color={COLORS.black} />
           <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
-      )}
-      <Text style={styles.currentFolderText}>{strings.CurrentFolder}: {folderStack[folderStack.length - 1].name}</Text>
+      )} */}
+      {/* <Text style={styles.currentFolderText}>{strings.CurrentFolder}: {folderStack[folderStack.length - 1].name}</Text> */}
       {isLoading ? (
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.primeryBlue} />
       ) : (
         <FlatList
-          data={organizedData}
-          renderItem={isGrid ?  renderItemGrid : renderItemList}
+          data={driveData}
+          renderItem={isGrid ?   renderItemList: renderItemGrid}
           keyExtractor={item => item.id.toString()}
           ListEmptyComponent={<View style={{flex:1,alignItems:'center'}}>
           <Text style={styles.emptyText}>This folder is empty|| or API Problem From BackEnd Token Expired</Text>
         </View>}
-            numColumns={isGrid ? 2 : 1}// Number of columns for grid or list view
+            numColumns={isGrid ? 1 : 2}// Number of columns for grid or list view
           onRefresh={onRefresh}
           refreshing={refreshing}
-          key={isGrid ? 'grid' : 'list'} // Key to re-render FlatList on viewType change
+          key={isGrid ?  'list':'grid' } // Key to re-render FlatList on viewType change
         />
        
       )}
@@ -583,6 +481,86 @@ const styles = StyleSheet.create({
       input: {
         flex: 1,
         height: '100%',
+      },
+      container: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+      },
+      breadcrumbContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        // backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+      },
+      backButton: {
+        marginRight: 10,
+      },
+      breadcrumbText: {
+        fontSize: 18,
+        fontWeight: '600',
+        color:COLORS.black
+      },
+      folderDetailsContainer: {
+        backgroundColor: '#FFFFFF',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+      },
+      folderDetailsTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+      },
+      folderDetailsContent: {
+        fontSize: 14,
+      },
+      userSection: {
+        marginTop: 10,
+      },
+      userItem: {
+        marginLeft: 10,
+      },
+      listContainer: {
+        padding: 10,
+      },
+      loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      itemContainer: {
+        flex: 1,
+        alignItems: 'center',
+        margin: 5,
+        padding: 10,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+      },
+      folderMetadata: {
+        marginTop: 5,
+        backgroundColor: '#F0F0F0',
+        padding: 3,
+        borderRadius: 4,
+      },
+      folderMetadataText: {
+        fontSize: 10,
+        color: '#666',
+      },
+      image: {
+        width: '100%',
+        aspectRatio: 1,
+      },
+      fileName: {
+        marginTop: 5,
+        textAlign: 'center',
+        fontSize: 12,
       },
 });
 

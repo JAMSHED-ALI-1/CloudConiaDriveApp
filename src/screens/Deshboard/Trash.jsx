@@ -19,6 +19,7 @@ import Trashremove from '../../Modaals/Trashremove';
 import ModalForUploadAndCreateFile from '../../Modaals/ModalForUpladAndCreateFile';
 import ProgressBar from '../../components/ProgressBar';
 import strings from '../../helper/Language/LocalizedStrings';
+import getItemIcon from '../../constants/GetItemIcon';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Trash = () => {
@@ -26,7 +27,7 @@ const Trash = () => {
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
-  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Root' }]);
+  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Deleted' }]);
   const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,7 +78,7 @@ const Trash = () => {
         },
       });
       setAllData(response.data.data);
-      console.log(response.data.data)
+      // console.log(response.data.data)
     if(response.status===403){
       navigation.replace('Login')
     }
@@ -130,7 +131,8 @@ const Trash = () => {
   // };
   const handleItemPress = useCallback((item) => {
     if (item.type === 'folder') {
-      setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
+      // setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
+      toggleModalVisible(item)
     } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
       // Navigate to ImageViewer if the item is an image
       navigation.navigate('ImageViewer',{
@@ -141,53 +143,56 @@ const Trash = () => {
     } 
     else if (item.type === 'pdf') {
       // Navigate to ImageViewer if the item is an image
-      navigation.navigate('PdfView',{
-        filePath: item,
-        user: user,
-      });
+    //  navigation.navigate('PdfView',{
+    //     filePath: item,
+    //     user: user,
+    //   }); 
+    toggleModalVisible(item)
       
     } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)){
-      navigation.navigate('VideoPreview', {
-        filePath: item,
-        user: user, 
-      });
-    } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)){
-      navigation.navigate('AudioPreview', {
-        filePath: item,
-        user: user, 
-      });
+      // navigation.navigate('VideoPreview', {
+      //   filePath: item,
+      //   user: user, 
+      // });
+      toggleModalVisible(item)
+    // } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)){
+    //   navigation.navigate('AudioPreview', {
+    //     filePath: item,
+    //     user: user, 
+    //   });
+    // }
+    // else if (['doc', 'docx'].includes(item.extension)){
+    //   navigation.navigate('WordPreview', {
+    //     filePath: item,
+    //     user: user, 
+    //   });
     }
-    else if (['doc', 'docx'].includes(item.extension)){
-      navigation.navigate('WordPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['pptx','ppt','odp'].includes(item.extension)){
-      navigation.navigate('PptPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['xls','xlsx','csv','ods'].includes(item.extension)){
-      navigation.navigate('SpreadsheetPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['txt'].includes(item.extension)){
-      navigation.navigate('TextFilePreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['zip','tar','rar','exe','app','apk'].includes(item.extension)){
-      navigation.navigate('Zipapkpreview', {
-        filePath: item,
-        user: user, 
-      });
-    }else {
-      console.log('File clicked:',);
+    // else if (['pptx','ppt','odp'].includes(item.extension)){
+    //   navigation.navigate('PptPreview', {
+    //     filePath: item,
+    //     user: user, 
+    //   });
+    // }
+    // else if (['xls','xlsx','csv','ods'].includes(item.extension)){
+    //   navigation.navigate('SpreadsheetPreview', {
+    //     filePath: item,
+    //     user: user, 
+    //   });
+    // }
+    // else if (['txt'].includes(item.extension)){
+    //   navigation.navigate('TextFilePreview', {
+    //     filePath: item,
+    //     user: user, 
+    //   });
+    // }
+    // else if (['zip','tar','rar','exe','app','apk'].includes(item.extension)){
+    //   navigation.navigate('Zipapkpreview', {
+    //     filePath: item,
+    //     user: user, 
+    //   });
+    // }
+    else {
+      toggleModalVisible(item)
     }
   }, [navigation, user, folderStack]);
   const handleBackPress = useCallback(() => {
@@ -196,84 +201,7 @@ const Trash = () => {
     }
   }, [folderStack]);
 
-  const getItemIcon = (item) => {
-    if (item.type === 'folder') return 'folder';
-  
-    // Extract file extension from the item name
-    const extension = item.name.split('.').pop().toLowerCase();
-  
-    switch (extension) {
-      // Images
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-      case 'bmp':
-      case 'tiff':
-      case 'webp':
-      case 'svg':
-        return 'image';
-  
-      // Documents
-      case 'doc':
-      case 'docx':
-        return 'wordpress'; // Consider using a different icon for Word documents
-      case 'pdf':
-        return 'picture-as-pdf';
-      case 'odt':
-      case 'rtf':
-      case 'txt':
-      case 'md':
-        return 'my-library-books';
-  
-      // Presentations
-      case 'ppt':
-      case 'pptx':
-      case 'odp':
-      case 'key':
-        return 'slideshow';
-  
-      // Spreadsheets
-      case 'xls':
-      case 'xlsx':
-      case 'ods':
-      case 'csv':
-        return 'table_chart';
-  
-      // Audio
-      case 'mp3':
-      case 'wav':
-      case 'flac':
-      case 'aac':
-      case 'ogg':
-        return 'audiotrack';
-  
-      // Video
-      case 'mp4':
-      case 'avi':
-      case 'mov':
-      case 'mkv':
-      case 'webm':
-        return 'videocam';
-  
-      // Archives
-      case 'zip':
-      case 'rar':
-      case 'tar':
-      case 'gz':
-        return 'archive';
-  
-      // Executables and Apps
-      case 'exe':
-      case 'app':
-      case 'apk':
-        return 'developer_mode';
-  
-      // Default
-      default:
-        return 'insert-drive-file';
-    }
-  };
+ 
 
   const renderItemList = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
@@ -319,18 +247,15 @@ const Trash = () => {
    
     <View style={styles.container}>
         <CustomHeader
-          back={true}
-          left={true}
+          // back={true}
+          // left={true}
           right={true}
           grid={true}
           title={strings.DELETEFILE}
           ViewType={isGrid}  // Pass the view type state
           hadleGidList={handleGridListToggle}
         />
-        <View style={styles.statusContainer}>
-          {/* <StorageStatus user={user} usertoken={user?.access_token} /> */}
-          <ProgressBar/>
-        </View>
+       
 <View style={styles.folderContainer}>
   {FilderData.map(item => (
     <View key={item.id} style={styles.folderItem}>
@@ -348,13 +273,22 @@ const Trash = () => {
   ))}
 </View>
 
+<View style={{ borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+          <View>
       {folderStack.length > 1 && (
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Icon name="arrow-back" size={24} color={COLORS.black} />
-          <Text style={styles.backButtonText}>{strings.Backto}  {folderStack[folderStack.length - 2].name}</Text>
+          <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
       )}
-      <Text style={styles.currentFolderText}>{strings.CurrentFolder}: {folderStack[folderStack.length - 1].name}</Text>
+      <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text>
+      </View>
+      {/* <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
+        <Text style={styles.currentFolderText}>Sort</Text>
+        <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
+      </TouchableOpacity> */}
+      </View>
       {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
@@ -402,13 +336,14 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     marginLeft: 10,
-    color: COLORS.primary,
+    color: COLORS.black,
     fontSize: 16,
   },
   currentFolderText: {
     padding: 10,
     fontSize: 18,
     fontWeight: 'bold',
+    color: COLORS.black,
   },
   item: {
     flexDirection: 'row',

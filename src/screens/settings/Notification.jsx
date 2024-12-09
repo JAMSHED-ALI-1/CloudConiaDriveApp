@@ -9,20 +9,20 @@ import { COLORS } from '../../utils/Colors'
 const data = [
     {
         id: 1,
-        text: 'You shared a file on Whatsapp to Fatima OA.',
-        date: '29 June 2022, 7.14 PM',
+        text: 'You shared a file on Whatsapp to Jamshed OA.',
+        date: '29 June 2022, 8.14 PM',
         name: 'x',
     },
     {
         id: 2,
         text: 'You shared a file on Whatsapp to Fatima OA.',
-        date: '29 June 2022, 7.14 PM',
+        date: '30 June 2022, 9.14 PM',
         name: 'y',
     },
     {
         id: 3,
-        text: 'You shared a file on Whatsapp to Fatima OA.',
-        date: '29 June 2022, 7.14 PM',
+        text: 'You shared a file on Whatsapp to salman OA.',
+        date: '01 July 2022, 7.14 PM',
         name: 'z',
     }
 ]
