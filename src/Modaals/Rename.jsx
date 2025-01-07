@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, ActivityIndicator, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import { makeApiCall } from '../helper/apiHelper';
+import { COLORS } from '../utils/Colors';
+import { useSelector } from 'react-redux';
+import strings from '../helper/Language/LocalizedStrings';
 
 const RenameModal = ({ isVisible, onClose, item, user, }) => {
-
+  const workspaces = useSelector(state => state.workspace.workspace);
   const [initialName, setInitialName] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +19,7 @@ const RenameModal = ({ isVisible, onClose, item, user, }) => {
       setInitialName(item.name);
     }
   }, [isVisible, item]);
-
+ 
   const renameFile = async () => {
     if (name.trim() === "") {
       setError('Please enter a file name');
@@ -29,7 +32,7 @@ const RenameModal = ({ isVisible, onClose, item, user, }) => {
     setError('');
     // setLoading(true);
     try {
-      const response = await makeApiCall(`/api/v1/file-entries/${item.id}?_method=PUT`, user?.access_token, 'post', {
+      const response = await makeApiCall(`/api/v1/file-entries/${item.id}?workspaceId=${workspaces}&_method=PUT`, user?.access_token, 'post', {
         name: name
       });
 
@@ -68,10 +71,11 @@ const RenameModal = ({ isVisible, onClose, item, user, }) => {
       onClose();
     }}>
       <View style={styles.modalContent}>
-        <Text style={styles.title}>Rename File</Text>
+        <Text style={styles.title}>{strings.RENAME } file</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter new file name"
+          placeholderTextColor={COLORS.noermalText}
           value={name}
           onChangeText={(text) => {
             setName(text);
@@ -88,10 +92,10 @@ const RenameModal = ({ isVisible, onClose, item, user, }) => {
             setError(''); // Clear error on cancel
             onClose();
           }}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
+            <Text style={styles.cancelButtonText}>{strings.Cancel}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.renameButton} onPress={renameFile} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Rename</Text>}
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{strings.RENAME}</Text>}
           </TouchableOpacity>
         </View>
       </View>
@@ -112,6 +116,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 12,
     fontWeight: 'bold',
+    color:COLORS.noermalText
   },
   input: {
     height: 40,
@@ -121,6 +126,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 8,
     borderRadius: 4,
+    color:COLORS.noermalText
   },
   buttonContainer: {
     flexDirection: 'row',

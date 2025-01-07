@@ -5,12 +5,16 @@ import { makeApiCall } from '../helper/apiHelper';
 import { baseURL } from '../utils/constant/settings';
 import DocumentPicker from 'react-native-document-picker';
 import RNFetchBlob from 'rn-fetch-blob';
+import { COLORS } from '../utils/Colors';
+import { useSelector } from 'react-redux';
+import strings from '../helper/Language/LocalizedStrings';
 const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,user, folderId  }) => {
-  const [folderModalVisible, setFolderModalVisible] = useState(false); // State for folder modal
-  const [folderName, setFolderName] = useState(''); // State to capture folder name
+  // const language = useSelector((state) => state.language.language);
+  const [folderModalVisible, setFolderModalVisible] = useState(false); 
+  const [folderName, setFolderName] = useState(''); 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  // Toggle for folder creation modal
+  const workspaces = useSelector(state => state.workspace.workspace);
   const toggleFolderModal = () => {
     setFolderModalVisible(!folderModalVisible);
   };
@@ -30,17 +34,7 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
     }
   }, []);
   // Handle folder creation
-  const handleCreateFolder = () => {
-    if (folderName.trim() !== '') {
-      if (uploadFolder) {
-        uploadFolder(folderName); // Pass the folder name when creating a folder
-      }
-      toggleFolderModal(); // Close the modal after folder creation
-      setFolderName(''); // Reset the folder name input
-    } else {
-      alert('Please enter a folder name'); // Prompt user to enter folder name
-    }
-  };
+ 
   const createFolder = async () => {
     if (folderName.trim() === "") {
       setError('Please enter a folder name');
@@ -51,7 +45,7 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
     setIsLoading(true);
 
     try {
-      const response = await makeApiCall('/api/v1/folders', user?.access_token, 'post', {
+      const response = await makeApiCall(`/api/v1/folders?workspaceId=${workspaces}`, user?.access_token, 'post', {
         parentId: folderId === 0 ? null : folderId,
         name: folderName,
       });
@@ -72,11 +66,7 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
   };
 
   // Trigger the file upload function passed from the parent
-  const handleFileUpload = () => {
-    if (onUpload) {
-      onUpload(); // Trigger the upload function passed as a prop
-    }
-  };
+  
   const uploadFile = async () => {
     try {
       const res = await DocumentPicker.pick({
@@ -84,7 +74,7 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
       });
       const fileUri = Platform.OS === 'ios' ? res[0].uri.replace('file://', '') : res[0].uri;
       const fileName = res[0].name;
-      const uploadUrl = `${baseURL}/uploads`;
+      const uploadUrl = `${baseURL}/uploads?workspaceId=${workspaces}`;
       const token = user?.access_token;
 
       setIsLoading(true);
@@ -100,12 +90,14 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
       ];
 
       console.log('Uploading file...'); // Add this log
+      setIsLoading(true)
       const response = await RNFetchBlob.fetch('POST', uploadUrl, {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',
       }, formData);
       
-      console.log('Upload response:', response.data); // Add this log
+      console.log('Upload response:', response.data); 
+      setIsLoading(false)// Add this log
 
       if (response.respInfo.status === 200 || response.respInfo.status === 201) {
         const responseData = JSON.parse(response.data);
@@ -138,7 +130,9 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
 
 
   return (
+   
     <>
+    
       {/* Main Modal for Upload and Create */}
       <Modal
         animationType="slide"
@@ -149,12 +143,23 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
         <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1}>
           <View style={styles.modalContainer}>
             <TouchableOpacity style={styles.modalItem} onPress={() => { onClose(); toggleFolderModal(); }}>
-              <Image source={require('../assets/icon/Smallfolder.png')} style={styles.modalIcon} />
-              <Text>Create Folder</Text>
+              <Image source={require('../assets/FileFolderIcons/SharedFolderFileIcon.png')} style={styles.modalIcon} />
+              <Text style={styles.nornalText}>{strings.CREATE_FOLDER}</Text>
             </TouchableOpacity>
+            {
+              isLoading?(<ActivityIndicator size={'large'} color={COLORS.blue}/>):
+              <TouchableOpacity style={styles.modalItem} onPress={uploadFile}>
+              <Image source={require('../assets/FileFolderIcons/ArchiveFileIcon.png')} style={styles.modalIcon} />
+              <Text style={styles.nornalText}>{strings.UPLOAD_FILE}</Text>
+            </TouchableOpacity>
+            }
+            {/* <TouchableOpacity style={styles.modalItem} onPress={uploadFile}>
+              <Image source={require('../assets/FileFolderIcons/ArchiveFileIcon.png')} style={styles.modalIcon} />
+              <Text style={styles.nornalText}>Upload File</Text>
+            </TouchableOpacity> */}
             <TouchableOpacity style={styles.modalItem} onPress={uploadFile}>
-              <Image source={require('../assets/icon/spreadsheet.png')} style={styles.modalIcon} />
-              <Text>Upload File</Text>
+              {/* <Image source={require('../assets/icon/spreadsheet.png')} style={styles.modalIcon} /> */}
+              {/* <Text style={styles.nornalText}>Upload File</Text> */}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -174,10 +179,11 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
                 placeholder="Enter Folder Name"
                 style={styles.input}
                 value={folderName}
+                placeholderTextColor={COLORS.noermalText}
                 onChangeText={setFolderName} // Capture the folder name in state
               />
               <TouchableOpacity style={styles.createButton} onPress={createFolder}>
-                <Text style={styles.createButtonText}>Create Folder</Text>
+                <Text style={styles.nornalText}>{strings.CREATE_FOLDER}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -201,6 +207,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    marginBottom:Platform.OS==='android'?65:0
   },
   modalItem: {
     flexDirection: 'row',
@@ -211,6 +218,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginRight: 20,
+    resizeMode:'contain'
   },
   centerModal: {
     flex: 1,
@@ -231,6 +239,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
+    color:COLORS.noermalText
   },
   createButton: {
     backgroundColor: '#007BFF',
@@ -242,4 +251,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  nornalText:{
+    fontWeight:'600',
+    fontSize:14,
+    color:COLORS.black
+  }
 });

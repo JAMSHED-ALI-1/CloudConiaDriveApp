@@ -70,9 +70,8 @@ const PptPreview = ({ route }) => {
     
     const baseUrl = `${AppSettings.base_url}${filePath.url}?preview_token=${previewToken}`;
     
-    return Platform.OS === 'android'
-      ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(baseUrl)}`
-      : baseUrl;
+    return  `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(baseUrl)}`
+      
   };
 
   const handleError = () => {

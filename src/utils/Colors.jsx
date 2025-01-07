@@ -11,7 +11,7 @@ export const COLORS = {
     faint:'#9e9e9e',
     primeryBlue:'#265FB1',
     secondry:'#58606A',
-    noermalText:'#696D70',
+    noermalText:'#071625',
     boldText:'#071625',
     backgroundColor:"#F1f1f1",
     orenge:"#F16623",

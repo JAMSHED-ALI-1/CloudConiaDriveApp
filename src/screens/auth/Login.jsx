@@ -10,9 +10,11 @@ import CustomHeader from '../../components/CustomHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAsync } from '../../redux/reducers/authSlice';
 import { showMessage } from 'react-native-flash-message';
+import strings from '../../helper/Language/LocalizedStrings';
 
 
 const Login = () => {
+  const language = useSelector((state) => state.language.language);
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -59,9 +61,9 @@ const Login = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.loginMainContainer}
       >
-        <CustomHeader  title={'Login'} />
-        <Text style={styles.title}>Welcome back!</Text>
-        <Text style={styles.Description}>Let’s get to know each other, input personal details to begin</Text>
+        <CustomHeader  title={strings.LOGIN} />
+        <Text style={styles.title}>{strings.WELCOME_BACK}</Text>
+        <Text style={styles.Description}>{strings.Letsgettoknoweachotherinputpersonaldetailstobegin}</Text>
 
         <Formik
           initialValues={LoginInitialValue}
@@ -79,7 +81,7 @@ const Login = () => {
           }) => (
             <View>
               <InputBox
-                placeholder="Enter your email"
+                placeholder={strings.EnterYourEmail}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 value={values.email}
@@ -89,7 +91,7 @@ const Login = () => {
               />
 
               <InputBox
-                placeholder="Enter your password"
+                placeholder={strings.Enteryourpassword}
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 value={values.password}
@@ -108,15 +110,15 @@ onPress={()=>navigation.navigate('UpdatePassword')}
               <Text style={styles.forget} >Forget Password?</Text>
 </TouchableOpacity> */}
 <TouchableOpacity 
-// onPress={()=>navigation.navigate('PrivacyPolicy')}
-onPress={()=>navigation.navigate('Test')}
+onPress={()=>navigation.navigate('PrivacyPolicy')}
+// onPress={()=>navigation.navigate('Test')}
 >
   
-<Text style={styles.forget} >Privacy Policy?</Text>
+<Text style={styles.forget} >{strings.PrivacyPolicy}?</Text>
 </TouchableOpacity>
 
               <CustomButton 
-                buttonTitle="Login"
+                buttonTitle={strings.LOGIN}
                 onPress={handleSubmit}
                 isLoading={isLoading}  // Show loader when submitting
                 disabled={!isValid || isLoading}  // Disable button while loading or form invalid

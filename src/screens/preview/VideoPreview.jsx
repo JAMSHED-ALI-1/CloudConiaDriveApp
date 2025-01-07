@@ -311,7 +311,7 @@ const VideoPreview = ({ route, navigation }) => {
   const { user, filePath } = route.params;
   const accesstoken = user?.access_token;
   const videoId = filePath?.id;
-
+// console.log('vedioInfo--',route.params)
   // State variables
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -327,6 +327,7 @@ const VideoPreview = ({ route, navigation }) => {
 
   // Redux workspace selector
   const workspaces = useSelector(state => state.workspace.workspace);
+  
 
   // Fetch preview token
   useEffect(() => {
@@ -351,6 +352,7 @@ const VideoPreview = ({ route, navigation }) => {
         
         const token = response.data.preview_token;
         setPreviewToken(token);
+        console.log(response.data)
         
         // Construct video URL with preview token
         const constructedVideoUrl = `${AppSettings.base_url}${filePath.url}?preview_token=${token}`;
@@ -459,7 +461,11 @@ const VideoPreview = ({ route, navigation }) => {
         <Video
           ref={videoRef}
           source={{ uri: videoUrl }}
-
+          // source={{
+          //    uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+          //   //  uri:'https://drive.coniacloud.com/api/v1/file-entries/18756?preview_token=npHy8LxW3fcb3GE'
+          //   // uri:'https://www.youtube.com/watch?v=UvF3dY488pU'
+          // }}
           style={styles.video}
           controls={false}
           paused={!isPlaying || !shouldPlay}  

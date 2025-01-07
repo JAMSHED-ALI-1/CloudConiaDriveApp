@@ -35,13 +35,6 @@ const Signup = () => {
                 OnPress={() => navigation.goBack()} />
            
                 <Text style={styles.text}>Let’s get to know each other, input personal details to begin</Text>
-                {/* <Image source={require('../../assets/logo1.png')} style={styles.logoImage} /> */}
-          
-           
-                {/* <View style={{ alignItems: 'center', height: 33 }}>
-                    <Text style={{ color: '#263c69', fontSize: 22, fontWeight: '700' }}>Sign in to your account</Text>
-                </View> */}
-                {/* {error && <Alertm type={'error'} text={'Invalid username or password!'} />} */}
                 <Formik
                     initialValues={SignupInitialValue}
                     validationSchema={SignupValidtionSchema}
@@ -125,15 +118,15 @@ export default Signup;
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: COLORS.backgroundColor,  // Ensuring background color
+      backgroundColor: COLORS.backgroundColor,  
     },
     
     loginMainContainer: {
       flex: 1,
-      paddingHorizontal: 20,  // Ensure padding horizontally
+      paddingHorizontal: 20,  
       paddingTop: Platform.select({
-        ios: 20,   // Adjust padding for iOS
-        android: 20  // Adjust padding for Android
+        ios: 20,   
+        android: 20  
       }),
       backgroundColor: COLORS.backgroundColor, 
     },

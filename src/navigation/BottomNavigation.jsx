@@ -15,8 +15,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomNavigation = ({ navigation }) => {
   const language = useSelector((state) => state.language.language);
-
-  useEffect(() => {
+useEffect(() => {
     const handleBackButton = () => {
       // Get the current route name from navigation state
       const currentRoute = navigation.getState().routes[navigation.getState().index];
@@ -48,8 +47,14 @@ const BottomNavigation = ({ navigation }) => {
       }
     };
 
- 
-  }, [navigation]); // Add navigation as dependency
+    // Adding the back button listener
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+    // Cleanup the listener when component unmounts
+    return () => {
+      backHandler.remove();
+    };
+  }, [navigation]); 
 
   return (
     <Tab.Navigator

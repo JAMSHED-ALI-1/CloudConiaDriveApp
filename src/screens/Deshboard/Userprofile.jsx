@@ -172,7 +172,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   const navigationData = [
     { id: 1, ImagePath: require('../../assets/icon/fi_user-check.png'), text: strings.ACCOUNT_INFORMATION, navigate: "EditProfile" },
     { id: 2, ImagePath: require('../../assets/icon/Lock.png'), text: strings.CHANGE_PASSWORD, navigate: "UpdatePassword" },
-    //  { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, navigate: "ChoseLanguage" },
+      { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, navigate: "ChoseLanguage" },
   ];
 
   const renderNavigationItem = ({ id, ImagePath, text, navigate }) => (
@@ -201,13 +201,13 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
       <ProfileSection />
 
      
-  <TouchableOpacity style={styles.upgrade}
+  {/* <TouchableOpacity style={styles.upgrade}
             // onPress={()=>navigation.navigate('UpgradeScreen')}>
             onPress={()=>navigation.navigate('Pricelist')}>
               <Text style={{padding:'5%',fontSize:16,color:COLORS.white}}>
                 {strings.UpgradeStorageSpace}
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 <View style={styles.navigationContainer}>
         {navigationData.map(renderNavigationItem)}
       </View>

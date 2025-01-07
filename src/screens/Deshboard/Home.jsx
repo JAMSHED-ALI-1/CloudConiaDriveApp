@@ -24,7 +24,7 @@ const Home = () => {
   const user = useSelector((state) => state.auth.user);
   const language = useSelector((state) => state.language.language);
   const workspaces = useSelector(state => state.workspace.workspace);
-  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Root' }]);
+  const [folderStack, setFolderStack] = useState([{ id: null, name: strings.HOME }]);
   const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,10 +43,10 @@ const Home = () => {
   const navigation=useNavigation()
 
   const sortByOptions = [
-    { key: 'Size', value: 'file_size' },
-    { key: 'Name', value: 'name' },
-    { key: 'Last modified', value: 'updated_at' },
-    { key: 'Upload date', value: 'created_at' },
+    { key: strings.Size, value: 'file_size' },
+    { key: strings.Name, value: 'name' },
+    { key: strings.LastModified, value: 'updated_at' },
+    { key: strings.UploadDate, value: 'created_at' },
   ];
   // console.log('---',workspaces)
   const fetchData = useCallback(async () => {
@@ -70,14 +70,14 @@ const Home = () => {
       });
       setAllData(response.data.data);
       console.log(response.status)
-      // if(response.status===403){
-      //   navigation.replace('Login')
-      // }
+      if(response.status===403){
+        navigation.replace('Login')
+      }
     } catch (error) {
       console.log('Got Error', error);
-      // if (error.response && error.response.status === 403) {
-      //   navigation.replace('Login') // Redirect to login page
-      // }
+      if (error.response && error.response.status === 403) {
+        navigation.replace('Login') // Redirect to login page
+      }
     } finally {
       setIsLoading(false);
     }
@@ -190,13 +190,19 @@ const Home = () => {
   };
   
 
-
+ 
+  
 
   const renderItemList = ({ item }) => (
+    
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
  
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
       </View>
       <View style={{left:10}}>
       <Text style={[styles.itemText,]}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}</Text>
@@ -217,8 +223,12 @@ const Home = () => {
 
     
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
-      </View>
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
+    </View>
       <Text style={styles.itemText}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}</Text>
       <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
       </View>
@@ -262,16 +272,20 @@ const Home = () => {
           <Icon name="arrow-back" size={24} color={COLORS.black} />
           <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
-      )}
-      <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text>
+      )}{
+        folderStack.length<=1 &&(
+          <Text style={styles.currentFolderText}>{strings.HOME}</Text>
+        )
+      }
+     
       </View>
       <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
-        <Text style={styles.currentFolderText}>Sort</Text>
+        <Text style={styles.currentFolderText}>{strings.SORT}</Text>
         <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
       </TouchableOpacity>
       </View>
       {isLoading ? (
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.blue} />
       ) : (
         <FlatList
           data={organizedData}
@@ -417,5 +431,10 @@ textAlign:'center',
 marginTop:30
 
 
-  }
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    tintColor: COLORS.white, // Apply a tint color if applicable
+  },
 });

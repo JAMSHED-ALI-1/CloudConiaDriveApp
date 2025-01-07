@@ -54,6 +54,7 @@ import { View, StyleSheet, SafeAreaView ,ActivityIndicator} from 'react-native';
 import { WebView } from 'react-native-webview';
 import CustomHeader from '../../components/CustomHeader';
 import { useNavigation } from '@react-navigation/native';
+import { COLORS } from '../../utils/Colors';
 
 const PrivacyPolicy = () => {
     const navigation=useNavigation()
@@ -86,6 +87,7 @@ const PrivacyPolicy = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:COLORS.backgroundColor
   },
 });
 

@@ -6,8 +6,11 @@ import RNFetchBlob from 'rn-fetch-blob';
 import RenameModal from './Rename';
 import { baseURL } from '../utils/constant/settings';
 import { makeApiCall } from '../helper/apiHelper';
+import { COLORS } from '../utils/Colors';
+import { useSelector } from 'react-redux';
 const ActionModal = ({isVisible, onClose,user,item }) => {
-    
+  const workspaces = useSelector(state => state.workspace.workspace);
+  const language = useSelector((state) => state.language.language);
   const [isShareModalVisible, setShareModalVisible] = useState(false);
   const [isRenameModalVisible, setRenameModalVisible] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
@@ -95,22 +98,54 @@ const ActionModal = ({isVisible, onClose,user,item }) => {
     }
   };
 
-  const deleteFile = async () => {
-    try {
-      let data = {
-        entryIds: [item?.id],
-        deleteForever: 0,
-      };
-      await makeApiCall('/api/v1/file-entries/delete', user?.access_token, 'post', data);
+  // const deleteFile = async () => {
+  //   try {
+  //     let data = {
+  //       entryIds: [item?.id],
+  //       deleteForever: 0,
+  //     };
+  //     await makeApiCall(`/api/v1/file-entries/delete?workspaceId=${workspaces}`, user?.access_token, 'post', data);
       
-      Alert.alert('Success', 'File deleted successfully!');
-      onClose(); // Close the modal after successful deletion
-    } catch (error) {
-      console.error('Error deleting file:', error);
-      Alert.alert('Error', 'Error deleting file.');
-    }
+  //     Alert.alert('Success', 'File deleted successfully!');
+  //     onClose(); 
+  //   } catch (error) {
+  //     console.error('Error deleting file:', error);
+  //     Alert.alert('Error', 'Error deleting file.');
+  //   }
+  // };
+  const deleteFile = async () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Do you really want to delete this file?",
+      [
+        {
+          text: "No",
+          onPress: () => console.log("Delete cancelled"),
+          style: "cancel", // Makes the "No" button more prominent as a cancel action
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              let data = {
+                entryIds: [item?.id],
+                deleteForever: 0,
+              };
+              await makeApiCall(`/api/v1/file-entries/delete?workspaceId=${workspaces}`, user?.access_token, 'post', data);
+  
+              Alert.alert('Success', 'File deleted successfully!');
+              onClose();
+            } catch (error) {
+              console.error('Error deleting file:', error);
+              Alert.alert('Error', 'Error deleting file.');
+            }
+          },
+        },
+      ],
+      { cancelable: false } // Ensures the alert must be dismissed by clicking a button
+    );
   };
-
+  
 
   return (
    <>
@@ -122,7 +157,7 @@ const ActionModal = ({isVisible, onClose,user,item }) => {
     <TouchableOpacity style={styles.modalContainer} onPress={onClose} activeOpacity={1}>
       <View style={styles.modalContent}>
       <View style={styles.header}>
-      <Text style={styles.modalTitle}>File Options</Text>
+      <Text style={styles.modalTitle}>{strings.File_Options}</Text>
       <TouchableOpacity onPress={onClose}>
         <Image
           source={require('../assets/icons/close.png')}
@@ -134,13 +169,13 @@ const ActionModal = ({isVisible, onClose,user,item }) => {
        onPress={openShareModal}
         >
           <Image source={require('../assets/icons/share.png')} style={styles.image} />
-          <Text>Shere</Text>
+          <Text style={styles.nornalText}>{strings.SHARE}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.itemContainer} 
       onPress={downloadFile}
         >
           <Image source={require('../assets/icons/fi_download.png')} style={styles.image} />
-          <Text>Download</Text>
+          <Text style={styles.nornalText}>{strings.DOWNLOAD}</Text>
         </TouchableOpacity>
         {downloadProgress > 0 && (
               <View style={styles.progressBar}>
@@ -151,13 +186,13 @@ const ActionModal = ({isVisible, onClose,user,item }) => {
         onPress={openrenameModal}
         >
           <Image source={require('../assets/Modalicon/fi_edit-2.png')} style={styles.image} />
-          <Text>Rename</Text>
+          <Text style={styles.nornalText}>{strings.RENAME}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.itemContainer} 
         onPress={deleteFile}
         >
           <Image source={require('../assets/Modalicon/fi_trash-2.png')} style={styles.image} />
-          <Text>Delete</Text>
+          <Text style={styles.nornalText}>{strings.DELETEFILE}</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -182,6 +217,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         padding: 20,
         paddingBottom: 40,
+        marginBottom:Platform.OS==='android'?65:0
       },
       itemContainer: {
         flexDirection: 'row',
@@ -213,6 +249,7 @@ const styles = StyleSheet.create({
       modalTitle: {
         fontSize: 18,
         fontWeight: 'bold',
+        color:COLORS.noermalText
       },
       progressBar: {
         height: 10,
@@ -225,4 +262,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#4CAF50',
         borderRadius: 5,
       },
+      nornalText:{
+        fontSize:14,
+        color:COLORS.noermalText,
+        fontWeight:'600'
+      }
 })

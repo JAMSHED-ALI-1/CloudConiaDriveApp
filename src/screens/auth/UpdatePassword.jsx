@@ -67,7 +67,7 @@ const UpdatePassword = () => {
       showMessageHandler("Error", error.message || "An error occurred", "danger");
     }
     finally {
-      setIsLoading(false);  // Hide loader after login attempt
+      setIsLoading(false);
     }
   };
 

@@ -31,7 +31,7 @@ const MyDrive = () => {
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
-  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Drive' }]);
+  const [folderStack, setFolderStack] = useState([{ id: null, name: strings.MyFiles }]);
   const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,10 +60,10 @@ const MyDrive = () => {
   ];
  
   const sortByOptions = [
-    { key: 'Size', value: 'file_size' },
-    { key: 'Name', value: 'name' },
-    { key: 'Last modified', value: 'updated_at' },
-    { key: 'Upload date', value: 'created_at' },
+    { key: strings.Size, value: 'file_size' },
+    { key: strings.Name, value: 'name' },
+    { key: strings.LastModified, value: 'updated_at' },
+    { key: strings.UploadDate, value: 'created_at' },
   ];
   
 
@@ -71,14 +71,13 @@ const MyDrive = () => {
 
   const currentFolderId = folderStack[folderStack.length - 1].id;
 
-  const fetchData = useCallback(async (filter = null,sortBy = 'updated_at', sortDir = 'desc') => {
+  const fetchData = useCallback(async (filter = null,) => {
     try {
       setIsLoading(true);
       const response = await axios.get(`${baseURL}/drive/file-entries?timestamp=${new Date().getTime()}`, {
         headers: { Authorization: `Bearer ${user?.access_token}` },
         params: {
           pageId: 0,
-          filters: filter,
           folderId: currentFolderId, 
           page: 1,
           workspaceId: workspaces?workspaces:0,
@@ -93,15 +92,15 @@ const MyDrive = () => {
         },
       });
       setAllData(response.data.data);
-  
-      // if(response.status===403){
-      //   navigation.replace('Login')
-      // }
+  console.log('Drive Status',response.status)
+      if(response.status===403){
+        navigation.replace('Login')
+      }
     } catch (error) {
       console.log('Got Error', error);
-      // if (error.response && error.response.status === 403) {
-      //   navigation.replace('Login') // Redirect to login page
-      // }
+      if (error.response && error.response.status === 403) {
+        navigation.replace('Login') 
+      }
     } finally {
       setIsLoading(false);
     }
@@ -212,7 +211,11 @@ const MyDrive = () => {
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
  
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
       </View>
       <View style={{left:10}}>
       <Text style={[styles.itemText,]}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}</Text>
@@ -233,7 +236,11 @@ const MyDrive = () => {
 
     
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
       </View>
       <Text style={styles.itemText}>{item.name.length > 13 ? `${item.name.substring(0, 13)}...` : item.name}</Text>
       <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
@@ -257,7 +264,6 @@ const MyDrive = () => {
    
     <View style={styles.container}>
         <CustomHeader
-         
           right={true}
           grid={true}
           title={strings.MyFiles}
@@ -289,11 +295,15 @@ const MyDrive = () => {
           <Icon name="arrow-back" size={24} color={COLORS.black} />
           <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
-      )}
-      <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text>
+      )}{
+        folderStack.length<=1 &&(
+          <Text style={styles.currentFolderText}>{strings.MyFiles}</Text>
+        )
+      }
+     
       </View>
       <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
-        <Text style={styles.currentFolderText}>Sort</Text>
+        <Text style={styles.currentFolderText}>{strings.SORT}</Text>
         <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
       </TouchableOpacity>
       </View>
@@ -316,12 +326,12 @@ const MyDrive = () => {
        
       )}
       {/*  */}
-      {/* <TouchableOpacity style={styles.btn} 
+      <TouchableOpacity style={styles.btn} 
       onPress={()=>setshowworkspacemodal(true)}
-      > */}
+      >
             {/* <Text style={styles.text}>+</Text> */}
-            {/* <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white}/> */}
-          {/* </TouchableOpacity> */}
+            <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white}/>
+          </TouchableOpacity>
           <WorkspaceModal
           visible={workspacemodal}
           user={user}
@@ -472,5 +482,10 @@ const styles = StyleSheet.create({
     text: {
       color: '#fff',
       fontSize: 30,
+    },
+    icon: {
+      width: 24,
+      height: 24,
+      tintColor: COLORS.white, // Apply a tint color if applicable
     },
 });

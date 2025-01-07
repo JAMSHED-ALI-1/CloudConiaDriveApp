@@ -1,18 +1,13 @@
 import { Image, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import React from 'react';
-// import { AppColor } from '../utils/AppColors';
-// import { useSelector } from 'react-redux';
 import { COLORS } from '../utils/Colors';
 
 const Width = Dimensions.get('window').width;
 const Height = Dimensions.get('window').height;
 
 const CustomHeader = ({ title, left, right, back, OnPress, textcolor, bgColor, grid, hadleGidList, ViewType }) => {
-  // console.log('----',hadleGidList)
-//   const language = useSelector((state) => state.language.language);
-
-  return (
-    <View style={[styles.container, { backgroundColor: bgColor }]}>
+   return (
+   <View style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.leftContainer}>
         {left && (
           <TouchableOpacity style={styles.iconContainer} onPress={OnPress}>
@@ -37,26 +32,15 @@ const CustomHeader = ({ title, left, right, back, OnPress, textcolor, bgColor, g
         {right && (
           <View style={styles.iconContainer}>
             {grid && (
-              <TouchableOpacity style={styles.iconContainer} onPress={hadleGidList}>
-                <Image
-                  source={ViewType 
-                    ? require('../assets/icons/fi_grid.png') 
-                    : require('../assets/list.png')}
-                  style={[styles.icon, { right: 40 }]}
+              <TouchableOpacity style={styles.iconContainer} onPress={() => hadleGidList(!ViewType)}>
+              <Image
+                  source={ViewType
+                      ? require('../assets/icons/fi_grid.png')
+                      : require('../assets/list.png')}
+                  style={styles.icon}
                   tintColor={textcolor ? COLORS.white : COLORS.black}
-                />
-              </TouchableOpacity>
-            )}
-            {grid && (
-              <TouchableOpacity style={[styles.iconContainer,]} onPress={hadleGidList}>
-                <Image
-                  source={ViewType 
-                    ? require('../assets/list.png')
-                    : require('../assets/icons/fi_grid.png') }
-                  style={[styles.icon, { right: 30 }]}
-                  tintColor={textcolor ? COLORS.white : COLORS.black}
-                />
-              </TouchableOpacity>
+              />
+          </TouchableOpacity>
             )}
           </View>
         )}

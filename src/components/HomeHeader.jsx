@@ -18,7 +18,7 @@ const HomeHeader = ({ user, handleIconPress }) => {
         </TouchableOpacity>
         <View>
           <Text style={styles.headerNormalText}>{strings.WELCOME_BACK}</Text>
-          <Text>{userName}</Text>
+          <Text style={{color:COLORS.noermalText}}>{userName}</Text>
         </View>
       </View>
 

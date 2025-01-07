@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, Platform, ScrollView } from 'react-native';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateWorkspaceAsync } from '../redux/reducers/workspaceSlice';
@@ -15,11 +15,13 @@ const WorkspaceModal = ({ visible, onClose }) => {
       visible={visible}
       onRequestClose={onClose}
     >
+    
       <TouchableOpacity
         style={styles.overlay}
         onPress={onClose}
         activeOpacity={1}
       >
+       
         <View style={styles.modalContainer}>
           {/* Private Option */}
           <TouchableOpacity
@@ -73,10 +75,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   modalContainer: {
+   
     backgroundColor: '#fff',
-    padding: 20,
+    padding: 30,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    marginBottom:Platform.OS==='android'?50:0
+  // height:'40%'
   },
   modalItem: {
     flexDirection: 'row',

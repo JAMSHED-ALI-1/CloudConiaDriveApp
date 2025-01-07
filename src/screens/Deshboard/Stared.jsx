@@ -26,7 +26,7 @@ const Stared = () => {
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
-  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Stared' }]);
+  const [folderStack, setFolderStack] = useState([{ id: null, name: strings.STARED_FILES }]);
   const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -201,7 +201,11 @@ const Stared = () => {
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
  
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
       </View>
       <View style={{left:10}}>
       <Text style={[styles.itemText,]}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}</Text>
@@ -222,7 +226,11 @@ const Stared = () => {
 
     
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
       </View>
       <Text style={styles.itemText}>{item.name.length > 13 ? `${item.name.substring(0, 13)}...` : item.name}</Text>
       <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
@@ -283,7 +291,12 @@ const Stared = () => {
           <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
         </TouchableOpacity>
       )}
-      <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text>
+      {
+        folderStack.length<=1 &&(
+          <Text style={styles.currentFolderText}>{strings.STARED_FILES}</Text>
+        )
+      }
+
       </View>
       {/* <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
         <Text style={styles.currentFolderText}>Sort</Text>
@@ -291,7 +304,7 @@ const Stared = () => {
       </TouchableOpacity> */}
       </View>
       {isLoading ? (
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.blue} />
       ) : (
         <FlatList
         data={organizedData}
@@ -451,6 +464,11 @@ const styles = StyleSheet.create({
       input: {
         flex: 1,
         height: '100%',
+      },
+      icon: {
+        width: 24,
+        height: 24,
+        tintColor: COLORS.white, // Apply a tint color if applicable
       },
 });
 

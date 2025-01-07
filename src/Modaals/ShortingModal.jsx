@@ -6,6 +6,7 @@ import {
   Modal,
   StyleSheet,
 } from 'react-native';
+import strings from '../helper/Language/LocalizedStrings';
 
 const ShortingModal = ({ isVisible, onClose, onApply ,sotinginfo ,sortingOptions}) => {
   const [selectedDirection, setSelectedDirection] = useState('asc');
@@ -13,8 +14,8 @@ const ShortingModal = ({ isVisible, onClose, onApply ,sotinginfo ,sortingOptions
 console.log('insied',sotinginfo)
   // Directions array with key and value
   const directions = [
-    { key: 'Ascending', value: 'asc' },
-    { key: 'Descending', value: 'desc' },
+    { key: strings.Ascending, value: 'asc' },
+    { key: strings.Descending, value: 'desc' },
   ];
 
   // Sort by options with key and value
@@ -37,7 +38,7 @@ console.log('insied',sotinginfo)
       <TouchableOpacity style={styles.modalBackground} onPress={onClose} activeOpacity={1}>
         <View style={styles.dropdownContainer}>
           {/* Direction Section */}
-          <Text style={styles.sectionHeader}>DIRECTION</Text>
+          <Text style={styles.sectionHeader}>{strings.Direction}</Text>
           {directions.map((direction) => (
             <TouchableOpacity
               key={direction.value}
@@ -54,7 +55,7 @@ console.log('insied',sotinginfo)
           ))}
 
           {/* Sort By Section */}
-          <Text style={styles.sectionHeader}>SORT BY</Text>
+          <Text style={styles.sectionHeader}>{strings.SortBy}</Text>
           {sortingOptions.map((option) => (
             <TouchableOpacity
               key={option.value}
@@ -73,7 +74,7 @@ console.log('insied',sotinginfo)
             style={styles.applyButton} 
             onPress={handleApply}
           >
-            <Text style={styles.applyButtonText}>Apply</Text>
+            <Text style={styles.applyButtonText}>{strings.Apply}</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

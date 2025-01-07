@@ -2,6 +2,7 @@ import React, { useState } from 'react';
   import { StyleSheet, Text, View } from 'react-native';
   import { Dropdown } from 'react-native-element-dropdown';
   import AntDesign from 'react-native-vector-icons/AntDesign';
+import { COLORS } from '../utils/Colors';
 
   const data = [
     { label: 'Item 1', value: '1' },
@@ -74,6 +75,7 @@ import React, { useState } from 'react';
       borderWidth: 0.5,
       borderRadius: 8,
       paddingHorizontal: 8,
+      color:COLORS.noermalText
     },
     icon: {
       marginRight: 5,
@@ -86,12 +88,15 @@ import React, { useState } from 'react';
       zIndex: 999,
       paddingHorizontal: 8,
       fontSize: 14,
+      color:COLORS.noermalText
     },
     placeholderStyle: {
       fontSize: 16,
+      color:COLORS.noermalText
     },
     selectedTextStyle: {
       fontSize: 16,
+      color:COLORS.noermalText
     },
     iconStyle: {
       width: 20,
@@ -100,6 +105,7 @@ import React, { useState } from 'react';
     inputSearchStyle: {
       height: 40,
       fontSize: 16,
+      color:COLORS.noermalText
     },
   });
 

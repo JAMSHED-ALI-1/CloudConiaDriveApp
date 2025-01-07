@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import axios from 'axios';
+import { COLORS } from '../utils/Colors';
+import { useSelector } from 'react-redux';
 
 const API_BASE_URL = 'https://drive.coniacloud.com/api/v1';
 
@@ -29,7 +31,7 @@ const ShareFileModal = ({ isVisible, onClose, item, user }) => {
   const [loading, setLoading] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState(PERMISSION_OPTIONS[0]);
   const [accessUsers, setAccessUsers] = useState([]);
-
+  const workspaces = useSelector(state => state.workspace.workspace);
   useEffect(() => {
     if (isVisible) {
       fetchSharedUserInfo();
@@ -81,8 +83,9 @@ const ShareFileModal = ({ isVisible, onClose, item, user }) => {
   const fetchSharedUserInfo = async () => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/drive/file-entries/${item.id}/model`,
-        { headers: getApiHeaders(user?.access_token) }
+        `${API_BASE_URL}/drive/file-entries/${item.id}/model?workspaceId=${workspaces}`,
+        { headers: getApiHeaders(user?.access_token) },
+        
       );
       // console.log('userinfo---',response)
       setAccessUsers(response.data.fileEntry.users|| []);
@@ -294,6 +297,7 @@ const ShareFileModal = ({ isVisible, onClose, item, user }) => {
             {emailList.length > 0 && renderEmailChips()}
             <TextInput
               style={[styles.input, error && styles.inputError]}
+              placeholderTextColor={COLORS.noermalText}
               placeholder="Enter email addresses (separate with comma or Enter)"
               value={currentEmail}
               onChangeText={(text) => {
@@ -337,7 +341,7 @@ const ShareFileModal = ({ isVisible, onClose, item, user }) => {
                 );
               }}
             >
-              <Text>{selectedPermission.label}</Text>
+              <Text style={{color:COLORS.noermalText}}>{selectedPermission.label}</Text>
             </TouchableOpacity>
           </View>
 
@@ -434,6 +438,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     fontSize: 16,
+    color:COLORS.noermalText
   },
   inputError: {
     borderColor: '#ff3b30',

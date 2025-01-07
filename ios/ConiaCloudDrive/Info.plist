@@ -26,11 +26,17 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	
+	
 	<dict>
+	<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+<true/>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+    <true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>This app requires access to music library.</string>
@@ -78,3 +84,7 @@
 	<false/>
 </dict>
 </plist>
+
+
+
+

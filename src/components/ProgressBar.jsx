@@ -8,12 +8,12 @@ import { COLORS } from '../utils/Colors';
 import { baseURL } from '../utils/constant/settings';
 import strings from '../helper/Language/LocalizedStrings';
 
-const ProgressBar = ({ width = 150, color = COLORS.orange, height = 10, label = '' }) => {
+const ProgressBar = ({ width = 150, color = COLORS.orenge, height = 10, label = '' }) => {
   const user = useSelector(state => state.auth.user);
   const [storageInfo, setStorageInfo] = useState({ used: 0, available: 0, percentage: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const language = useSelector(state => state.language.language);
+const language = useSelector((state) => state.language.language);
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -73,7 +73,7 @@ const ProgressBar = ({ width = 150, color = COLORS.orange, height = 10, label = 
           <View>
 
           <Text style={{...styles.label,alignSelf:'center',bottom:6}}>
-             Storage
+             {strings.storage}
             </Text>
             <Progress.Bar
               progress={storageInfo.percentage}

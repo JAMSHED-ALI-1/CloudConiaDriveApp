@@ -21,6 +21,7 @@ import ActionModal from '../../Modaals/ActionModal';
 import strings from '../../helper/Language/LocalizedStrings';
 import getItemIcon from '../../constants/GetItemIcon';
 import ProgressBar from '../../components/ProgressBar';
+import UnshareModal from '../../Modaals/UnshareModal';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Shared = () => {
@@ -37,7 +38,7 @@ const Shared = () => {
   });
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
-  const [folderStack, setFolderStack] = useState([{ id: null, name: 'Root' }]);
+  const [folderStack, setFolderStack] = useState([{ id: null, name: strings.Shared }]);
   const [refreshing, setRefreshing] = useState(false);
   const [isGrid, setIsGrid] = useState(true);
   const [currentFilter, setCurrentFilter] = useState(null);
@@ -48,7 +49,7 @@ const Shared = () => {
 // const [currentFolderId, setCurrentFolderId] = useState(null); // To track the active folder ID
 
   const handleGridListToggle = () => {
-    setIsGrid(!isGrid);
+    setIsGrid((isGrid)=>!isGrid);
   };
   const toggleModalVisible = (item) => {
     setSelectedItem(item); 
@@ -158,7 +159,7 @@ const Shared = () => {
           </TouchableOpacity>
         )}
         <Text style={styles.breadcrumbText}>
-          {currentFolder.breadcrumbs.map(folder => folder.name).join(' > ') || 'Shared Files'}
+          {currentFolder.breadcrumbs.map(folder => folder.name).join(' > ') || strings.Shared}
         </Text>
       </View>
     );
@@ -237,7 +238,11 @@ const Shared = () => {
     <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item,navigation, user, folderStack)}>
  
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
       </View>
       <View style={{left:10}}>
       <Text style={[styles.itemText,]}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}</Text>
@@ -258,7 +263,11 @@ const Shared = () => {
 
     
       <View style={styles.iconContainer}>
-        <Icon name={getItemIcon(item)} size={24} color={COLORS.white} />
+      <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
       </View>
       <Text style={styles.itemText}>{item.name.length > 13 ? `${item.name.substring(0, 13)}...` : item.name}</Text>
       <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
@@ -338,11 +347,17 @@ const Shared = () => {
         />
        
       )}
-      <ActionModal 
+      {/* <ActionModal 
             isVisible={actionModal} 
             onClose={()=>setactionModal(false)}
             user={user}
-            item={selectedItem}/>
+            item={selectedItem}/> */}
+            <UnshareModal
+             visible={actionModal}
+             user={user}
+             folderId={selectedItem} 
+             onClose={() => setactionModal(false)}
+            />
     </View>
     </SafeAreaView>
   );
@@ -482,10 +497,7 @@ const styles = StyleSheet.create({
         flex: 1,
         height: '100%',
       },
-      container: {
-        flex: 1,
-        backgroundColor: '#F5F5F5',
-      },
+     
       breadcrumbContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -561,6 +573,11 @@ const styles = StyleSheet.create({
         marginTop: 5,
         textAlign: 'center',
         fontSize: 12,
+      },
+      icon: {
+        width: 24,
+        height: 24,
+        tintColor: COLORS.white, // Apply a tint color if applicable
       },
 });
 

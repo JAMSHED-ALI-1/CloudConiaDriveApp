@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { APIServiceProvider } from './src/context/APIServiceContext';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { COLORS } from './src/utils/Colors';
 const App = () => {
   const user = useSelector((state) => state.auth.user);
   console.log('apna user',user)
@@ -15,7 +16,7 @@ const App = () => {
     
     <NavigationContainer> 
       <APIServiceProvider>
-        <StatusBar barStyle="light-content" backgroundColor="#0071BC" />
+        <StatusBar barStyle="light-content"   backgroundColor={COLORS.blue}/>
         <View style={styles.container}>
           <StackNavigation />
           <FlashMessage position="top" />
