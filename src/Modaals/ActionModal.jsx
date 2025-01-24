@@ -216,8 +216,9 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,
-        paddingBottom: 40,
-        marginBottom:Platform.OS==='android'?65:0
+        // paddingVertical:40
+        paddingBottom: Platform.OS==='android'?60:10
+      
       },
       itemContainer: {
         flexDirection: 'row',

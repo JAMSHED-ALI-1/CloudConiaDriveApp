@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
       ios: 30,
       android: 30,
     }),
-    paddingVertical: 14,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -57,7 +57,7 @@ const UnshareModal = ({ visible, onClose,user, folderId  }) => {
         }
       );
   
-      console.log('Successfully unshared:', response.data);
+      // console.log('Successfully unshared:', response.data);
       showAlert(ALERT_TYPE.SUCCESS, 'Success', 'Item unshared successfully!');
     } catch (error) {
       console.error('Error unsharing item:', error);

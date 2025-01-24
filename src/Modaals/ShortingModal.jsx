@@ -11,7 +11,7 @@ import strings from '../helper/Language/LocalizedStrings';
 const ShortingModal = ({ isVisible, onClose, onApply ,sotinginfo ,sortingOptions}) => {
   const [selectedDirection, setSelectedDirection] = useState('asc');
   const [selectedSortBy, setSelectedSortBy] = useState('created_at');
-console.log('insied',sotinginfo)
+// console.log('insied',sotinginfo)
   // Directions array with key and value
   const directions = [
     { key: strings.Ascending, value: 'asc' },

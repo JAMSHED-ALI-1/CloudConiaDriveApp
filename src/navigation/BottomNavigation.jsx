@@ -15,48 +15,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomNavigation = ({ navigation }) => {
   const language = useSelector((state) => state.language.language);
-useEffect(() => {
-    const handleBackButton = () => {
-      // Get the current route name from navigation state
-      const currentRoute = navigation.getState().routes[navigation.getState().index];
-      
-      if (currentRoute.name === 'Home') {
-        Alert.alert(
-          'Exit App',
-          'Are you sure you want to exit?',
-          [
-            {
-              text: 'Cancel',
-              onPress: () => null,
-              style: 'cancel',
-            },
-            {
-              text: 'OK',
-              onPress: () => {
-                BackHandler.exitApp();
-              },
-            },
-          ],
-          { cancelable: false }
-        );
-        return true; // Prevent default back button behavior
-      } else {
-        // If not on home screen, navigate to home
-        navigation.navigate('Home');
-        return true; // Prevent default back button behavior
-      }
-    };
-
-    // Adding the back button listener
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
-
-    // Cleanup the listener when component unmounts
-    return () => {
-      backHandler.remove();
-    };
-  }, [navigation]); 
-
-  return (
+return (
     <Tab.Navigator
       backBehavior="initialRoute"
       screenOptions={({ route }) => ({

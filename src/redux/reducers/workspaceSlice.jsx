@@ -9,7 +9,7 @@ export const updateWorkspaceAsync = createAsyncThunk(
   'workspace/updateWorkspace',
   async (data, { rejectWithValue }) => {
     try {
-      console.log(data);
+      // console.log(data);
       return data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);

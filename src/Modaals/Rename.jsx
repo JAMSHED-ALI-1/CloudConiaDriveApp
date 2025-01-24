@@ -36,7 +36,7 @@ const RenameModal = ({ isVisible, onClose, item, user, }) => {
         name: name
       });
 
-      console.log('Rename response:', response);
+      // console.log('Rename response:', response);
       setLoading(false);
       onClose();
       if (response.status === 'success') 

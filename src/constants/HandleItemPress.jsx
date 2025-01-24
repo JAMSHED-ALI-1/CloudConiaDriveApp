@@ -1,51 +1,74 @@
-import { useNavigation } from "@react-navigation/native";
-import { useCallback } from "react";
-const navigation=useNavigation()
-const HandleItemPress = useCallback((item,) => {
-  if (item.type === 'folder') {
-    setCurrentFolder((prevState) => ({
-      pageId: item.hash, // Dynamically use folder's hash as pageId
-      folderId: item.hash,
-      folderDetails: item,
-      breadcrumbs: [...prevState.breadcrumbs, item],
-    }));
-  } else {
-    const extensionToRouteMap = {
-      images: ['jpg', 'jpeg', 'png', 'gif', 'svg'],
-      pdf: ['pdf'],
-      videos: ['mp4', 'avi', 'mkv', 'mov', 'wmv'],
-      audio: ['mp3', 'wav', 'aac', 'flac'],
-      word: ['doc', 'docx'],
-      powerpoint: ['ppt', 'pptx', 'odp'],
-      spreadsheet: ['xls', 'xlsx', 'csv', 'ods'],
-      text: ['txt'],
-      archives: ['zip', 'tar', 'rar', 'exe', 'app', 'apk'],
-    };
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import React from 'react';
 
-    const routeMap = {
-      images: 'ImageViewer',
-      pdf: 'PdfView',
-      videos: 'VideoPreview',
-      audio: 'AudioPreview',
-      word: 'WordPreview',
-      powerpoint: 'PptPreview',
-      spreadsheet: 'SpreadsheetPreview',
-      text: 'TextFilePreview',
-      archives: 'Zipapkpreview',
-    };
+const HandleItemPress = ({ folderStack, handleBackPress, setShowDropdown, COLORS, strings }) => {
+  return (
+    <View style={styles.container}>
+      {/* Back Button Section */}
+      {folderStack.length > 1 ? (
+        <TouchableOpacity style={styles.backButton} 
+        // onPress={handleBackPress}
+        >
+          {/* <Image source={require('../assets/icon/arrow-back.png')} style={styles.icon} /> */}
+          <Text style={styles.backButtonText}>
+            {strings.Backto} {folderStack[folderStack.length - 2].name}
+          </Text>
+        </TouchableOpacity>
+      ) : (
+        <Text style={styles.currentFolderText}>{strings.HOME}</Text>
+      )}
 
-    const extension = item.extension?.toLowerCase();
-    const routeKey = Object.keys(extensionToRouteMap).find((key) =>
-      extensionToRouteMap[key].includes(extension)
-    );
+      {/* Sort Dropdown Section */}
+      <TouchableOpacity 
+        style={styles.sortButton} 
+        // onPress={() => setShowDropdown(true)}
+      >
+        <Text style={styles.currentFolderText}>{strings.SORT}</Text>
+        {/* <Image 
+          source={require('../assets/icon/sorting.png')} 
+          style={styles.sortIcon} 
+        /> */}
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-    if (routeKey && routeMap[routeKey]) {
-      navigation.navigate(routeMap[routeKey], {
-        filePath: item,
-        user: user,
-      });
-    } else {
-      console.warn('Unsupported file type clicked:', item);
-    }
-  }
-}, [navigation, user, folderStack]);
+export default HandleItemPress;
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#f5f5f5',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 10,
+  },
+  currentFolderText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sortIcon: {
+    height: 25,
+    width: 25,
+    resizeMode: 'contain',
+    marginLeft: 10,
+  },
+  icon: {
+    height: 24,
+    width: 24,
+    resizeMode: 'contain',
+  },
+});

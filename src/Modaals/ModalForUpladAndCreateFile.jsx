@@ -8,7 +8,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import { COLORS } from '../utils/Colors';
 import { useSelector } from 'react-redux';
 import strings from '../helper/Language/LocalizedStrings';
-const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,user, folderId  }) => {
+const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,user, folderId ,refreshing }) => {
   // const language = useSelector((state) => state.language.language);
   const [folderModalVisible, setFolderModalVisible] = useState(false); 
   const [folderName, setFolderName] = useState(''); 
@@ -49,10 +49,11 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
         parentId: folderId === 0 ? null : folderId,
         name: folderName,
       });
-      console.log('Creating Folder', response);
+      // console.log('Creating Folder', response);
       if (response?.status === 'success' && response.folder) {
         showAlert(ALERT_TYPE.SUCCESS, 'Success', 'Folder successfully created!');
         toggleFolderModal();
+        refreshing=true
         setFolderName('');
       } else {
         throw new Error('Folder creation failed');
@@ -96,12 +97,12 @@ const ModalForUploadAndCreateFile = ({ visible, onClose, onUpload, uploadFolder,
         'Content-Type': 'multipart/form-data',
       }, formData);
       
-      console.log('Upload response:', response.data); 
+      // console.log('Upload response:', response.data); 
       setIsLoading(false)// Add this log
 
       if (response.respInfo.status === 200 || response.respInfo.status === 201) {
         const responseData = JSON.parse(response.data);
-        console.log('Parsed response data:', responseData); // Add this log
+        // console.log('Parsed response data:', responseData); // Add this log
         if (responseData.status === 'success') {
           console.log('Upload successful, showing alert'); // Add this log
           showAlert(ALERT_TYPE.SUCCESS, 'Success', 'File uploaded successfully!');
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    marginBottom:Platform.OS==='android'?65:0
+     paddingBottom: Platform.OS==='android'?60:10
   },
   modalItem: {
     flexDirection: 'row',

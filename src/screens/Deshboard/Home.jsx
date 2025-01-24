@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, FlatList, Image, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, FlatList, Image, SafeAreaView, ScrollView ,BackHandler, Alert} from 'react-native';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { COLORS } from '../../utils/Colors';
 import { useSelector } from 'react-redux';
@@ -13,7 +13,7 @@ import { FastField } from 'formik';
 import HomeHeader from '../../components/HomeHeader';
 import AnimationModal from '../../Modaals/AnimationModal';
 import ActionModal from '../../Modaals/ActionModal';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ProgressBar from '../../components/ProgressBar';
 import strings from '../../helper/Language/LocalizedStrings';
 import { makeApiCall } from '../../helper/apiHelper';
@@ -39,8 +39,43 @@ const Home = () => {
     sortBy: 'updated_at',
     sortDir: 'desc',        
   });
-  
+  const [isSelectionModeEnabled, setIsSelectionModeEnabled] = useState(false);
   const navigation=useNavigation()
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (isSelectionModeEnabled) {
+          setIsSelectionModeEnabled(false);
+          return true; 
+        } else {
+          Alert.alert(
+            'Exit App',
+            'Are you sure you want to exit?',
+            [
+              {
+                text: 'Cancel',
+                onPress: () => null,  
+                style: 'cancel',
+              },
+              {
+                text: 'OK',
+                onPress: () => BackHandler.exitApp(),  // Exit app if confirmed
+              },
+            ],
+            { cancelable: false }  // Disable tapping outside the alert to dismiss
+          );
+          return true;  // prevents default behavior (so the app doesn't exit immediately)
+        }
+      };
+  
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+      );
+  
+      return () => subscription.remove();
+    }, [isSelectionModeEnabled])
+  );
 
   const sortByOptions = [
     { key: strings.Size, value: 'file_size' },
@@ -438,3 +473,331 @@ marginTop:30
     tintColor: COLORS.white, // Apply a tint color if applicable
   },
 });
+
+
+
+// import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+// import React, { useCallback, useEffect, useMemo, useState } from 'react'
+// import { commonStyle } from '../../utils/Commomcss'
+// import HomeHeader from '../../components/HomeHeader'
+// import { useSelector } from 'react-redux'
+// import ProgressBar from '../../components/ProgressBar'
+// import strings from '../../helper/Language/LocalizedStrings'
+// import { COLORS } from '../../utils/Colors'
+// import AnimationModal from '../../Modaals/AnimationModal'
+// import HandleItemPress from '../../constants/HandleItemPress'
+// import RenderCardListGrid from '../../components/RenderCardListGrid'
+// import { date } from 'yup'
+// import axios from 'axios'
+// import { baseURL } from '../../utils/constant/settings'
+// import { current } from '@reduxjs/toolkit'
+// import ShortingModal from '../../Modaals/ShortingModal'
+// import getItemIcon from '../../constants/GetItemIcon'
+// import Icon from 'react-native-vector-icons/MaterialIcons'
+// import ActionModal from '../../Modaals/ActionModal'
+// import ModalForUploadAndCreateFile from '../../Modaals/ModalForUpladAndCreateFile'
+
+//   const sortByOptions = [
+//     { key: strings.Size, value: 'file_size' },
+//     { key: strings.Name, value: 'name' },
+//     { key: strings.LastModified, value: 'updated_at' },
+//     { key: strings.UploadDate, value: 'created_at' },
+//   ];
+// const Home = ({navigation}) => {
+//     const user = useSelector((state) => state.auth.user);
+//   const language = useSelector((state) => state.language.language);
+//   const [folderStack, setFolderStack] = useState([{ id: null, name: strings.HOME }]);
+//   const workspaces = useSelector(state => state.workspace.workspace);
+//   const [grid, setGrid] = useState('list');
+//   const [actionModal,setactionModal]=useState(false)
+//   const [showDrodown,setshowdropdown]=useState(false)
+//   const [showModalAi,setshowmodalAi]=useState(false)
+//   const [loading,setIsLoading]=useState(false)
+//   const [DriveData,SetDriveData]=useState([])
+//   const [selectedItem, setSelectedItem] = useState(null);
+//   const [showmodal,setShowmodal]=useState(false)
+//   const [refreshing, setRefreshing] = useState(false);
+//     const [sortingInfo, setSortingInfo] = useState({
+//     sortBy: 'updated_at',
+//     sortDir: 'desc',        
+//   });
+//   const currentFolderId = folderStack[folderStack.length - 1].id;
+//   const fetchData = useCallback(async () => {
+//     try {
+//         setIsLoading(true); // Start loading
+//         const response = await axios.get(`${baseURL}/drive/file-entries`, {
+//             headers: { Authorization: `Bearer ${user?.access_token}` },
+//             params: {
+//            pageId: 0,
+//           folderId: currentFolderId, 
+//           page: 1,
+//           workspaceId: workspaces?workspaces:0,
+//           deletedOnly: false,
+//           starredOnly: false,
+//           recentOnly: false,
+//           sharedOnly: false,
+//           per_page: 100,
+//           orderBy: sortingInfo.sortBy,
+//           orderDir: sortingInfo.sortDir,
+//             },
+//         });
+//         SetDriveData(response.data.data);
+//         // console.log(response.data.data)
+//         if (response.status === 403) {
+//             navigation.replace('Login'); 
+//         }
+//     } catch (error) {
+//         console.log('Error fetching data:', error);
+//         if (error.response && error.response.status === 403) {
+//             navigation.replace('Login');
+//         }
+//     } finally {
+//         setIsLoading(false); 
+//     }
+// }, [user, currentFolderId,workspaces,refreshing,setRefreshing]);  
+
+// const handleSortApply = ({ sortBy, sortDir }) => {
+//   setSortingInfo({ sortBy, sortDir }); 
+//   fetchData(currentFilter, sortBy, sortDir); 
+//   console.log('Sort applied:', sortBy, sortDir);
+// };
+
+// useEffect(() => {
+//   fetchData();
+// }, [fetchData]);
+// const handleFilterSelection = (filter) => {
+//   setCurrentFilter(filter); 
+//   fetchData(filter);
+// };
+
+// useEffect(() => {
+//   fetchData();
+// }, [fetchData, currentFolderId, user,sortingInfo,]);
+
+// const onRefresh = useCallback(async () => {
+//   setRefreshing(true);
+//   await fetchData();
+//   setRefreshing(false);
+// }, [fetchData]);
+
+// const organizedData = useMemo(() => {
+//   return DriveData.sort((a, b) => {
+//     if (a.type === 'folder' && b.type !== 'folder') return -1;
+//     if (a.type !== 'folder' && b.type === 'folder') return 1;
+//     return a.name.localeCompare(b.name);
+//   });
+// }, [DriveData]);
+
+// const handleItemPress = useCallback((item) => {
+//   if (item.type === 'folder') {
+//     setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
+//   } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
+//     // Navigate to ImageViewer if the item is an image
+//     navigation.navigate('ImageViewer',{
+//       filePath: item,
+//       user: user,
+//     });
+    
+//   } 
+//   else if (item.type === 'pdf') {
+//     // Navigate to ImageViewer if the item is an image
+//     navigation.navigate('PdfView',{
+//       filePath: item,
+//       user: user,
+//     });
+    
+//   } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)){
+//     // navigation.navigate('VideoPreview', {
+//     navigation.navigate('VideoPreview', {
+//       filePath: item,
+//       user: user, 
+//     });
+//   } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)){
+//     navigation.navigate('AudioPreview', {
+//       filePath: item,
+//       user: user, 
+//     });
+//   }
+//   else if (['doc', 'docx'].includes(item.extension)){
+//     navigation.navigate('WordPreview', {
+//       filePath: item,
+//       user: user, 
+//     });
+//   }
+//   else if (['pptx','ppt','odp'].includes(item.extension)){
+//     navigation.navigate('PptPreview', {
+//       filePath: item,
+//       user: user, 
+//     });
+//   }
+//   else if (['xls','xlsx','csv','ods'].includes(item.extension)){
+//     navigation.navigate('SpreadsheetPreview', {
+//       filePath: item,
+//       user: user, 
+//     });
+//   }
+//   else if (['txt'].includes(item.extension)){
+//     navigation.navigate('TextFilePreview', {
+//       filePath: item,
+//       user: user, 
+//     });
+//   }
+//   else if (['zip','tar','rar','exe','app','apk'].includes(item.extension)){
+//     navigation.navigate('Zipapkpreview', {
+//       filePath: item,
+//       user: user, 
+//     });
+//   }else {
+//     console.log('File clicked:',);
+//   }
+// }, [navigation, user, folderStack]);
+
+// const handleBackPress = useCallback(() => {
+//   if (folderStack.length > 1) {
+//     setFolderStack(prev => prev.slice(0, -1));
+//   }
+// }, [folderStack]);
+
+//   const toggleModalVisible = (item) => {
+//     setSelectedItem(item); 
+//     setactionModal(!actionModal);
+//     console.log('Selected Item:', item);
+//   };
+  
+
+
+
+
+
+//   const renderItem = ({ item }) => (
+//     <RenderCardListGrid item={item} isGrid={grid === 'grid'} onPress={() => handleItemPress(item)} 
+//     getIcon={getItemIcon(item)}
+//     action={()=>toggleModalVisible(item)}/>
+//   );
+//   return (
+//     <View style={commonStyle.container}>
+//     <HomeHeader user={user} handleIconPress={() => setshowmodalAi(true)} />
+//     <ProgressBar/>
+//     {/* List Grid Part Start */}
+//          <View style={{ flexDirection: 'row', justifyContent: 'space-between',paddingVertical:8 }}>
+//         <Text style={commonStyle.heading}>{strings.RECENTLY_EDITED}</Text>
+//          <View style={{ flexDirection: "row", gap: 10 }}>
+//           <TouchableOpacity onPress={() => setGrid('list')}>
+//              <Image source={require('../../assets/list.png')} style={[styles.rightImage, { tintColor: grid ==='list' ? '#004181' : '#B3B4B6' }]} />
+//            </TouchableOpacity>
+//           <TouchableOpacity onPress={() => setGrid('grid')}>
+//              <Image source={require('../../assets/Grid.png')} style={[styles.rightImage, { tintColor: grid ==='grid'? '#004181' : '#B3B4B6' }]} />
+//            </TouchableOpacity>
+//         </View>
+//       </View>
+//        {/* List Grid Part End */}
+//        {/* <View style={{ ...styles.line}}>
+//           </View> */}
+//           {/* <HandleItemPress 
+//           // onPress={handleBackPress}
+//           // setShowDropdown={}
+//           /> */}
+//  <View style={{ borderBottomWidth: 1,
+//         borderBottomColor: '#E0E0E0',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+//           <View>
+//       {folderStack.length > 1 && (
+//         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+//           <Icon name="arrow-back" size={24} color={COLORS.black} />
+//           <Text style={styles.backButtonText}>{strings.Backto} {folderStack[folderStack.length - 2].name}</Text>
+//         </TouchableOpacity>
+//       )}{
+//         folderStack.length<=1 &&(
+//           <Text style={styles.currentFolderText}>{strings.HOME}</Text>
+//         )
+//       }
+     
+//       </View>
+//       <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
+//         <Text style={styles.currentFolderText}>{strings.SORT}</Text>
+//         <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
+//       </TouchableOpacity>
+//       </View>
+
+// <FlatList
+//         data={organizedData}
+//         renderItem={renderItem}
+//         keyExtractor={(item) => item.id.toString()}
+//         key={grid} 
+//         numColumns={grid === 'grid' ? 2 : 1}
+//         contentContainerStyle={{ paddingBottom: 20 }}
+//        showsVerticalScrollIndicator={false}
+//        onRefresh={onRefresh}
+//        refreshing={refreshing}
+//                  ListEmptyComponent={<View style={{flex:1,alignItems:'center'}}>
+//             <Text style={styles.emptyText}>This folder is empty</Text>
+//           </View>}
+//       />
+//               <TouchableOpacity style={styles.btn} 
+//       onPress={()=>setShowmodal(true)}
+//       >
+//             <Text style={styles.text}>+</Text>
+//           </TouchableOpacity>
+//       //             <ActionModal
+//             isVisible={actionModal} 
+//             onClose={()=>setactionModal(false)}
+//             user={user}
+//             item={selectedItem}/>
+//       <AnimationModal visible={showModalAi} onClose={() => setshowmodalAi(false)} />
+//                 <ShortingModal
+//             isVisible={showDrodown} 
+//             onClose={()=>setshowdropdown(false)}
+//              onApply={handleSortApply}
+//             sortingOptions={sortByOptions}
+//             initialSorting={sortingInfo}
+//  />
+//            <ModalForUploadAndCreateFile
+//            refreshing={refreshing}
+//           visible={showmodal}
+//           user={user}
+//            folderId={currentFolderId} 
+//           onClose={() => setShowmodal(false)}/>
+
+//     </View>
+//   )
+// }
+
+// export default Home
+
+// const styles = StyleSheet.create({
+//     rightImage: {
+//     width: 20,
+//     height: 20,
+//   },
+//   line:{
+//     borderBottomWidth: 1,
+//         borderBottomColor: '#E0E0E0',
+//         flexDirection:'row',
+//         justifyContent:'space-between',
+//         alignItems:'center'
+//   },
+//     backButton: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingVertical: 10,
+//   },
+//   backButtonText: {
+//      marginLeft: 10,
+//     color: COLORS.primary,
+//     fontSize: 16,
+//   },
+//     btn: {
+//     position: 'absolute',
+//     right: 20,
+//     bottom: 40,
+//     backgroundColor: '#0071BC',
+//     width: 50,
+//     height: 50,
+//     borderRadius: 25,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   text: {
+//     color: '#fff',
+//     fontSize: 30,
+//   },
+// })

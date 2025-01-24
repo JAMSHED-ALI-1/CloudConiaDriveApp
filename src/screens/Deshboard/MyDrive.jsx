@@ -156,6 +156,7 @@ const MyDrive = () => {
       });
       
     } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)){
+      // navigation.navigate('VideoPreview', {
       navigation.navigate('VideoPreview', {
         filePath: item,
         user: user, 
@@ -325,13 +326,13 @@ const MyDrive = () => {
         
        
       )}
-      {/*  */}
+   {folderStack.length<=1 &&
       <TouchableOpacity style={styles.btn} 
       onPress={()=>setshowworkspacemodal(true)}
       >
             {/* <Text style={styles.text}>+</Text> */}
             <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white}/>
-          </TouchableOpacity>
+          </TouchableOpacity>}
           <WorkspaceModal
           visible={workspacemodal}
           user={user}

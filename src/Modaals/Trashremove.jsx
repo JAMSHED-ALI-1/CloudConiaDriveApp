@@ -104,7 +104,7 @@ const Trashremove = ({ visible, onClose,user, item }) => {
               deleteForever: true,
             };
             const response = await makeApiCall('/api/v1/file-entries/delete', user?.access_token, 'post', data);
-            console.log('Permanent delete response:', response);
+            // console.log('Permanent delete response:', response);
             if (response?.status === 'success') {
               Alert.alert('Success', 'File permanently deleted!');
               onClose();
