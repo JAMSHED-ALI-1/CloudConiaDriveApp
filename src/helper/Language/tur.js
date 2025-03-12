@@ -10,6 +10,7 @@ export default {
   RENAME: 'Yeniden Adlandır',
   DELETEFILE: 'Sil',
   RESTORE: 'Geri Yükle',
+  goBack:'Go Back',
   SEARCH: 'Ara',
   CREATE_FOLDER: 'Klasör Oluştur',
   UPLOAD_FOLDER: 'Dosya Yükle',
@@ -73,7 +74,7 @@ export default {
   Apply: 'Uygula',
   EnterYourEmail:'E-postanızı Girin',
   Enteryourpassword:'Şifrenizi girin',
-
+  UNSHARED:"Dont share",
   PriceandfeaturListin$: 'Fiyat ve Özellik Listesi $',
   ConiaClouddrivebasic: 'ConiaCloud Drive Basic',
   STOREGESPACE25GB: 'Depolama Alanı: 25GB',
@@ -87,4 +88,14 @@ export default {
   ACCESSFILESFROMANYDEVICE: 'Dosyalara Herhangi Bir Cihazdan Erişim',
   AUTOMATICBACKUP: 'Otomatik Yedekleme',
   FILEPREVIEFUNCTIONALITY: 'Dosya Önizleme İşlevi',
+  PROFILE:'Profil',
+  Warning_Yourdemoaccounthasexpired: "Uyarı! Demo hesabınızın süresi doldu!",
+  Purchasethepackageyouchoosenowtocontinueyourlife: "Hayatınıza devam etmek için seçtiğiniz paketi şimdi satın alın",
+  whichismadeeasierbyConiaCloud: "bu, ConiaCloud tarafından kolaylaştırılmıştır",
+  PRICE_LIST: "Fiyat Listesi",
+  NEED_MORE: "Daha fazla gerekiyor",
+  STORAGECAPACITY: "Depolama kapasitesi",
+  UPGGRADE: "Yükselt",
+  ALL:'All' ,
+    // WarningDearUseYourdemoaccounthasexpiredPurchasethepackageyouchoosenowtocontinueyourlife,whichismadeeasierbyConiaCloud:'Uyarı! Sayın Kullanıcımız, Demo Hesabınızın Süresi Doldu! SonyCloud ile kolaylaştırılan hayatınıza devam etmek için seçtiğiniz paketi hemen satın alın.'
 };

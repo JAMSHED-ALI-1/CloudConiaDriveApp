@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   folderPath: [],
-  currentFolderId: null, // Initial folder or root folder
+  currentFolderId: null, 
 };
 
 const folderSlice = createSlice({

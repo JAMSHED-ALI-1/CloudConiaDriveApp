@@ -9,7 +9,7 @@ import { COLORS } from '../utils/Colors';
 import { useSelector } from 'react-redux';
 import strings from '../helper/Language/LocalizedStrings';
 import axios from 'axios';
-const UnshareModal = ({ visible, onClose,user, folderId  }) => {
+const UnshareModal = ({ visible, onClose,user, folderId,onSuccess  }) => {
   // const language = useSelector((state) => state.language.language);
   const [folderModalVisible, setFolderModalVisible] = useState(false); 
   const [folderName, setFolderName] = useState(''); 
@@ -59,6 +59,7 @@ const UnshareModal = ({ visible, onClose,user, folderId  }) => {
   
       // console.log('Successfully unshared:', response.data);
       showAlert(ALERT_TYPE.SUCCESS, 'Success', 'Item unshared successfully!');
+      onSuccess()
     } catch (error) {
       console.error('Error unsharing item:', error);
       const errorMessage = error.response?.data?.message || 'Failed to unshare item.';
@@ -108,8 +109,8 @@ const UnshareModal = ({ visible, onClose,user, folderId  }) => {
         <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1}>
           <View style={styles.modalContainer}>
             <TouchableOpacity style={styles.modalItem} onPress={() => { onClose(); confirmDelete(); }}>
-            <Image source={require('../assets/FileFolderIcons/delete.png')} style={styles.modalIcon} tintColor={COLORS.blue} />
-              <Text style={styles.nornalText}>{strings.Permanently_Delete}</Text>
+            <Image source={require('../assets/FileFolderIcons/dont-share.png')} style={styles.modalIcon} tintColor={COLORS.blue} />
+              <Text style={styles.nornalText}>{strings.UNSHARED}</Text>
             </TouchableOpacity>
            
             

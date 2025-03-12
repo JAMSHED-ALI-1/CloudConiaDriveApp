@@ -14,6 +14,7 @@ import pdfIcon from '../../assets/icons/pdf.png';
 import play from '../../assets/icons/pdf.png';
 import video from '../../assets/icon/video.png';
 import wordIcon from '../../assets/icon/word.png';
+import ic_allIcon from '../../assets/icon/all.png'
 import imageIcon from '../../assets/icon/image.png';
 import ModalForUploadAndCreateFile from '../../Modaals/ModalForUpladAndCreateFile';
 import ActionModal from '../../Modaals/ActionModal';
@@ -24,10 +25,20 @@ import getItemIcon from '../../constants/GetItemIcon';
 import DropdownComp from '../../components/DropdownComp';
 import ShortingModal from '../../Modaals/ShortingModal';
 import { tuple } from 'yup';
+import { accessData } from '../../utils/UserAccessData';
+import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
+import Filter from '../../components/Filter';
+import { FilterData } from '../../utils/constant/FilterData';
+import FileItem from '../../components/RenderCardListGrid';
+import { useMediaPreview } from '../../components/FileSystemComponent';
+import Gridlist from '../../constants/Gridlist';
+import HomeHeader from '../../components/HomeHeader';
+import FileFolderModal from '../../Modaals/FileFolderModal';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const MyDrive = () => {
   const user = useSelector((state) => state.auth.user);
+  const [hasAccess, setHasAccess] = useState(false);
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
@@ -39,8 +50,11 @@ const MyDrive = () => {
   const [currentFilter, setCurrentFilter] = useState(null);
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
+  const [showModalAi, setshowmodalAi] = useState(false);
   const [actionModal,setactionModal]=useState(false)
   const [workspacemodal,setshowworkspacemodal]=useState(false)
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [opencreateuplodModal, setopencreateModal] = useState(false);
   const [showDrodown,setshowdropdown]=useState(false)
   const [sortingInfo, setSortingInfo] = useState({
     sortBy: 'updated_at',
@@ -57,6 +71,7 @@ const MyDrive = () => {
     { id: 2, Image: fileIcon, title: strings.File, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidGV4dCIsImlzSW5hY3RpdmUiOmZhbHNlLCJvcGVyYXRvciI6Ij0iLCJ2YWx1ZUtleSI6IjAyIn1d' },
     { id: 3, Image: imageIcon, title: strings.Image, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoiaW1hZ2UiLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNSJ9XQ%3D%3D' },
     { id: 4, Image: video, title:strings.Video, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidmlkZW8iLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNCJ9XQ%3D%3D' },
+    { id: 4, Image: ic_allIcon, title:strings.ALL, filters: '' },
   ];
  
   const sortByOptions = [
@@ -77,7 +92,8 @@ const MyDrive = () => {
       const response = await axios.get(`${baseURL}/drive/file-entries?timestamp=${new Date().getTime()}`, {
         headers: { Authorization: `Bearer ${user?.access_token}` },
         params: {
-          pageId: 0,
+          filters: filter,
+          pageId: search?search: 0,
           folderId: currentFolderId, 
           page: 1,
           workspaceId: workspaces?workspaces:0,
@@ -88,6 +104,8 @@ const MyDrive = () => {
           per_page: 100,
           orderBy: sortingInfo.sortBy,
           orderDir: sortingInfo.sortDir,
+          query:'',
+          thumbnail:true
   
         },
       });
@@ -120,6 +138,13 @@ const MyDrive = () => {
   };
   
   useEffect(() => {
+    const hasAccess = accessData(user);
+    setHasAccess(hasAccess);
+    console.log("User has access:", hasAccess);
+  }, [user]); 
+
+
+  useEffect(() => {
     fetchData();
   }, [fetchData, currentFolderId, user,sortingInfo,]);
 
@@ -137,69 +162,24 @@ const MyDrive = () => {
     });
   }, [allData]);
 
-  const handleItemPress = useCallback((item) => {
+  const handleFolderCreationSuccess = () => {
+    fetchData()
+  };
+
+
+  const handleMediaPreview = useMediaPreview(navigation, user);
+  const onItemPress = (item) => {
+    // If it's a folder, handle folder navigation
     if (item.type === 'folder') {
+      // setIsFolderChanging(true);
+      // Your folder navigation logic
       setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
-    } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
-      // Navigate to ImageViewer if the item is an image
-      navigation.navigate('ImageViewer',{
-        filePath: item,
-        user: user,
-      });
-      
-    } 
-    else if (item.type === 'pdf') {
-      // Navigate to ImageViewer if the item is an image
-      navigation.navigate('PdfView',{
-        filePath: item,
-        user: user,
-      });
-      
-    } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)){
-      // navigation.navigate('VideoPreview', {
-      navigation.navigate('VideoPreview', {
-        filePath: item,
-        user: user, 
-      });
-    } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)){
-      navigation.navigate('AudioPreview', {
-        filePath: item,
-        user: user, 
-      });
+    } else {
+      // Preview the file
+      handleMediaPreview(item);
     }
-    else if (['doc', 'docx'].includes(item.extension)){
-      navigation.navigate('WordPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['pptx','ppt','odp'].includes(item.extension)){
-      navigation.navigate('PptPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['xls','xlsx','csv','ods'].includes(item.extension)){
-      navigation.navigate('SpreadsheetPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['txt'].includes(item.extension)){
-      navigation.navigate('TextFilePreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['zip','tar','rar','exe','app','apk'].includes(item.extension)){
-      navigation.navigate('Zipapkpreview', {
-        filePath: item,
-        user: user, 
-      });
-    }else {
-      console.log('File clicked:',);
-    }
-  }, [navigation, user, folderStack]);
+  };
+
 
   const handleBackPress = useCallback(() => {
     if (folderStack.length > 1) {
@@ -207,52 +187,18 @@ const MyDrive = () => {
     }
   }, [folderStack]);
 
- 
-  const renderItemList = ({ item }) => (
-    <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
- 
-      <View style={styles.iconContainer}>
-      <Image 
-        source={getItemIcon(item)} 
-        style={styles.icon} 
-        resizeMode="contain" 
-      />
-      </View>
-      <View style={{left:10}}>
-      <Text style={[styles.itemText,]}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}</Text>
-      <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
-      </View>
-      <TouchableOpacity
-           onPress={() => toggleModalVisible(item)}
-          style={{position:'absolute',right:10}}>
-            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
-          </TouchableOpacity>
-    </TouchableOpacity>
-  );
 
-  const renderItemGrid = ({ item }) => (
-    
-    <TouchableOpacity style={styles.grid} onPress={() => handleItemPress(item)}>
-      <View>
 
-    
-      <View style={styles.iconContainer}>
-      <Image 
-        source={getItemIcon(item)} 
-        style={styles.icon} 
-        resizeMode="contain" 
-      />
-      </View>
-      <Text style={styles.itemText}>{item.name.length > 13 ? `${item.name.substring(0, 13)}...` : item.name}</Text>
-      <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
-      </View>
-      <TouchableOpacity
-           onPress={() => toggleModalVisible(item)}
-          >
-            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 30, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
-          </TouchableOpacity>
-    </TouchableOpacity>
-  );
+  const renderItem = useCallback(({ item }) => (
+    <FileItem
+      item={item}
+      grid={isGrid}
+      handleMediaPreview={() => onItemPress(item)}
+      onOpenModal={toggleModalVisible}
+    />
+  ), [isGrid, ]);
+  
+
 
   const toggleModalVisible = (item) => {
     setSelectedItem(item); 
@@ -261,33 +207,24 @@ const MyDrive = () => {
 
   return (
     <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}>
-
+  <HomeHeader user={user} handleIconPress={() => setshowmodalAi(true)}
+        handlecreateOpenModal={handlecreateOpenModal}
+       />
    
     <View style={styles.container}>
-        <CustomHeader
-          right={true}
-          grid={true}
-          title={strings.MyFiles}
-          ViewType={isGrid}  // Pass the view type state
-          hadleGidList={handleGridListToggle}
-        />
+      <View style={{paddingBottom:10}}>
+
+      <ProgressBar />
+      </View>
        
-<View style={styles.folderContainer}>
-  {FilderData.map(item => (
-    <View key={item.id} style={styles.folderItem}>
-      <TouchableOpacity 
-        style={[
-          styles.filtercontainer,
-          currentFilter === item.filters && styles.selectedFilter,
-        ]}
-        onPress={() => handleFilterSelection(item.filters)}
-      >
-        <Image source={item.Image} style={styles.folderIcon} />
-      </TouchableOpacity>
-      <Text style={styles.folderTitle}>{item.title}</Text>
-    </View>
-  ))}
-</View>
+       
+
+{/* <Filter
+       FilterData={FilterData}
+       selectedFilter={selectedFilter}
+       handleFilterSelect={handleFilterSelection}
+       /> */}
+
      <View style={{ borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
           <View>
@@ -303,36 +240,36 @@ const MyDrive = () => {
       }
      
       </View>
-      <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
-        <Text style={styles.currentFolderText}>{strings.SORT}</Text>
-        <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
-      </TouchableOpacity>
+    
+      <Gridlist toggleView={()=>setIsGrid(!isGrid)} grid={isGrid} setShowDropdown={() => setshowdropdown(true)}/>
       </View>
-      {isLoading ? (
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      ) : (
-        <FlatList
-          data={organizedData}
-          renderItem={isGrid ?    renderItemList:renderItemGrid}
-          keyExtractor={item => item.id.toString()}
-          ListEmptyComponent={<View style={{flex:1,alignItems:'center'}}>
-          <Text style={styles.emptyText}>This folder is empty|| or API Problem From BackEnd Token Expired</Text>
-        </View>}
-            numColumns={isGrid ? 1 : 2}// Number of columns for grid or list view
-          onRefresh={onRefresh}
-          refreshing={refreshing}
-          key={isGrid ?  'list':'grid'} // Key to re-render FlatList on viewType change
-        />
-        
-       
-      )}
-   {folderStack.length<=1 &&
-      <TouchableOpacity style={styles.btn} 
-      onPress={()=>setshowworkspacemodal(true)}
-      >
-            {/* <Text style={styles.text}>+</Text> */}
-            <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white}/>
-          </TouchableOpacity>}
+
+{isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.blue} />
+        ) : hasAccess ? ( // Corrected: Moved hasAccess check outside the extra curly braces
+          <FlatList
+            data={organizedData}
+            // renderItem={isGrid ? renderItemList:renderItemGrid}
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderItem}
+            key={isGrid ? 'grid' : 'list'}
+            numColumns={isGrid ? 2 : 1}
+            // onRefresh={refetch}
+            refreshing={isLoading}
+            showsVerticalScrollIndicator={false}
+            // ListEmptyComponent={EmptyListComponent}
+            contentContainerStyle={styles.listContent}
+          />
+        ) : (
+          <>
+           <Text style={{fontSize:16,fontWeight:'500',textAlign:"center",color:COLORS.red}}>
+  {[strings.Warning_Yourdemoaccounthasexpired, strings.Purchasethepackageyouchoosenowtocontinueyourlife, strings.whichismadeeasierbyConiaCloud].join(' ')}
+</Text>
+
+            <SubscriptionAnimation />
+          </>
+        )}
+  
           <WorkspaceModal
           visible={workspacemodal}
           user={user}
@@ -342,7 +279,9 @@ const MyDrive = () => {
             isVisible={actionModal} 
             onClose={()=>setactionModal(false)}
             user={user}
-            item={selectedItem}/>
+            item={selectedItem}
+            onSuccess={handleFolderCreationSuccess}
+            />
             <ShortingModal
             isVisible={showDrodown} 
             onClose={()=>setshowdropdown(false)}
@@ -350,6 +289,13 @@ const MyDrive = () => {
             sortingOptions={sortByOptions}
             initialSorting={sortingInfo}
 />
+<FileFolderModal
+          visible={opencreateuplodModal}
+          // onClose={handleclosecreatefolderFileModal}
+          onSuccess={handleFolderCreationSuccess}
+          user={user}
+          folderId={folderStack}
+        />
     </View>
     </SafeAreaView>
   );
@@ -361,7 +307,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundColor,
-    padding:10
+    paddingHorizontal:10
   },
   heading: {
     fontSize: 18,

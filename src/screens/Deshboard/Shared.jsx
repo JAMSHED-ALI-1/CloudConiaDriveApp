@@ -22,12 +22,16 @@ import strings from '../../helper/Language/LocalizedStrings';
 import getItemIcon from '../../constants/GetItemIcon';
 import ProgressBar from '../../components/ProgressBar';
 import UnshareModal from '../../Modaals/UnshareModal';
+import { accessData } from '../../utils/UserAccessData';
+import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
+import FileItem from '../../components/RenderCardListGrid';
+import Gridlist from '../../constants/Gridlist';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Shared = () => {
   const user = useSelector((state) => state.auth.user);
   const workspaces = useSelector(state => state.workspace.workspace);
-  
+  const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [driveData, setDriveData] = useState([]);
   const [currentFolder, setCurrentFolder] = useState({
@@ -45,22 +49,24 @@ const Shared = () => {
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [actionModal,setactionModal]=useState(false)
+  const [showDropdown, setShowDropdown] = useState(false);
   // To track folder navigation
 // const [currentFolderId, setCurrentFolderId] = useState(null); // To track the active folder ID
 
   const handleGridListToggle = () => {
     setIsGrid((isGrid)=>!isGrid);
   };
+
   const toggleModalVisible = (item) => {
     setSelectedItem(item); 
     setactionModal(!actionModal);
   };
-  const FilderData = [
-    { id: 1, Image: folderIcon, title: strings.Folder, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoiZm9sZGVyIiwiaXNJbmFjdGl2ZSI6ZmFsc2UsIm9wZXJhdG9yIjoiPSIsInZhbHVlS2V5IjoiMTEifV0%3D' },
-    { id: 2, Image: fileIcon, title: strings.File, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidGV4dCIsImlzSW5hY3RpdmUiOmZhbHNlLCJvcGVyYXRvciI6Ij0iLCJ2YWx1ZUtleSI6IjAyIn1d' },
-    { id: 3, Image: imageIcon, title: strings.Image, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoiaW1hZ2UiLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNSJ9XQ%3D%3D' },
-    { id: 4, Image: video, title:strings.Video, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidmlkZW8iLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNCJ9XQ%3D%3D' },
-  ];
+  useEffect(() => {
+    const hasAccess = accessData(user);
+    setHasAccess(hasAccess);
+    console.log('User has access:', hasAccess);
+  }, [user]);
+
 
 
 
@@ -127,6 +133,10 @@ const Shared = () => {
     fetchDriveData(filter); // Fetch data based on the selected filter
   };
   
+  const handleFolderCreationSuccess = () => {
+    fetchDriveData()
+  };
+
   useEffect(() => {
     fetchDriveData();
   }, [ currentFolderId, user,workspaces]);
@@ -161,6 +171,11 @@ const Shared = () => {
         <Text style={styles.breadcrumbText}>
           {currentFolder.breadcrumbs.map(folder => folder.name).join(' > ') || strings.Shared}
         </Text>
+        <Gridlist
+            toggleView={handleGridListToggle}
+            grid={isGrid}
+            setShowDropdown={() => setShowDropdown(true)}
+          />
       </View>
     );
   };
@@ -251,7 +266,7 @@ const Shared = () => {
       <TouchableOpacity
            onPress={() => toggleModalVisible(item)}
           style={{position:'absolute',right:10}}>
-            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
+            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:COLORS.black }]} />
           </TouchableOpacity>
     </TouchableOpacity>
   ),[handleItemPress]);
@@ -275,10 +290,24 @@ const Shared = () => {
       <TouchableOpacity
            onPress={() => toggleModalVisible(item)}
           >
-            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
+            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 20, width: 20,tintColor:COLORS.black }]} />
           </TouchableOpacity>
     </TouchableOpacity>
   ),[handleItemPress]);
+
+
+
+  const renderItem = useCallback(
+    ({item}) => (
+      <FileItem
+        item={item}
+        grid={isGrid}
+        handleMediaPreview={() => handleItemPress(item)}
+        onOpenModal={toggleModalVisible}
+      />
+    ),
+    [isGrid, handleItemPress],
+  );
 
   return (
     <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}>
@@ -322,7 +351,9 @@ const Shared = () => {
 
 <ProgressBar/>
 </View>
+
 {renderBreadcrumbs()}
+
       {/* {folderStack.length > 1 && (
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Icon name="arrow-back" size={24} color={COLORS.black} />
@@ -330,7 +361,7 @@ const Shared = () => {
         </TouchableOpacity>
       )} */}
       {/* <Text style={styles.currentFolderText}>{strings.CurrentFolder}: {folderStack[folderStack.length - 1].name}</Text> */}
-      {isLoading ? (
+      {/* {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.primeryBlue} />
       ) : (
         <FlatList
@@ -346,7 +377,45 @@ const Shared = () => {
           key={isGrid ?  'list':'grid' } // Key to re-render FlatList on viewType change
         />
        
-      )}
+      )} */}
+  
+
+{isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.blue} />
+        ) : hasAccess ? ( // Corrected: Moved hasAccess check outside the extra curly braces
+          <FlatList
+            data={driveData}
+            // renderItem={isGrid ? renderItemList:renderItemGrid}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+            ListEmptyComponent={
+              <View style={{flex: 1, alignItems: 'center'}}>
+                <Text style={styles.emptyText}>This folder is empty</Text>
+              </View>
+            }
+            numColumns={isGrid ? 2 : 1}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            key={isGrid ?  'list':'grid'} 
+          
+         
+          
+          
+            
+        
+            showsVerticalScrollIndicator={false}
+            // ListEmptyComponent={EmptyListComponent}
+            contentContainerStyle={styles.listContent}
+          />
+        ) : (
+          <>
+           <Text style={{fontSize:16,fontWeight:'500',textAlign:"center",color:COLORS.red}}>
+  {[strings.Warning_Yourdemoaccounthasexpired, strings.Purchasethepackageyouchoosenowtocontinueyourlife, strings.whichismadeeasierbyConiaCloud].join(' ')}
+</Text>
+
+            <SubscriptionAnimation />
+          </>
+        )}
       {/* <ActionModal 
             isVisible={actionModal} 
             onClose={()=>setactionModal(false)}
@@ -357,6 +426,7 @@ const Shared = () => {
              user={user}
              folderId={selectedItem} 
              onClose={() => setactionModal(false)}
+             onSuccess={handleFolderCreationSuccess}
             />
     </View>
     </SafeAreaView>
@@ -505,6 +575,7 @@ const styles = StyleSheet.create({
         // backgroundColor: '#FFFFFF',
         borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',
+        justifyContent:'space-between'
       },
       backButton: {
         marginRight: 10,

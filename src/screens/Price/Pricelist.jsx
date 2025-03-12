@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, ScrollView, Button } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, ScrollView, Button, Touchable, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { COLORS } from '../../utils/Colors'; // Assuming you have a COLORS utility
 import CustomHeader from '../../components/CustomHeader';
 import CustomButton from '../../components/CustomButton';
 import { useSelector } from 'react-redux';
 import strings from '../../helper/Language/LocalizedStrings';
+import axios from 'axios';
+import { baseURL } from '../../utils/constant/settings';
+import { date } from 'yup';
 
 const pricelistData = [
   {
@@ -125,33 +128,62 @@ const pricelistData = [
 
 const Pricelist = ({ navigation }) => {
   const [currency, setCurrency] = useState('USD'); 
-  const language = useSelector((state) => state.language.language);
-  console.log(language)
-  useEffect(() => {
-    strings.setLanguage(language); 
-  }, [language]);
+  const [feature,setFeature]=useState([])
+  const user = useSelector(state => state.auth.user);
+  const [isLoading,setIsLoading]=useState(false)
+  // const language = useSelector(state => state.language.language);
+
+  const handlePriceList=async()=>{
+    setIsLoading(true)
+    try {
+      // const res=await axios.get(`${baseURL}billing/products`)
+      const res=await axios.get(`${baseURL}/billing/products`)
+      console.log('respoce ki Information3---->>>>>',res?.data?.pagination?.data)
+      setFeature(res?.data?.pagination?.data)
+
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setIsLoading(false)
+    }
+  }
+  useEffect(()=>{
+  handlePriceList()
+  },[])
+ 
+  const hanndleSUbsbutton=()=>{
+    Alert.alert('Working On It Thanks For Buying Product')
+  }
+  
   const toggleCurrency = () => {
     setCurrency((prevCurrency) => (prevCurrency === 'USD' ? 'TRY' : 'USD'));
   };
 
   return (
     <SafeAreaView style={styles.container}>
-        <View style={{flex:1,paddingHorizontal:15}}>
+        <View style={{flex:1,padding:15}}>
 
         
-      <CustomHeader back={true}   OnPress={() => navigation.goBack()} title="Price List" left={true} />
-      <ScrollView contentContainerStyle={styles.content}>
+      <CustomHeader back={true}   OnPress={() => navigation.goBack()} title={strings.PRICE_LIST}left={true} />
         <View style={styles.header}>
           <Text style={styles.headerText}>
-            Price & Feature List in {currency === 'USD' ? '$' : '₺'}
+            Price & Feature List in {currency === 'USD' ? '€ ' : '₺'}
           </Text>
-          <Button
-            title={`Switch to ${currency === 'USD' ? 'Turkish Lira (₺)' : 'USD $'}`}
+          <TouchableOpacity style={{padding:15,backgroundColor:COLORS.BUTTON,borderRadius:10}}
+                      onPress={toggleCurrency}>
+            <Text style={{fontSize:14,color:COLORS.white,fontWeight:'600'}}>
+            {`Switch to ${currency === 'USD' ? 'Turkish Lira (₺)' : 'EUR € '}`}
+            </Text>
+          </TouchableOpacity>
+          {/* <Button
+            title={`Switch to ${currency === 'USD' ? 'Turkish Lira (₺)' : 'EUR € '}`}
             onPress={toggleCurrency}
-          />
+            /> */}
         </View>
+          { isLoading ?<ActivityIndicator size={'large'} color={COLORS.blue}/>: <ScrollView contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}>
 
-        {pricelistData.map((item) => (
+        {/* {pricelistData.map((item) => (
           <View key={item.id} style={styles.card}>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.price}>
@@ -169,8 +201,40 @@ const Pricelist = ({ navigation }) => {
             </View>
           
           </View>
-        ))}
-      </ScrollView>
+        ))} */}
+       {feature.map((item, index) => (
+  <View key={item?.id || index} style={{ ...styles.card }}>
+    <Text style={{ ...styles.title }}>{item.name}</Text>
+
+    {/* Mapping prices correctly */}
+
+{item.prices.length > 0 ? (
+  <Text style={{...styles.price}}>
+    {currency === 'USD'
+      ? ` € ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'} /Year `
+      : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} /Year`}
+  </Text>
+) : (
+  <Text style={{color:COLORS.black}}>No Pricing Data</Text>
+)}
+
+{/* 
+    <Text>{item.price}</Text> */}
+    {/* <Text style={{...styles.feature}}>{item.available_space}</Text> */}
+    <Text style={{...styles.headerText}}>{(item.available_space / (1024 ** 3)).toFixed(2)} GB</Text>
+
+    {/* Mapping feature_list correctly */}
+    {item.feature_list?.map((featureItem, featureIndex) => (
+      <Text key={featureIndex} style={styles.feature}>• {featureItem}</Text>
+    ))} 
+    <View style={{paddingVertical:25}}>
+
+    <CustomButton buttonTitle="Subscribe" onPress={hanndleSUbsbutton} />
+    </View>
+  </View>
+))}
+
+      </ScrollView>}
       </View>
     </SafeAreaView>
   );
@@ -192,9 +256,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerText: {
-    fontSize: 26,
+    fontSize: 18,
     fontWeight: '600',
-    color: COLORS.blue || '#333',
+    color: COLORS.black || '#333',
     marginBottom: 10,
   },
   card: {
@@ -216,10 +280,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   price: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '600',
-    color: COLORS.secondary || '#007BFF',
-    marginBottom: 10,
+    color: COLORS.blue || '#007BFF',
+    // marginBottom: 10,
   },
   divider: {
     borderBottomColor: COLORS.faint || '#ddd',

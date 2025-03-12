@@ -10,11 +10,17 @@ import Trash from '../screens/Deshboard/Trash';
 import Stared from '../screens/Deshboard/Stared';
 import Userprofile from '../screens/Deshboard/Userprofile';
 import { COLORS } from '../utils/Colors';
+import Homescreen from '../screens/Deshboard1/Homescreen';
+import MyDriveScreen from '../screens/Deshboard1/MyDriveScreen';
+import Sharedscreen from '../screens/Deshboard1/Sharedscreen';
+import TrashScreen from '../screens/Deshboard1/TrashScreen';
 
 const Tab = createBottomTabNavigator();
 
 const BottomNavigation = ({ navigation }) => {
   const language = useSelector((state) => state.language.language);
+  const user = useSelector((state) => state.auth.user);
+  // console.log('BottomNavigation Info ',user)
 return (
     <Tab.Navigator
       backBehavior="initialRoute"
@@ -24,6 +30,7 @@ return (
           backgroundColor: COLORS.blue,
           height: Platform.OS === 'android' ? 70 : 100,
           paddingHorizontal: Platform.OS === 'android' ? 12 : 15,
+          unmountOnBlur: true
         },
         tabBarShowLabel: false,
         tabBarIcon: ({ focused }) => {
@@ -84,8 +91,12 @@ return (
         },
       })}
     >
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="My Drive" component={MyDrive} />
+    <Tab.Screen name="Home" component={Homescreen} />
+    <Tab.Screen name="My Drive" component={MyDriveScreen} />
+    {/* <Tab.Screen name="Shared"component={Sharedscreen} /> */}
+    {/* <Tab.Screen name="Trash" component={TrashScreen} /> */}
+      {/* <Tab.Screen name="Home" component={Home} /> */}
+      {/* <Tab.Screen name="My Drive" component={MyDrive} /> */}
       <Tab.Screen name="Shared" component={Shared} />
       <Tab.Screen name="Trash" component={Trash} />
       <Tab.Screen name="Stared" component={Stared} />

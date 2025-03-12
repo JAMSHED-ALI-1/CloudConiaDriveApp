@@ -6,7 +6,7 @@ import { COLORS } from '../utils/Colors';
 import { useSelector } from 'react-redux';
 import strings from '../helper/Language/LocalizedStrings';
 
-const RenameModal = ({ isVisible, onClose, item, user, }) => {
+const RenameModal = ({ isVisible, onClose, item, user,onSuccess }) => {
   const workspaces = useSelector(state => state.workspace.workspace);
   const [initialName, setInitialName] = useState('');
   const [name, setName] = useState('');
@@ -39,6 +39,7 @@ const RenameModal = ({ isVisible, onClose, item, user, }) => {
       // console.log('Rename response:', response);
       setLoading(false);
       onClose();
+      onSuccess()
       if (response.status === 'success') 
         
         {

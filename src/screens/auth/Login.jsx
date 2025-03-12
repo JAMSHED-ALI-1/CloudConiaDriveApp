@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Platform, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Platform, KeyboardAvoidingView,Image, Dimensions } from 'react-native';
 import React, { useState } from 'react';
 import { Formik } from 'formik';
-import { LoginInitialValue, loginValidationSchema } from './utils';
+import { LoginInitialValue, loginValidtionSchema } from './utils';
 import InputBox from '../../components/InputBox';
 import CustomButton from '../../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
@@ -11,27 +11,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginAsync } from '../../redux/reducers/authSlice';
 import { showMessage } from 'react-native-flash-message';
 import strings from '../../helper/Language/LocalizedStrings';
+import showMessageHandler from '../../utils/constant/ShowMessageHandler';
 
+const HEIGHT = Dimensions.get('screen').height;
+const WIDTH = Dimensions.get('screen').width;
 
 const Login = () => {
   const language = useSelector((state) => state.language.language);
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
-  // Helper function to display flash messages
-  const showMessageHandler = (message, description, type) => {
-    showMessage({
-      message,
-      description,
-      type,
-      icon: type, // icon can be 'success' or 'danger'
-      duration: 3000,
-      hideOnPress: true,
-    });
-  };
-
-  const handleLogin = async (values) => {
+ const handleLogin = async (values) => {
     const { email, password } = values;
     setIsLoading(true);  // Show loader while login is happening
     try {
@@ -42,6 +32,7 @@ const Login = () => {
         showMessageHandler("Login Successful", "You have logged in successfully.", "success");
         // Perform any further actions here, like navigating to the dashboard
         navigation.navigate('BottomNavigation');
+        // navigation.navigate('Test');c
       } else {
         // Show failure flash message
         showMessageHandler("Login Failed", "Invalid credentials or user not registered.", "danger");
@@ -56,88 +47,58 @@ const Login = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.loginMainContainer}
-      >
-        <CustomHeader  title={strings.LOGIN} />
-        <Text style={styles.title}>{strings.WELCOME_BACK}</Text>
-        <Text style={styles.Description}>{strings.Letsgettoknoweachotherinputpersonaldetailstobegin}</Text>
-
-        <Formik
-          initialValues={LoginInitialValue}
-          validationSchema={loginValidationSchema}
-          onSubmit={handleLogin}
-        >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            touched,
-            errors,
-            isValid
-          }) => (
-            <View>
-              <InputBox
-                placeholder={strings.EnterYourEmail}
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
-                value={values.email}
-                touched={touched.email}
-                errors={errors.email}
-                icon={require('../../assets/icons/mail.png')}
-              />
-
-              <InputBox
-                placeholder={strings.Enteryourpassword}
-                onChangeText={handleChange('password')}
-                onBlur={handleBlur('password')}
-                value={values.password}
-                touched={touched.password}
-                errors={errors.password}
-                secureTextEntry
-                secure={true}
-                icon={require('../../assets/Lock.png')}
-              />
-{/* <TouchableOpacity 
-onPress={()=>navigation.navigate('UpdatePassword')}
-// onPress={()=>navigation.navigate('BottomNavigation')}
-// onPress={()=>navigation.navigate('Test')}
->
-
-              <Text style={styles.forget} >Forget Password?</Text>
-</TouchableOpacity> */}
-<TouchableOpacity 
-onPress={()=>navigation.navigate('PrivacyPolicy')}
-// onPress={()=>navigation.navigate('Test')}
->
-  
-<Text style={styles.forget} >{strings.PrivacyPolicy}?</Text>
-</TouchableOpacity>
-
-              <CustomButton 
-                buttonTitle={strings.LOGIN}
-                onPress={handleSubmit}
-                isLoading={isLoading}  // Show loader when submitting
-                disabled={!isValid || isLoading}  // Disable button while loading or form invalid
-              />
-            </View>
-          )}
-        </Formik>
-
-        <View style={styles.signUpButton}>
-          {/* <Text style={styles.text}>Don’t have an account? </Text> */}
-          {/* <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={[styles.text, { color: COLORS.primeryBlue, fontSize: 16, marginTop: 5 }]}>
-              Create a new account
-            </Text>
-          </TouchableOpacity> */}
+    <Formik
+    initialValues={LoginInitialValue}
+    validationSchema={loginValidtionSchema}
+    onSubmit={handleLogin}
+  >
+    {({ handleChange, handleBlur, handleSubmit, values, touched, errors, isValid }) => (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Image source={require('../../assets/ConiaSoft.png')} style={styles.headerlogo} />
+          <Text style={styles.title}>{strings.WELCOME_BACK}</Text>
+          <Text style={styles.subtitle}>{strings.Letsgettoknoweachotherinputpersonaldetailstobegin}</Text>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
+
+        <View style={styles.formContainer}>
+          <InputBox
+            placeholder="Enter Your Email"
+            onChangeText={handleChange('email')}
+            onBlur={handleBlur('email')}
+            value={values.email}
+            touched={touched.email}
+            errors={errors.email}
+            icon={require('../../assets/icons/mail.png')}
+          />
+
+          <InputBox
+            placeholder="Enter Your Password"
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
+            value={values.password}
+            touched={touched.password}
+            errors={errors.password}
+            // secureTextEntry={!passwordVisible}
+            secure={true}
+            icon={require('../../assets/Lock.png')}
+          />
+
+          <CustomButton
+            buttonTitle="Login"
+            onPress={handleSubmit}
+            isLoading={isLoading}
+            disabled={!isValid || isLoading}
+          />
+
+         <TouchableOpacity style={styles.forgotPassword} 
+         onPress={()=>navigation.navigate('PrivacyPolicy')}>
+              <Text style={styles.forgotPasswordText}>PrivacyPolicy?</Text>
+            </TouchableOpacity>
+        </View>
+      </View>
+    )}
+  </Formik>
+  )
 };
 
 export default Login;
@@ -149,72 +110,60 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundColor,  // Ensuring background color
-  },
-  
-  loginMainContainer: {
-    flex: 1,
-    paddingHorizontal: 20,  // Ensure padding horizontally
-    paddingTop: Platform.select({
-      ios: 20,   // Adjust padding for iOS
-      android: 20  // Adjust padding for Android
-    }),
-    backgroundColor: COLORS.backgroundColor, 
-  },
-  
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: COLORS.boldText,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-
-  Description: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: COLORS.boldText,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-
-  forget: {
-    color: COLORS.blue,
-    fontSize: 16,
-    textAlign: 'right',
-    marginVertical: 10,
-    paddingRight: 10,
-  },
-
-  signUpButton: {
+    backgroundColor: COLORS.backgroundColor,
     alignItems: 'center',
-    marginTop: 20,
+    // justifyContent: 'center',
+  },
+  header: {
+    marginTop:Dimensions.get('screen').height*0.06,
+    alignItems: 'center',
     marginBottom: 40,
   },
-
-  text: {
-    color: COLORS.boldText,
-    fontSize: 14,
-    textAlign: 'center',
-    fontWeight: '400',
-  },
-
-  buttonContainer: {
-    backgroundColor: COLORS.primery,
-    borderRadius: 25,
-    paddingVertical: 15,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
+  title: {
+    fontSize: 28,
     fontWeight: 'bold',
+    color: COLORS.black,
+    marginTop: 10,
   },
-
-  inputContainer: {
-    marginBottom: 20,
+  subtitle: {
+    fontSize: 16,
+    color: COLORS.black,
+    marginTop: 5,
+    textAlign: 'center',
+    paddingHorizontal:20
   },
+  formContainer: {
+    width: '95%',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 20,
+    elevation: 10,
+    shadowColor: COLORS.blue,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  passwordToggle: {
+    marginTop: 10,
+    alignSelf: 'flex-end',
+  },
+  passwordToggleText: {
+    fontSize: 14,
+    color: '#6C63FF',
+  },
+  forgotPassword: {
+    marginTop: 15,
+    alignSelf: 'flex-end',
+  },
+  forgotPasswordText: {
+    color: '#6C63FF',
+    fontSize: 14,
+    
+  },
+  headerlogo:{
+    height:HEIGHT*.10,
+    width:WIDTH*0.30,
+    resizeMode:'contain'
+  }
 });
+

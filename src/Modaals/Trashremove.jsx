@@ -76,7 +76,7 @@ import { COLORS } from '../utils/Colors';
 import { useSelector } from 'react-redux';
 import strings from '../helper/Language/LocalizedStrings';
 import axios from 'axios';
-const Trashremove = ({ visible, onClose,user, item }) => {
+const Trashremove = ({ visible, onClose,user, item ,onSuccess}) => {
   const language = useSelector((state) => state.language.language);
   const [folderModalVisible, setFolderModalVisible] = useState(false); 
   const [folderName, setFolderName] = useState(''); 
@@ -95,6 +95,7 @@ const Trashremove = ({ visible, onClose,user, item }) => {
             console.log('restore responce',responce)
             if(responce.status==='success'){
                 onClose()
+                onSuccess()
             }
         }
         const permanentDelete = async () => {
@@ -107,6 +108,7 @@ const Trashremove = ({ visible, onClose,user, item }) => {
             // console.log('Permanent delete response:', response);
             if (response?.status === 'success') {
               Alert.alert('Success', 'File permanently deleted!');
+              onSuccess()
               onClose();
             } else {
               Alert.alert('Error', 'Failed to delete file permanently.');

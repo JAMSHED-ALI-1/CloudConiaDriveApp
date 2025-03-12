@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setLanguage } from '../../redux/reducers/languageSlice';
 import strings from '../../helper/Language/LocalizedStrings';
 import Checkbox from '../../components/Checkbox';
-
+import RNRestart from 'react-native-restart';
 const ChoseLanguage = () => {
   const [modalVisible, setModalVisible] = useState(true);
   const [selectedCheckboxIndex, setSelectedCheckboxIndex] = useState(null);
@@ -48,6 +48,7 @@ const ChoseLanguage = () => {
       const message = `Language has been set to ${checkboxLabels[selectedCheckboxIndex].label}`;
       setModalVisible(false);
       setTimeout(() => showAlert(message), 100);
+      // RNRestart.restart();
     }
   };
 
@@ -88,12 +89,15 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: 'center',
     alignItems: 'center',
+    flex:1
   },
   modalContainer: {
-    width: '80%',
+    // height:'80%',
+    width: '100%',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
+    paddingVertical:50
   },
   applyButton: {
     marginTop: 20,

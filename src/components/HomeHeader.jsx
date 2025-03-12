@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '../utils/Colors';
 import strings from '../helper/Language/LocalizedStrings';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
-const HomeHeader = ({ user, handleIconPress }) => {
+const HomeHeader = ({ user, handleIconPress,handlecreateOpenModal }) => {
   const userAvatar = user?.avatar ? { uri: user.avatar } : require('../assets/150.jpg');
   const navigation=useNavigation()
   const userName = user?.display_name || 'Guest';
   const language = useSelector((state) => state.language.language);
+  const [showmodal, setShowmodal] = useState(false);
   return (
     <View style={styles.headerContainer}>
       <View style={styles.userInfoContainer}>
@@ -23,6 +24,9 @@ const HomeHeader = ({ user, handleIconPress }) => {
       </View>
 
       <View style={styles.iconContainer}>
+        <TouchableOpacity onPress={handlecreateOpenModal}>
+          <Text style={{...styles.text}}> +</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton} onPress={handleIconPress}>
           <Image source={require('../assets/ConiaSoft_AI_Icon.png')} style={styles.icon} />
         </TouchableOpacity>
@@ -39,7 +43,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop:10
+    // marginTop:10,
+    backgroundColor:COLORS.white,
+    // borderTopWidth:1,
+    padding:10,
+    // borderBottomColor:'pink',
+    // borderBottomWidth:1
   },
   userInfoContainer: {
     flexDirection: 'row',
@@ -86,6 +95,11 @@ borderWidth:0.5
     height: 26,
     marginLeft: 18,
     resizeMode: 'contain',
+  },
+  text: {
+    color: '#111',
+    fontSize: 30,
+    fontWeight:'800'
   },
 });
 

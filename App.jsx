@@ -7,18 +7,23 @@ import { APIServiceProvider } from './src/context/APIServiceContext';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from './src/utils/Colors';
+
+if (__DEV__) {
+  require("./ReactotronConfig");
+}
+
 const App = () => {
-  const user = useSelector((state) => state.auth.user);
-  console.log('apna user',user)
+
  
   return (
     <>
     
     <NavigationContainer> 
       <APIServiceProvider>
-        <StatusBar barStyle="light-content"   backgroundColor={COLORS.blue}/>
         <View style={styles.container}>
+        <StatusBar barStyle="light-content"   backgroundColor={COLORS.blue}/>
           <StackNavigation />
+          {/* <Mainstack/> */}
           <FlashMessage position="top" />
         </View>
       </APIServiceProvider>

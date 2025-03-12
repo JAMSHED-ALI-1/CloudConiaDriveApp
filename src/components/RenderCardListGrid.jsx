@@ -1,125 +1,116 @@
-import { StyleSheet, Text, TouchableOpacity, View, Dimensions, Image } from 'react-native';
 import React from 'react';
+import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import moment from 'moment';
+import getItemIcon from '../constants/GetItemIcon';
 import { COLORS } from '../utils/Colors';
-import { timeAgo } from '../helper/functionHelper';
-import { fileColorCode } from '../utils/constant/settings';
 
-const { width } = Dimensions.get('window'); 
+const FileItem = ({ item, grid, handleMediaPreview,onOpenModal }) => {
+  const getIconName = (type) => {
+    switch (type) {
+      case 'folder': return 'folder';
+      case 'pdf': return 'document-text';
+      case 'image': return 'image';
+      case 'video': return 'videocam';
+      default: return 'document';
+    }
+  };
 
-const RenderCardListGrid = ({ item, isGrid,onPress ,getIcon,action}) => {
   return (
-    <TouchableOpacity 
-      style={[
-        styles.card,
-         
-        { 
-          width: isGrid ? width / 2 -22 : width - 30,
-          margin: isGrid ? 5 : 0,
-        }
-      ]}
-    onPress={onPress}>
-      
-      {isGrid ?
-             <View style={{...styles.gridContent}}>
-              <View style={{...styles.moreimgcontainer}}>
-
- <View style={styles.iconContainer}>
-  
-               <Image 
-                 source={getIcon} 
-                 style={styles.img} 
-               />
-             </View>
-             <TouchableOpacity style={{...styles.iconContainer,height:36,width:36}}>
-               <Image 
-                 source={require('../assets/MoreOption.png')} 
-                 style={{...styles.img,height:20,width:20}} 
-               />
-             </TouchableOpacity>
-              </View>
-             <Text style={styles.title}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name || "Title Placeholder"}</Text>
-               <Text style={styles.subtitle}>{timeAgo(item.created_at)|| "time ago"}</Text>
-             
-             </View>
-             : <View style={styles.content}>
-             {/* Left Icon */}
-             <View style={styles.iconContainer}>
-               <Image 
-                  source={getIcon} 
-                 style={styles.img} 
-               />
-               
-             </View>
-     
-             {/* Middle Text */}
-             <View style={styles.textContainer}>
-               <Text style={styles.title}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name || "Title Placeholder"}</Text>
-               <Text style={styles.subtitle}>{timeAgo(item.created_at)|| "Subtitle Placeholder"}</Text>
-             </View>
-     
-             {/* Right Icon */}
-             <TouchableOpacity style={{}} onPress={action}>
-               <Image 
-                 source={require('../assets/MoreOption.png')} 
-                 style={[styles.moreicon, { height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]}
-               />
-             </TouchableOpacity>
-           </View>}
+    
+    <TouchableOpacity
+      onPress={() => handleMediaPreview(item)}
+      style={[styles.card, grid && styles.gridCard]}
+    >
+      <View style={styles.iconContainer}>
+        {/* <Icon 
+          name={getIconName(item.type)} 
+          size={40} 
+          color={item.type === 'folder' ? "#FF8C00" : "#007BFF"} 
+        /> */}
+         <Image 
+        source={getItemIcon(item)} 
+        style={styles.icon} 
+        resizeMode="contain" 
+      />
+      </View>
+      <View style={styles.infoContainer}>
+        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+        <Text style={styles.itemModified}>
+          {moment(item.updated_at).fromNow()}
+        </Text>
+        {item.file_size > 0 && (
+          <Text style={styles.itemSize}>
+            {(item.file_size / 1024).toFixed(2)} KB
+          </Text>
+        )}
+      </View>
+      <TouchableOpacity onPress={() => onOpenModal(item)} style={[styles.moreOptions,grid && styles.gridMoreOptions]}>
+        <Image source={require('../assets/MoreOption.png')} style={styles.moreIcon} />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
 
-export default RenderCardListGrid;
-
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    marginTop: 10,
-    padding: 10,
-    borderRadius: 10,
-    shadowColor: COLORS.blue,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3, // For Android shadow
-  },
-  content: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    padding: 16,
+    marginBottom: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  gridCard: {
+    width: '48%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginHorizontal: 4,
   },
   iconContainer: {
-    width: 50,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 25,
-    backgroundColor: COLORS.orenge, // Optional background for better visibility
+    marginRight: 12,
   },
-  textContainer: {
+  infoContainer: {
     flex: 1,
-    marginHorizontal: 10,
   },
-  title: {
+  itemName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
+  itemModified: {
+    fontSize: 12,
+    color: '#777',
   },
-  img: {
-    height: '65%',
-    width: '65%',
-    resizeMode: 'contain',
-    tintColor:COLORS.white,
+  itemSize: {
+    fontSize: 10,
+    color: '#777',
   },
-  gridContent:{
-   
+  icon: {
+    width: 35,
+    height: 35,
+  margin:10
+    // tintColor: COLORS.white, // Apply a tint color if applicable
   },
-  moreimgcontainer:{
-    flexDirection:'row',justifyContent:'space-between'
-  }
+  moreOptions: {
+    // position: 'absolute',
+    // right: 10,
+    // top: 10,
+  },
+  gridMoreOptions: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+  },
+  moreIcon: {
+    height: 20,
+    width: 20,
+  },
 });
+
+export default FileItem;

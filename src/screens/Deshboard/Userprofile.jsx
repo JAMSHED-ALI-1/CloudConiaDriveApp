@@ -13,6 +13,9 @@ import strings from '../../helper/Language/LocalizedStrings';
 import { baseURL } from '../../utils/constant/settings';
 import Test from '../../../Test';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/AntDesign'
+import * as Animatable from 'react-native-animatable';
+import UpgradeButton from '../../components/UpgradeButton';
 const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = '' }) => {
   const [isVisible,setVisible]=useState(false)
   const language = useSelector((state) => state.language.language);
@@ -173,17 +176,29 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
     { id: 1, ImagePath: require('../../assets/icon/fi_user-check.png'), text: strings.ACCOUNT_INFORMATION, navigate: "EditProfile" },
     { id: 2, ImagePath: require('../../assets/icon/Lock.png'), text: strings.CHANGE_PASSWORD, navigate: "UpdatePassword" },
       { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, navigate: "ChoseLanguage" },
+      // { id: 4, ImagePath: require('../../assets/setting.png'), text: strings.Settings, navigate: "Settings" },
   ];
 
   const renderNavigationItem = ({ id, ImagePath, text, navigate }) => (
     <TouchableOpacity
       key={id}
-      style={styles.navigationItem}
+      activeOpacity={0.9}
       onPress={() => navigation.navigate(navigate)}
       disabled={loggingOut}
     >
-      <Image source={ImagePath} style={styles.navigationIcon} />
+   <Animatable.View  animation={'fadeInRightBig'} View style={styles.navigationItem}>
+
+
+
+<View style={{flexDirection:'row',alignItems:'center',gap:10}}>
+
+      <Image source={ImagePath} style={styles.navigationIcon} tintColor={'#696D70'}/>
       <Text style={styles.navigationText}>{text}</Text>
+</View>
+     
+     
+      <Icon name='right' size={20} color={'#696D70'}/>
+      </Animatable.View>
     </TouchableOpacity>
   );
 
@@ -194,7 +209,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   return (
    <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}> 
      <View style={styles.container}>
-      <CustomHeader title={strings.User} />
+      <CustomHeader title={strings.PROFILE} />
       <ScrollView showsVerticalScrollIndicator={false}>
 
       
@@ -211,8 +226,22 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
 <View style={styles.navigationContainer}>
         {navigationData.map(renderNavigationItem)}
       </View>
-    
+    {/* upgrade */}
+   {/* <TouchableOpacity
+   style={{...styles.more}}
+   activeOpacity={0.7}
+   onPress={()=>navigation.navigate('Pricelist')}>
+    <View>
 
+    <Text style={{...styles.btnText}}>{strings.NEED_MORE}</Text>
+    <Text style={{...styles.btnText}}>{strings.STORAGECAPACITY}</Text>
+    </View>
+    <Text style={{...styles.btnText}}>{strings.UPGGRADE}</Text>
+
+
+   </TouchableOpacity> */}
+   {/* UpGrade Button -------- */}
+   <UpgradeButton/>
 
       <TouchableOpacity 
         style={[styles.btn, loggingOut && styles.btnDisabled]}
@@ -324,20 +353,32 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   navigationContainer: {
-    marginTop: 10,
+    marginTop:20
+    // width:'100%'
+    // marginTop: 10,
+    // backgroundColor: COLORS.white,
+    // borderRadius: 10,
+    // elevation: 2,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // paddingHorizontal:10
+  },
+  navigationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'space-between',
     backgroundColor: COLORS.white,
+    marginVertical: 10,
     borderRadius: 10,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    paddingHorizontal:10
-  },
-  navigationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 15,
+    paddingHorizontal:10,
+    padding:20
   },
   navigationIcon: {
     height: 25,
@@ -373,5 +414,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  more:{
+    backgroundColor:COLORS.blue,
+    borderRadius:10,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    padding:13,
+    paddingVertical:20,
+    alignItems:'center'
   }
 });

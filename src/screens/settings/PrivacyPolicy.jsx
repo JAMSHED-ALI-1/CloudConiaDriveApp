@@ -87,7 +87,8 @@ const PrivacyPolicy = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:COLORS.backgroundColor
+    backgroundColor:COLORS.backgroundColor,
+    padding:15
   },
 });
 

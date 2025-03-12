@@ -27,11 +27,13 @@ import { useSelector } from 'react-redux';
 import { selectIsLoggedIn } from '../redux/reducers/authSlice';
 import PrivacyPolicy from '../screens/settings/PrivacyPolicy';
 import Pricelist from '../screens/Price/Pricelist';
+import Settings from '../screens/settings/Settings';
+import WebViewComp from '../components/WebView';
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
-  const isLoggedIn = useSelector(selectIsLoggedIn);
-  const user = useSelector((state) => state.auth.user);
-  const [isLoading, setIsLoading] = React.useState(true);
+  // const isLoggedIn = useSelector(selectIsLoggedIn);
+  // const user = useSelector((state) => state.auth.user);
+  // const [isLoading, setIsLoading] = React.useState(true);
   
 
   return (
@@ -69,13 +71,17 @@ const StackNavigation = () => {
       {/* Notification */}
       <Stack.Screen name="Notification" component={Notification}  options={{headerShown:false}}/>
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy}  options={{headerShown:false}}/>
+      <Stack.Screen name="Settings" component={Settings}  options={{headerShown:false}}/>
+      <Stack.Screen name="WebViewComp" component={WebViewComp}  options={{headerShown:false}}/>
 
 
 {/* Price      */}
 <Stack.Screen name="UpgradeScreen" component={UpgradeScreen}  options={{headerShown:false}}/>
 <Stack.Screen name="Pricelist" component={Pricelist}  options={{headerShown:false}}/>
 {/* Testing Purpose */}
+
 <Stack.Screen name="Test" component={Test}  options={{headerShown:false}}/>
+
 
     </Stack.Navigator>
 </>

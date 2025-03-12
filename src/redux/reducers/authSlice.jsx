@@ -16,6 +16,7 @@ export const loginAsync = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${baseURL}/auth/login`, credentials);
+      // console.log('Auth Res=====',response)
       const token = response.data.user.access_token;
       const workspace = await axios.get(`${baseURL}/me/workspaces?workspaceId=0`, {
         headers: {

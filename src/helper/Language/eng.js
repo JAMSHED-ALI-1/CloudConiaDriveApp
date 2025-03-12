@@ -73,8 +73,8 @@ export default {
   Apply: 'Apply',
   EnterYourEmail:'Enter Your Email',
   Enteryourpassword:'Enter your password',
-
-
+  goBack:'Go Back',
+  UNSHARED:"Dont share",
   PriceandfeaturListin$: 'Price & Feature List in $',
   ConiaClouddrivebasic: 'ConiaCloud Drive Basic',
   STOREGESPACE25GB: 'Storage Space: 25GB',
@@ -88,4 +88,15 @@ export default {
   ACCESSFILESFROMANYDEVICE: 'Access Files from Any Device',
   AUTOMATICBACKUP: 'Automatic Backup',
   FILEPREVIEFUNCTIONALITY: 'File Preview Functionality',
+  PROFILE:'Profile',
+  Warning_Yourdemoaccounthasexpired:'Warning! Your demo account has expired!',
+  Purchasethepackageyouchoosenowtocontinueyourlife:'Purchase the package you choose now to continue your life',
+  whichismadeeasierbyConiaCloud:'which is made easier by ConiaCloud',
+  PRICE_LIST:'Price List',
+  NEED_MORE:'Need more',
+  STORAGECAPACITY:"Storage capacity",
+  UPGGRADE:'Upgrade',
+ ALL:'All' ,
+
+
 };

@@ -1,0 +1,4 @@
+const handleImageViewer=(workspaceId,fileId)=>{
+  
+
+}

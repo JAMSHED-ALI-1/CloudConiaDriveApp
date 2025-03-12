@@ -8,7 +8,8 @@ import { baseURL } from '../utils/constant/settings';
 import { makeApiCall } from '../helper/apiHelper';
 import { COLORS } from '../utils/Colors';
 import { useSelector } from 'react-redux';
-const ActionModal = ({isVisible, onClose,user,item }) => {
+const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
+  // console.log('----->>>>',item)
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const [isShareModalVisible, setShareModalVisible] = useState(false);
@@ -135,6 +136,7 @@ const ActionModal = ({isVisible, onClose,user,item }) => {
   
               Alert.alert('Success', 'File deleted successfully!');
               onClose();
+              onSuccess()
             } catch (error) {
               console.error('Error deleting file:', error);
               Alert.alert('Error', 'Error deleting file.');
@@ -197,8 +199,17 @@ const ActionModal = ({isVisible, onClose,user,item }) => {
       </View>
     </TouchableOpacity>
   </Modal>
-  <ShareFileModal isVisible={isShareModalVisible} onClose={()=>setShareModalVisible(false)} item={item} user={user}/>
-  <RenameModal isVisible={isRenameModalVisible} onClose={()=>setRenameModalVisible(false)} item={item} user={user}/>
+  <ShareFileModal 
+  isVisible={isShareModalVisible} 
+  onClose={()=>setShareModalVisible(false)} 
+  item={item} 
+  user={user}/>
+  <RenameModal 
+  isVisible={isRenameModalVisible} 
+  onClose={()=>setRenameModalVisible(false)} 
+  item={item} 
+  onSuccess={onSuccess}
+  user={user}/>
    </>
   )
 }
@@ -210,6 +221,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-end',
         backgroundColor: 'rgba(0,0,0,0.5)',
+        paddingVertical:60
       },
       modalContent: {
         backgroundColor: '#fff',
@@ -217,7 +229,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         padding: 20,
         // paddingVertical:40
-        paddingBottom: Platform.OS==='android'?60:10
+        // paddingBottom: Platform.OS==='android'?60:10
       
       },
       itemContainer: {

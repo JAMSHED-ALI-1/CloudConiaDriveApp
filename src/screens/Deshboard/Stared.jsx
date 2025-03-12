@@ -19,10 +19,13 @@ import ProgressBar from '../../constants/Userinfo';
 import ActionModal from '../../Modaals/ActionModal';
 import strings from '../../helper/Language/LocalizedStrings';
 import getItemIcon from '../../constants/GetItemIcon';
+import { accessData } from '../../utils/UserAccessData';
+import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Stared = () => {
   const user = useSelector((state) => state.auth.user);
+  const [hasAccess, setHasAccess] = useState(false);
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
@@ -38,6 +41,12 @@ const Stared = () => {
   const handleGridListToggle = () => {
     setIsGrid(!isGrid);
   };
+
+  useEffect(() => {
+    const hasAccess = accessData(user);
+    setHasAccess(hasAccess);
+    console.log('User has access:', hasAccess);
+  }, [user]);
   const toggleModalVisible = (item) => {
     setSelectedItem(item); 
     setactionModal(!actionModal);
@@ -214,7 +223,7 @@ const Stared = () => {
       <TouchableOpacity
            onPress={() => toggleModalVisible(item)}
           style={{position:'absolute',right:10}}>
-            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
+            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:COLORS.black}]} />
           </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -238,7 +247,7 @@ const Stared = () => {
       <TouchableOpacity
            onPress={() => toggleModalVisible(item)}
           >
-            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
+            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 20, width: 20,tintColor:COLORS.black }]} />
           </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -303,7 +312,7 @@ const Stared = () => {
         <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
       </TouchableOpacity> */}
       </View>
-      {isLoading ? (
+      {/* {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.blue} />
       ) : (
         <FlatList
@@ -319,7 +328,31 @@ const Stared = () => {
         key={isGrid ?  'list':'grid' } // Key to re-render FlatList on viewType change
       />
        
-      )}
+      )} */}
+      {isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.blue} />
+        ) : hasAccess ? ( // Corrected: Moved hasAccess check outside the extra curly braces
+          <FlatList
+            data={organizedData}
+            renderItem={isGrid ? renderItemList:renderItemGrid}
+            keyExtractor={item => item.id.toString()}
+            ListEmptyComponent={
+              <View style={{flex: 1, alignItems: 'center'}}>
+                <Text style={styles.emptyText}>This folder is empty</Text>
+              </View>
+            }
+            numColumns={isGrid ? 1 : 2}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            key={isGrid ?  'list':'grid'} 
+          />
+        ) : (
+          <>
+            <Text>Please Subscribe</Text>
+            <SubscriptionAnimation />
+          </>
+        )}
+     
       <ActionModal 
             isVisible={actionModal} 
             onClose={()=>setactionModal(false)}

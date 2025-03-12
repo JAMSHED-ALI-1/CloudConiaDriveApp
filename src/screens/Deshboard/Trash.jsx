@@ -20,10 +20,14 @@ import ModalForUploadAndCreateFile from '../../Modaals/ModalForUpladAndCreateFil
 import ProgressBar from '../../components/ProgressBar';
 import strings from '../../helper/Language/LocalizedStrings';
 import getItemIcon from '../../constants/GetItemIcon';
+import { accessData } from '../../utils/UserAccessData';
+import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
+import FileItem from '../../components/RenderCardListGrid';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Trash = () => {
   const user = useSelector((state) => state.auth.user);
+  const [hasAccess, setHasAccess] = useState(false);
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const navigation=useNavigation()
@@ -47,9 +51,15 @@ const Trash = () => {
     { id: 4, Image: video, title:strings.Video, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidmlkZW8iLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNCJ9XQ%3D%3D' },
   ];
 
+  const handleFolderCreationSuccess = () => {
+    fetchData()
+  };
 
-
-
+  useEffect(() => {
+    const hasAccess = accessData(user);
+    setHasAccess(hasAccess);
+    console.log('User has access:', hasAccess);
+  }, [user]);
 
   const currentFolderId = folderStack[folderStack.length - 1].id;
 
@@ -220,7 +230,7 @@ const Trash = () => {
       <TouchableOpacity
             onPress={() => toggleModalVisible(item)}
           style={{position:'absolute',right:10}}>
-            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
+            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:COLORS.black}]} />
           </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -244,10 +254,23 @@ const Trash = () => {
       <TouchableOpacity
              onPress={() => toggleModalVisible(item)}
           >
-            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 30, width: 20,tintColor:fileColorCode[Math.floor(Math.random() * 4)] }]} />
+            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 30, width: 20,tintColor:COLORS.black }]} />
           </TouchableOpacity>
     </TouchableOpacity>
   );
+
+  const renderItem = useCallback(
+    ({item}) => (
+      <FileItem
+        item={item}
+        grid={isGrid}
+        handleMediaPreview={() => handleItemPress(item)}
+        onOpenModal={toggleModalVisible}
+      />
+    ),
+    [isGrid, handleItemPress],
+  );
+
 
   return (
     <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}>
@@ -302,7 +325,7 @@ const Trash = () => {
         <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
       </TouchableOpacity> */}
       </View>
-      {isLoading ? (
+      {/* {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
         <FlatList
@@ -318,13 +341,54 @@ const Trash = () => {
           key={isGrid ? 'grid' : 'list'} // Key to re-render FlatList on viewType change
         />
        
-      )}
+      )} */}
+      {isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.blue} />
+        ) : hasAccess ? ( // Corrected: Moved hasAccess check outside the extra curly braces
+          <FlatList
+            data={organizedData}
+            // renderItem={isGrid ? renderItemList:renderItemGrid}
+            // keyExtractor={item => item.id.toString()}
+           
+            // numColumns={isGrid ? 1 : 2}
+            // onRefresh={onRefresh}
+            // refreshing={refreshing}
+            // key={isGrid ?  'list':'grid'} 
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+            ListEmptyComponent={
+              <View style={{flex: 1, alignItems: 'center'}}>
+                <Text style={styles.emptyText}>This folder is empty</Text>
+              </View>
+            }
+            numColumns={isGrid ? 2 : 1}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            key={isGrid ?  'list':'grid'} 
+          
+         
+          
+          
+            
+        
+            showsVerticalScrollIndicator={false}
+            // ListEmptyComponent={EmptyListComponent}
+            contentContainerStyle={styles.listContent}
+          />
+        ) : (
+          <>
+            <Text>Please Subscribe</Text>
+            <SubscriptionAnimation />
+          </>
+        )}
      
           <Trashremove
           visible={showmodal}
           user={user}
           item={selectedItem}
-          onClose={() => setShowmodal(false)}/>
+          onClose={() => setShowmodal(false)}
+          onSuccess={handleFolderCreationSuccess}
+          />
          
     </View>
     </SafeAreaView>
