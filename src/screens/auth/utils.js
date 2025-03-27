@@ -16,12 +16,24 @@ export const profileInitialValue = {
     mobile : ''
 }
 
-export const profileValidtionSchema = yup.object().shape({
-    first_name:yup.string().required('FirstNaame is required'),
-    lastname:yup.string().required('LastName is required'),
-    company:yup.string().notRequired('Company name must be string'),
-    mobile:yup.string().notRequired('Mobile is required'),
-})
+
+export const profileValidationSchema = yup.object().shape({
+    first_name: yup.string().required('First Name is required'),
+    last_name: yup.string().required('Last Name is required'),
+    email: yup.string().email('Invalid email format').required('Email is required'),
+    mobile: yup
+        .string()
+        .matches(/^[0-9]+$/, 'Mobile number must contain only digits')
+        .min(10, 'Mobile number must be at least 10 digits')
+        .max(15, 'Mobile number cannot exceed 15 digits')
+        .nullable(),
+    company: yup.string().nullable(),
+    designation: yup.string().nullable(),
+    country: yup.string().nullable(),
+    zipcode: yup.string().nullable(),
+    address: yup.string().nullable(),
+    city: yup.string().nullable(),
+});
 export const updatepasswordValidtionSchema = yup.object().shape({
     current_password:yup.string().required('Current password is required'),
     new_password:yup.string().required('New password is required'),

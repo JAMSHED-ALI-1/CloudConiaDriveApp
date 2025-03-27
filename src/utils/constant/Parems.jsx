@@ -1,10 +1,7 @@
 const parems=[{
 
 
-    pageId:0,
-    folderId: 0,
-    page: 1,
-    workspaceId: workspaces || 0,
+
     deletedOnly: false,
     starredOnly: false,
     recentOnly: false,
@@ -12,9 +9,10 @@ const parems=[{
     per_page: 100,
     orderBy:'updated_at',
     orderDir:'Desc',
+    ...other
     // orderBy: sortingInfo.sortBy,
     // orderDir: sortingInfo.sortDir,
-    filters: filter,
+    // filters: ,
 }
 ]
 

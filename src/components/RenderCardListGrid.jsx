@@ -1,56 +1,66 @@
-import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { useState } from 'react';
+import { TouchableOpacity, View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import moment from 'moment';
 import getItemIcon from '../constants/GetItemIcon';
-import { COLORS } from '../utils/Colors';
+import FastImage from 'react-native-fast-image';
 
-const FileItem = ({ item, grid, handleMediaPreview,onOpenModal }) => {
-  const getIconName = (type) => {
-    switch (type) {
-      case 'folder': return 'folder';
-      case 'pdf': return 'document-text';
-      case 'image': return 'image';
-      case 'video': return 'videocam';
-      default: return 'document';
-    }
+const FileItem =React.memo(({ item, grid, handleMediaPreview, onOpenModal, user, workspace }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
+    setHasError(false);
   };
 
+  const handleImageError = () => {
+    setIsLoading(false);
+    setHasError(true);
+  };
+
+  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(item.extension?.toLowerCase()) || item.type?.toLowerCase().includes('image');
+
   return (
-    
-    <TouchableOpacity
-      onPress={() => handleMediaPreview(item)}
-      style={[styles.card, grid && styles.gridCard]}
-    >
+    <TouchableOpacity onPress={() => handleMediaPreview(item)} style={[styles.card, grid && styles.gridCard]}>
       <View style={styles.iconContainer}>
-        {/* <Icon 
-          name={getIconName(item.type)} 
-          size={40} 
-          color={item.type === 'folder' ? "#FF8C00" : "#007BFF"} 
-        /> */}
-         <Image 
-        source={getItemIcon(item)} 
-        style={styles.icon} 
-        resizeMode="contain" 
-      />
+        {/* Show loading indicator if the image is still loading */}
+
+        {/* Show image if valid, otherwise fallback to icon */}
+        {isImage && isLoading && !hasError && <ActivityIndicator size="small" color="#007bff" style={styles.loader} />}
+        {isImage && !hasError ? (
+          <FastImage
+            style={styles.imageThumbnail}
+            source={{
+              uri: `https://drive.coniacloud.com/api/v1/file-entries/${item?.id}?workspaceId=${workspace}&thumbnail=true`,
+              headers: { Authorization: `Bearer ${user?.access_token}` },
+              priority: FastImage.priority.high,
+            }}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            resizeMode={FastImage.resizeMode.contain}
+            // resizeMode='contain'
+          />
+        ) : (
+          <Image source={getItemIcon(item)} style={styles.icon} resizeMode="contain" />
+        )}
       </View>
+
       <View style={styles.infoContainer}>
         <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-        <Text style={styles.itemModified}>
-          {moment(item.updated_at).fromNow()}
-        </Text>
+        <Text style={styles.itemModified}>{moment(item.updated_at).fromNow()}</Text>
         {item.file_size > 0 && (
           <Text style={styles.itemSize}>
             {(item.file_size / 1024).toFixed(2)} KB
           </Text>
         )}
       </View>
-      <TouchableOpacity onPress={() => onOpenModal(item)} style={[styles.moreOptions,grid && styles.gridMoreOptions]}>
+
+      <TouchableOpacity onPress={() => onOpenModal(item)} style={[styles.moreOptions, grid && styles.gridMoreOptions]}>
         <Image source={require('../assets/MoreOption.png')} style={styles.moreIcon} />
       </TouchableOpacity>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -74,6 +84,8 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   infoContainer: {
     flex: 1,
@@ -94,14 +106,14 @@ const styles = StyleSheet.create({
   icon: {
     width: 35,
     height: 35,
-  margin:10
-    // tintColor: COLORS.white, // Apply a tint color if applicable
+    margin: 10,
   },
-  moreOptions: {
-    // position: 'absolute',
-    // right: 10,
-    // top: 10,
+  imageThumbnail: {
+    width: 50,
+    height: 50,
+    borderRadius: 5,
   },
+  moreOptions: {},
   gridMoreOptions: {
     position: 'absolute',
     right: 10,
@@ -110,6 +122,9 @@ const styles = StyleSheet.create({
   moreIcon: {
     height: 20,
     width: 20,
+  },
+  loader: {
+    position: 'absolute',
   },
 });
 

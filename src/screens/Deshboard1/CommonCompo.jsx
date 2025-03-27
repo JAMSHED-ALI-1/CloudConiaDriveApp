@@ -33,6 +33,9 @@ import Filter from '../../components/Filter';
 import ShortingModal from '../../Modaals/ShortingModal';
 import ProgressBar from '../../components/ProgressBar';
 import Trashremove from '../../Modaals/Trashremove';
+import { accessData } from '../../utils/UserAccessData';
+import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
+import UpgradeButton from '../../components/UpgradeButton';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -66,6 +69,9 @@ const CommonCompo = ({
   const [showmodal, setShowmodal] = useState(false);
   const [showModalAi, setshowmodalAi] = useState(false);
   const [showmodalTrash, setShowmodalTrash] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [sortingInfo, setSortingInfo] = useState({
     sortBy: 'updated_at',
@@ -90,12 +96,19 @@ const CommonCompo = ({
     [],
   );
 
+  useEffect(() => {
+    const hasAccess = accessData(user);
+    setHasAccess(hasAccess);
+    console.log('User has access:', hasAccess);
+  }, [user]);
+
+
   const params = useMemo(
     () => ({
       query: searchQuery,
       pageId: 0,
       folderId: folderHistory[folderHistory.length - 1],
-      page: 1,
+      page: currentPage,
       workspaceId: workspaces || 0,
       per_page: 100,
       orderBy: sortingInfo.sortBy,
@@ -103,7 +116,7 @@ const CommonCompo = ({
       filters: selectedFilter,
       ...extraParams,
     }),
-    [folderHistory, sortingInfo, workspaces, selectedFilter, searchQuery],
+    [folderHistory, sortingInfo, workspaces, selectedFilter, searchQuery,currentPage],
   );
 
   const {data, error, isLoading, refetch} = useGetFileFolderQuery(params);
@@ -111,9 +124,9 @@ const CommonCompo = ({
     console.log('Error:', error);
   
     // Handle specific error status (e.g., 403)
-    if (error.status === 403) {
+    if (error.status  === 403 || error) {
       console.log('Access forbidden. Navigating to login...');
-      navigation.navigate('Login');  // Assuming `navigation` is available
+      navigation.push('Login');  // Assuming `navigation` is available
     } else {
       console.log('An error occurred:', error.message);  // Log any other error messages
     }
@@ -121,7 +134,10 @@ const CommonCompo = ({
 
   useEffect(() => {
     if (data?.data) {
-      setLocalData(data.data);
+      setLocalData(prev =>(currentPage === 1 ? data.data : [...prev, ...data.data]));
+      setCurrentPage(prev => prev + 1);
+      setIsLoadingMore(false);
+
       setIsFolderChanging(false);
     }
   }, [data]);
@@ -173,6 +189,14 @@ const CommonCompo = ({
         null;
     }
   };
+
+  const loadMoreData = () => {
+    if (!isLoadingMore && data?.next_page) {
+      setIsLoadingMore(true);
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
 
   const handleMediaPreview = useMediaPreview(navigation, user);
   const onItemPress = item => {
@@ -246,6 +270,7 @@ const CommonCompo = ({
           <Gridlist
             toggleView={toggleView}
             grid={grid}
+            showshort={true}
             setShowDropdown={() => setShowDropdown(true)}
           />
         </View>
@@ -262,7 +287,7 @@ const CommonCompo = ({
           <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color={COLORS.blue} />
           </View>
-        ) : (
+        ) :  hasAccess ?(
           <FlatList
             data={localData} // Use localData instead of data?.data
             keyExtractor={item => item.id.toString()}
@@ -270,11 +295,22 @@ const CommonCompo = ({
             key={grid ? 'grid' : 'list'}
             numColumns={grid ? 2 : 1}
             onRefresh={refetch}
+            onEndReached={loadMoreData}
+            onEndReachedThreshold={0.5}
             refreshing={isLoading}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={EmptyListComponent}
             contentContainerStyle={styles.listContent}
+            ListFooterComponent={isLoadingMore ? <ActivityIndicator size="small" color="#000" /> : null}
           />
+        ): (
+          <>
+            <Text style={{fontSize:16,fontWeight:'500',textAlign:"center",color:COLORS.red}}>
+  {[strings.Warning_Yourdemoaccounthasexpired, strings.Purchasethepackageyouchoosenowtocontinueyourlife, strings.whichismadeeasierbyConiaCloud].join(' ')}
+</Text>
+            <SubscriptionAnimation />
+<UpgradeButton/>
+          </>
         )}
 
         {workspace ? (

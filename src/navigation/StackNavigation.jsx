@@ -23,19 +23,52 @@ import SpreadsheetPreview from '../screens/preview/SpreadsheetPreview';
 import zipapkpreview from '../screens/preview/zipapkpreview';
 import Zipapkpreview from '../screens/preview/zipapkpreview';
 import Notification from '../screens/settings/Notification';
-import { useSelector } from 'react-redux';
-import { selectIsLoggedIn } from '../redux/reducers/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginAsync, selectIsLoggedIn } from '../redux/reducers/authSlice';
 import PrivacyPolicy from '../screens/settings/PrivacyPolicy';
 import Pricelist from '../screens/Price/Pricelist';
 import Settings from '../screens/settings/Settings';
 import WebViewComp from '../components/WebView';
+import ViewPriceProduct from '../screens/Price/ViewPriceProduct';
+import { getData } from '../helper/functionHelper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Previewfiles from '../screens/preview/Previewfiles';
+import { useUser } from '../redux/context/UserContext';
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   // const isLoggedIn = useSelector(selectIsLoggedIn);
   // const user = useSelector((state) => state.auth.user);
   // const [isLoading, setIsLoading] = React.useState(true);
   
+  const [isLoading, setIsLoading] = React.useState(true);
+  const isLoggedIn = useSelector(selectIsLoggedIn);
+  const dispatch = useDispatch();
 
+  const checkUser = async () => {
+    try {
+      const userData = await getData();  // Check if there's user data in AsyncStorage
+      console.log('User Data:', userData);
+      if (userData) {
+        setIsLoading(false);
+      } else {
+        setIsLoading(false); // Set loading to false if no user data found
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setIsLoading(false); // Always stop loading if there's an error
+    }
+  };
+  
+ 
+
+  // useEffect(() => {
+  //   checkStorageAfterLogout();  // Check user data when the component mounts
+  // }, []);
+  
+  // const checkStorageAfterLogout = async () => {
+  //   const user = await AsyncStorage.getItem('user');
+  //   console.log('AsyncStorage after logout:', user);  // Should log null if correctly removed
+  // };
   return (
     <>
     {/* <Stack.Navigator initialRouteName='Test'> */}
@@ -63,6 +96,7 @@ const StackNavigation = () => {
 <Stack.Screen name="PptPreview" component={PptPreview}  options={{headerShown:false}}/>
 <Stack.Screen name="SpreadsheetPreview" component={SpreadsheetPreview}  options={{headerShown:false}}/>
 <Stack.Screen name="Zipapkpreview" component={Zipapkpreview}  options={{headerShown:false}}/>
+<Stack.Screen name="Previewfiles" component={Previewfiles}  options={{headerShown:false}}/>
 
 
 {/* Setting    Etc */}
@@ -78,6 +112,7 @@ const StackNavigation = () => {
 {/* Price      */}
 <Stack.Screen name="UpgradeScreen" component={UpgradeScreen}  options={{headerShown:false}}/>
 <Stack.Screen name="Pricelist" component={Pricelist}  options={{headerShown:false}}/>
+<Stack.Screen name="ViewPriceProduct" component={ViewPriceProduct}  options={{headerShown:false}}/>
 {/* Testing Purpose */}
 
 <Stack.Screen name="Test" component={Test}  options={{headerShown:false}}/>

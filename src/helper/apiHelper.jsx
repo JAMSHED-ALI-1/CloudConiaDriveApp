@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { AppSettings } from '../utils/Settings';
+import { getData } from './functionHelper';
 
 const api = axios.create({
   baseURL: AppSettings.base_url,
@@ -58,5 +59,26 @@ export const makeApiCallWithHeader = async (endpoint, method = 'GET', data = nul
   } finally {
     // This block will always execute, regardless of whether the request succeeded or failed
     console.log('API call with header completed');
+  }
+};
+
+export const makeApihandler = async (endpoint, method = 'GET', data=null ) => {
+  try {
+    const user = await getData();
+    if (!user?.access_token) throw new Error('No access token found');
+
+    const response = await api({
+      method,
+      url: endpoint,
+      data,
+      headers: {
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    });
+
+    return response?.data;
+  } catch (error) {
+    console.error('API Error:', error?.response?.data || error.message);
+    throw error;
   }
 };

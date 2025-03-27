@@ -9,13 +9,16 @@ import CustomHeader from '../../components/CustomHeader';
 import InputBox from '../../components/InputBox';
 import CustomButton from '../../components/CustomButton';
 import { makeApiCall } from '../../helper/apiHelper';
-import { updateUserAsync } from '../../redux/reducers/authSlice';
+import { logoutAsync, updateUserAsync } from '../../redux/reducers/authSlice';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../utils/Colors';
 import strings from '../../helper/Language/LocalizedStrings';
+import showMessageHandler from '../../utils/constant/ShowMessageHandler';
+import LottieView from 'lottie-react-native';
+import AnimationModal from '../../Modaals/AnimationModal';
+import SuccessAndFailModal from '../../Modaals/SuccessAndFailModal';
 
-const EditProfile = () => {
-  const navigation = useNavigation();
+const EditProfile = ({navigation}) => {
   const dispatch = useDispatch();
   const [profileInitialValue, setProfileInitialValue] = useState({
     first_name: '',
@@ -23,7 +26,11 @@ const EditProfile = () => {
     email: '',
     mobile: '',
     company: '',
-    designation: ''
+    designation: '',
+    country:'',
+    zipcode:'',
+    address:'',
+    city:'',
   });
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -32,9 +39,14 @@ const EditProfile = () => {
   const { user } = useSelector((state) => state.auth);
   const language = useSelector((state) => state.language.language);
 
+  const [showLottie,setShowLottie]=useState(false);
+  const [lottieUrl,setLottieUrl]=useState(require('../../assets/data/Successfully.json'));
+
+  // console.log(showLottie,'showLottie')
+
   useEffect(() => {
     if (!user) {
-      navigation.navigate('Login');
+      navigation.replace('Login')
     } else {
       setProfileInitialValue({
         first_name: user?.first_name || '',
@@ -42,7 +54,11 @@ const EditProfile = () => {
         email: user?.email || '',
         mobile: user?.mobile || '',
         company: user?.company || '',
-        designation: user?.designation || ''
+        designation: user?.designation || '',
+        country:user?.country||'',
+        zipcode:user?.zipcode||'',
+        address:user?.address||'',
+        city:user?.city||''
       });
     }
   }, [user, navigation]);
@@ -50,21 +66,38 @@ const EditProfile = () => {
   const handleProfile = async (values) => {
     try {
       const updateUser = await dispatch(updateUserAsync(values)).unwrap();
-      Dialog.show({
-        type: ALERT_TYPE.SUCCESS,
-        title: 'Success',
-        textBody: 'Profile updated successfully',
-        button: 'Close'
-      });
+      if(updateUser){
+        // Show success flash message
+        setLottieUrl(require('../../assets/data/Successfully.json'))
+        setShowLottie(true);
+
+        
+        showMessageHandler("Update Successful", "You have Updae in successfully.", "success");
+
+        
+      }
+   console.log(updateUser,'successfully')
     } catch (error) {
-      Dialog.show({
-        type: ALERT_TYPE.WARNING,
-        title: 'Error',
-        textBody: error.message,
-        button: 'Close'
-      });
+     console.log('error',error)
+     setLottieUrl(require('../../assets/data/failed.json'))
+      setShowLottie(true);
+     showMessageHandler("Update Failed", "Invalid.", "danger");
+
+     if(error.message==="Unauthenticated." || error.message==="Unauthorized."){
+       try {
+        // console.log(first)
+        //  await dispatch(logoutAsync());
+        setTimeout(() => {
+          navigation.replace('Login')
+        }, 2000);
+        //  navigation.navigate('Login');
+       } catch (error) {  
+      console.log('error',error)
+     }
+
     }
   };
+}
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -73,7 +106,9 @@ const EditProfile = () => {
   return (
     <AlertNotificationRoot>
       <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundColor }}>
-        <ScrollView style={styles.container}>
+        <View style={{flex:1,padding:10}}>
+
+
           <CustomHeader
             back={true}
             OnPress={() => navigation.goBack()}
@@ -98,6 +133,9 @@ const EditProfile = () => {
               }) => (
                 <View style={{ marginTop: 20, width: '100%' }}>
                   {/* First Name */}
+                  <ScrollView style={{marginBottom:50}}>
+
+                
                   <Text style={styles.normaltext}>First Name</Text>
                   <InputBox
                     placeholder="First Name"
@@ -163,18 +201,66 @@ const EditProfile = () => {
                     errors={errors.mobile}
                     keyboardType="phone-pad"
                   />
-
+                    <Text style={styles.normaltext}>Address</Text>
+   <InputBox
+                    placeholder="Address"
+                    onChangeText={handleChange('address')}
+                    onBlur={handleBlur('address')}
+                    value={values.address}
+                    touched={touched.address}
+                    errors={errors.address}
+                    // keyboardType="phone-pad"
+                  />
+  <Text style={styles.normaltext}>City</Text>
+<InputBox
+                    placeholder="City"
+                    onChangeText={handleChange('city')}
+                    onBlur={handleBlur('city')}
+                    value={values.city}
+                    touched={touched.city}
+                    errors={errors.city}
+                    // keyboardType="phone-pad"
+                  />
+                    <Text style={styles.normaltext}>Country</Text>
+                   <InputBox
+                    placeholder="Country"
+                    onChangeText={handleChange('country')}
+                    onBlur={handleBlur('country')}
+                    value={values.country}
+                    touched={touched.country}
+                    errors={errors.country}
+                    // keyboardType="phone-pad"
+                  />
+                    <Text style={styles.normaltext}>ZipCode</Text>
+                   <InputBox
+                    placeholder="ZipCode"
+                    onChangeText={handleChange('zipcode')}
+                    onBlur={handleBlur('zipcode')}
+                    value={values.zipcode}
+                    touched={touched.zipcode}
+                    errors={errors.zipcode}
+                    // keyboardType="phone-pad"
+                  />
                   {/* Submit Button */}
                   <CustomButton
                     buttonTitle="Update"
                     onPress={handleSubmit}
-                    disabled={!isValid || loading}
+                    // disabled={!isValid || loading}
                   />
+                    </ScrollView>
                 </View>
               )}
             </Formik>
+            {showLottie && (
+              <SuccessAndFailModal
+              visible={showLottie}
+              onClose={() => setShowLottie(false)}
+              url={lottieUrl}
+              fromWhere="EditProfile"
+              />
+            )}
           </View>
-        </ScrollView>
+          </View>
       </SafeAreaView>
     </AlertNotificationRoot>
   );

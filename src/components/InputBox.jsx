@@ -71,12 +71,22 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 0,
     borderColor: 'grey',
     borderRadius: 10,
     paddingHorizontal: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
+   backgroundColor:COLORS.white,
+   shadowColor: COLORS.blue,
+shadowOffset: {
+	width: 0,
+	height: 6,
+},
+shadowOpacity: 0.37,
+shadowRadius: 7.49,
+
+elevation: 12,
   },
   iconStyle: {
     width: 20,
@@ -88,6 +98,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingRight: 15,
     color:COLORS.black,
+   
   },
   errorStyle: {
     color: 'red',

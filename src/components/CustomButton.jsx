@@ -38,11 +38,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
+   
   },
   buttonStyle: {
     color: 'white',
     fontSize: 18,
     textAlign: 'center',
+    
   },
   disabledContainer: {
     backgroundColor: COLORS.BUTTON, // You can define this color in your COLORS

@@ -127,7 +127,7 @@ const pricelistData = [
 ];
 
 const Pricelist = ({ navigation }) => {
-  const [currency, setCurrency] = useState('USD'); 
+  const [currency, setCurrency] = useState('TRY'); 
   const [feature,setFeature]=useState([])
   const user = useSelector(state => state.auth.user);
   const [isLoading,setIsLoading]=useState(false)
@@ -138,7 +138,7 @@ const Pricelist = ({ navigation }) => {
     try {
       // const res=await axios.get(`${baseURL}billing/products`)
       const res=await axios.get(`${baseURL}/billing/products`)
-      console.log('respoce ki Information3---->>>>>',res?.data?.pagination?.data)
+      // console.log('respoce ki Information3---->>>>>',res?.data?.pagination?.data)
       setFeature(res?.data?.pagination?.data)
 
     } catch (error) {
@@ -151,12 +151,13 @@ const Pricelist = ({ navigation }) => {
   handlePriceList()
   },[])
  
-  const hanndleSUbsbutton=()=>{
-    Alert.alert('Working On It Thanks For Buying Product')
+  const hanndleSUbsbutton=(item)=>{
+    navigation.navigate('ViewPriceProduct',{item,currency})
+    // Alert.alert('Working On It Thanks For Buying Product')
   }
   
   const toggleCurrency = () => {
-    setCurrency((prevCurrency) => (prevCurrency === 'USD' ? 'TRY' : 'USD'));
+    setCurrency((prevCurrency) => (prevCurrency === 'TRY' ? 'EUR':'TRY' ));
   };
 
   return (
@@ -167,12 +168,12 @@ const Pricelist = ({ navigation }) => {
       <CustomHeader back={true}   OnPress={() => navigation.goBack()} title={strings.PRICE_LIST}left={true} />
         <View style={styles.header}>
           <Text style={styles.headerText}>
-            Price & Feature List in {currency === 'USD' ? '€ ' : '₺'}
+            Price & Feature List in {currency === 'TRY' ? '€ ' : '₺'}
           </Text>
           <TouchableOpacity style={{padding:15,backgroundColor:COLORS.BUTTON,borderRadius:10}}
                       onPress={toggleCurrency}>
             <Text style={{fontSize:14,color:COLORS.white,fontWeight:'600'}}>
-            {`Switch to ${currency === 'USD' ? 'Turkish Lira (₺)' : 'EUR € '}`}
+            {`Switch to ${currency === 'TRY' ? 'Turkish Lira (₺)' : 'EUR € '}`}
             </Text>
           </TouchableOpacity>
           {/* <Button
@@ -210,7 +211,7 @@ const Pricelist = ({ navigation }) => {
 
 {item.prices.length > 0 ? (
   <Text style={{...styles.price}}>
-    {currency === 'USD'
+    {currency === 'TRY'
       ? ` € ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'} /Year `
       : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} /Year`}
   </Text>
@@ -229,7 +230,8 @@ const Pricelist = ({ navigation }) => {
     ))} 
     <View style={{paddingVertical:25}}>
 
-    <CustomButton buttonTitle="Subscribe" onPress={hanndleSUbsbutton} />
+    <CustomButton buttonTitle="Subscribe" onPress={() => hanndleSUbsbutton(item)} />
+
     </View>
   </View>
 ))}

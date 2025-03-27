@@ -15,6 +15,7 @@ import play from '../../assets/icons/pdf.png';
 import video from '../../assets/icon/video.png';
 import wordIcon from '../../assets/icon/word.png';
 import imageIcon from '../../assets/icon/image.png';
+import All from '../../assets/icon/all.png'
 import Trashremove from '../../Modaals/Trashremove';
 import ModalForUploadAndCreateFile from '../../Modaals/ModalForUpladAndCreateFile';
 import ProgressBar from '../../components/ProgressBar';
@@ -23,6 +24,14 @@ import getItemIcon from '../../constants/GetItemIcon';
 import { accessData } from '../../utils/UserAccessData';
 import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
 import FileItem from '../../components/RenderCardListGrid';
+import HomeHeader from '../../components/HomeHeader';
+import Filter from '../../components/Filter';
+import FileFolderModal from '../../Modaals/FileFolderModal';
+import AnimationModal from '../../Modaals/AnimationModal';
+import Gridlist from '../../constants/Gridlist';
+import UpgradeButton from '../../components/UpgradeButton';
+import EmptyComponent from '../../components/EmptyComponent';
+import ImagepreviewModal from '../../Modaals/ImagepreviewModal';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Trash = () => {
@@ -40,6 +49,12 @@ const Trash = () => {
   const [search, setSearch] = useState('');
   const [showmodal, setShowmodal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [opencreateuplodModal, setopencreateModal] = useState(false);
+  const [showModalAi, setshowmodalAi] = useState(false);
+  const handlecreateOpenModal = () => setopencreateModal(true);
+  const [handleImageViewMidal,setImageViewModal]=useState(false)
+            const [imageId,setImgaeid]=useState(0)
+  const handleclosecreatefolderFileModal = () => setopencreateModal(false);
   const handleGridListToggle = () => {
     setIsGrid(!isGrid);
   };
@@ -49,6 +64,7 @@ const Trash = () => {
     { id: 2, Image: fileIcon, title: strings.File, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidGV4dCIsImlzSW5hY3RpdmUiOmZhbHNlLCJvcGVyYXRvciI6Ij0iLCJ2YWx1ZUtleSI6IjAyIn1d' },
     { id: 3, Image: imageIcon, title: strings.Image, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoiaW1hZ2UiLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNSJ9XQ%3D%3D' },
     { id: 4, Image: video, title:strings.Video, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidmlkZW8iLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNCJ9XQ%3D%3D' },
+    { id: 5, Image: All, title:strings.ALL, filters: '' },
   ];
 
   const handleFolderCreationSuccess = () => {
@@ -145,10 +161,12 @@ const Trash = () => {
       toggleModalVisible(item)
     } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
       // Navigate to ImageViewer if the item is an image
-      navigation.navigate('ImageViewer',{
-        filePath: item,
-        user: user,
-      });
+      // navigation.navigate('ImageViewer',{
+      //   filePath: item,
+      //   user: user,
+      // });
+      setImgaeid(item?.id)
+      setImageViewModal(true)
       
     } 
     else if (item.type === 'pdf') {
@@ -266,6 +284,12 @@ const Trash = () => {
         grid={isGrid}
         handleMediaPreview={() => handleItemPress(item)}
         onOpenModal={toggleModalVisible}
+        // item={item}
+        // grid={isGrid}
+        user={user}
+        // handleMediaPreview={() => handleItemClick(item)}
+        // onOpenModal={toggleModalVisible}
+        workspace={workspaces}
       />
     ),
     [isGrid, handleItemPress],
@@ -276,8 +300,21 @@ const Trash = () => {
     <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}>
 
    
+<HomeHeader
+        user={user}
+        handleIconPress={() => setshowmodalAi(true)}
+        handlecreateOpenModal={handlecreateOpenModal}
+      />
+<View style={{height:110}}>
+
+<Filter
+       FilterData={FilderData}
+       selectedFilter={currentFilter}
+       handleFilterSelect={handleFilterSelection}
+       />
+</View>
     <View style={styles.container}>
-        <CustomHeader
+        {/* <CustomHeader
           // back={true}
           // left={true}
           right={true}
@@ -285,9 +322,9 @@ const Trash = () => {
           title={strings.DELETEFILE}
           ViewType={isGrid}  // Pass the view type state
           hadleGidList={handleGridListToggle}
-        />
+        /> */}
        
-<View style={styles.folderContainer}>
+{/* <View style={styles.folderContainer}>
   {FilderData.map(item => (
     <View key={item.id} style={styles.folderItem}>
       <TouchableOpacity 
@@ -302,11 +339,12 @@ const Trash = () => {
       <Text style={styles.folderTitle}>{item.title}</Text>
     </View>
   ))}
-</View>
+</View> */}
+
 
 <View style={{ borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-          <View>
+          <View style={{flexDirection:'row',justifyContent:'space-between'}}>
       {folderStack.length > 1 && (
         <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Icon name="arrow-back" size={24} color={COLORS.black} />
@@ -318,8 +356,14 @@ const Trash = () => {
           <Text style={styles.currentFolderText}>{strings.DELETEFILE}</Text>
         )
       }
+
       {/* <Text style={styles.currentFolderText}>{folderStack[folderStack.length - 1].name}</Text> */}
       </View>
+<Gridlist
+            toggleView={handleGridListToggle}
+            grid={isGrid}
+            // setShowDropdown={() => setShowDropdown(true)}
+          />
       {/* <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>setshowdropdown(true)}>
         <Text style={styles.currentFolderText}>Sort</Text>
         <Image source={require('../../assets/icon/sorting.png')} style={{height:25,width:25,resizeMode:'contain'}}/>
@@ -356,11 +400,11 @@ const Trash = () => {
             // key={isGrid ?  'list':'grid'} 
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
-            ListEmptyComponent={
-              <View style={{flex: 1, alignItems: 'center'}}>
-                <Text style={styles.emptyText}>This folder is empty</Text>
-              </View>
-            }
+            // ListEmptyComponent={
+            //   <View style={{flex: 1, alignItems: 'center'}}>
+            //     <Text style={styles.emptyText}>This folder is empty</Text>
+            //   </View>
+            // }
             numColumns={isGrid ? 2 : 1}
             onRefresh={onRefresh}
             refreshing={refreshing}
@@ -372,14 +416,17 @@ const Trash = () => {
             
         
             showsVerticalScrollIndicator={false}
-            // ListEmptyComponent={EmptyListComponent}
+            ListEmptyComponent={EmptyComponent}
             contentContainerStyle={styles.listContent}
           />
         ) : (
           <>
-            <Text>Please Subscribe</Text>
-            <SubscriptionAnimation />
-          </>
+          <Text style={{fontSize:16,fontWeight:'500',textAlign:"center",color:COLORS.red}}>
+{[strings.Warning_Yourdemoaccounthasexpired, strings.Purchasethepackageyouchoosenowtocontinueyourlife, strings.whichismadeeasierbyConiaCloud].join(' ')}
+</Text>
+          <SubscriptionAnimation />
+<UpgradeButton/>
+        </>
         )}
      
           <Trashremove
@@ -389,6 +436,24 @@ const Trash = () => {
           onClose={() => setShowmodal(false)}
           onSuccess={handleFolderCreationSuccess}
           />
+            <FileFolderModal
+          visible={opencreateuplodModal}
+          onClose={handleclosecreatefolderFileModal}
+          onSuccess={handleFolderCreationSuccess}
+          user={user}
+          folderId={selectedItem}
+        />
+        <AnimationModal
+          visible={showModalAi}
+          onClose={() => setshowmodalAi(false)}
+        />
+         <ImagepreviewModal
+        visible={handleImageViewMidal}
+        workspace={workspaces}
+        onClose={()=>setImageViewModal(false)}
+        imageId={imageId}
+        user={user}
+        />
          
     </View>
     </SafeAreaView>
@@ -400,7 +465,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundColor,
-    padding:10
+    paddingHorizontal:10
   },
   heading: {
     fontSize: 18,

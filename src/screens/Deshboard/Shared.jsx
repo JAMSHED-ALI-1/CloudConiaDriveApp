@@ -26,10 +26,17 @@ import { accessData } from '../../utils/UserAccessData';
 import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
 import FileItem from '../../components/RenderCardListGrid';
 import Gridlist from '../../constants/Gridlist';
+import HomeHeader from '../../components/HomeHeader';
+import FileFolderModal from '../../Modaals/FileFolderModal';
+import AnimationModal from '../../Modaals/AnimationModal';
+import UpgradeButton from '../../components/UpgradeButton';
+import EmptyComponent from '../../components/EmptyComponent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ImagepreviewModal from '../../Modaals/ImagepreviewModal';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Shared = () => {
-  const user = useSelector((state) => state.auth.user);
+ const user = useSelector(state => state.auth.user);
   const workspaces = useSelector(state => state.workspace.workspace);
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,13 +57,18 @@ const Shared = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [actionModal,setactionModal]=useState(false)
   const [showDropdown, setShowDropdown] = useState(false);
+  const [opencreateuplodModal, setopencreateModal] = useState(false);
+  const [showModalAi, setshowmodalAi] = useState(false);
+   const [handleImageViewMidal,setImageViewModal]=useState(false)
+              const [imageId,setImgaeid]=useState(0)
   // To track folder navigation
 // const [currentFolderId, setCurrentFolderId] = useState(null); // To track the active folder ID
 
   const handleGridListToggle = () => {
     setIsGrid((isGrid)=>!isGrid);
   };
-
+  const handlecreateOpenModal = () => setopencreateModal(true);
+  const handleclosecreatefolderFileModal = () => setopencreateModal(false);
   const toggleModalVisible = (item) => {
     setSelectedItem(item); 
     setactionModal(!actionModal);
@@ -81,6 +93,7 @@ const Shared = () => {
   const fetchDriveData = useCallback(async (folderParams = {},filter = null) => {
     try {
       setIsLoading(true);
+     
       const { 
         pageId = 'shares',
         
@@ -189,64 +202,21 @@ const Shared = () => {
         breadcrumbs: [...prevState.breadcrumbs, item]
       }));
     
-    } else if (['jpg', 'jpeg', 'png', 'gif', 'svg',].includes(item.extension.toLowerCase())) {
-      // Navigate to ImageViewer if the item is an image
-      navigation.navigate('ImageViewer',{
+    }else if (
+      ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(item.extension.toLowerCase())
+    ) {
+      // console.log('File ID:', item.id);
+      setImgaeid(item?.id)
+      setImageViewModal(true)
+     
+    }  else {
+      // Implement file download logic
+      navigation.navigate('Previewfiles', {
         filePath: item,
         user: user,
       });
-      
-    } 
-    else if (item.type === 'pdf') {
-      // Navigate to ImageViewer if the item is an image
-      navigation.navigate('PdfView',{
-        filePath: item,
-        user: user,
-      });
-      
-    } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)){
-      navigation.navigate('VideoPreview', {
-        filePath: item,
-        user: user, 
-      });
-    } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)){
-      navigation.navigate('AudioPreview', {
-        filePath: item,
-        user: user, 
-      });
     }
-    else if (['doc', 'docx'].includes(item.extension)){
-      navigation.navigate('WordPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['pptx','ppt','odp'].includes(item.extension)){
-      navigation.navigate('PptPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['xls','xlsx','csv','ods'].includes(item.extension)){
-      navigation.navigate('SpreadsheetPreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['txt'].includes(item.extension)){
-      navigation.navigate('TextFilePreview', {
-        filePath: item,
-        user: user, 
-      });
-    }
-    else if (['zip','tar','rar','exe','app','apk'].includes(item.extension)){
-      navigation.navigate('Zipapkpreview', {
-        filePath: item,
-        user: user, 
-      });
-    }else {
-      console.log('File clicked:',);
-    }
+   
   }, [navigation, user, folderStack]);
 
   const renderItemList = useCallback(({ item }) => (
@@ -304,6 +274,10 @@ const Shared = () => {
         grid={isGrid}
         handleMediaPreview={() => handleItemPress(item)}
         onOpenModal={toggleModalVisible}
+        user={user}
+        // handleMediaPreview={() => handleItemClick(item)}
+        // onOpenModal={toggleModalVisible}
+        workspace={workspaces}
       />
     ),
     [isGrid, handleItemPress],
@@ -312,16 +286,21 @@ const Shared = () => {
   return (
     <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}>
 
+<HomeHeader
+        user={user}
+        handleIconPress={() => setshowmodalAi(true)}
+        handlecreateOpenModal={handlecreateOpenModal}
+      />
    
     <View style={styles.container}>
-        <CustomHeader
+        {/* <CustomHeader
           
           right={true}
           grid={true}
           title={strings.Shared}
           ViewType={isGrid}  // Pass the view type state
           hadleGidList={handleGridListToggle}
-        />
+        /> */}
          {/* <View style={styles.inputContainer}>
             <TouchableOpacity>
               <Image source={require('../../assets/Search.png')} style={styles.leftImage} />
@@ -347,9 +326,9 @@ const Shared = () => {
     </View>
   ))}
 </View> */}
-<View style={{width:'95%',alignSelf:'center'}}>
+<View style={{width:'100%',}}>
 
-<ProgressBar/>
+{/* <ProgressBar/> */}
 </View>
 
 {renderBreadcrumbs()}
@@ -388,11 +367,7 @@ const Shared = () => {
             // renderItem={isGrid ? renderItemList:renderItemGrid}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
-            ListEmptyComponent={
-              <View style={{flex: 1, alignItems: 'center'}}>
-                <Text style={styles.emptyText}>This folder is empty</Text>
-              </View>
-            }
+           
             numColumns={isGrid ? 2 : 1}
             onRefresh={onRefresh}
             refreshing={refreshing}
@@ -404,17 +379,17 @@ const Shared = () => {
             
         
             showsVerticalScrollIndicator={false}
-            // ListEmptyComponent={EmptyListComponent}
+            ListEmptyComponent={EmptyComponent}
             contentContainerStyle={styles.listContent}
           />
         ) : (
           <>
-           <Text style={{fontSize:16,fontWeight:'500',textAlign:"center",color:COLORS.red}}>
-  {[strings.Warning_Yourdemoaccounthasexpired, strings.Purchasethepackageyouchoosenowtocontinueyourlife, strings.whichismadeeasierbyConiaCloud].join(' ')}
+          <Text style={{fontSize:16,fontWeight:'500',textAlign:"center",color:COLORS.red}}>
+{[strings.Warning_Yourdemoaccounthasexpired, strings.Purchasethepackageyouchoosenowtocontinueyourlife, strings.whichismadeeasierbyConiaCloud].join(' ')}
 </Text>
-
-            <SubscriptionAnimation />
-          </>
+          <SubscriptionAnimation />
+<UpgradeButton/>
+        </>
         )}
       {/* <ActionModal 
             isVisible={actionModal} 
@@ -428,6 +403,24 @@ const Shared = () => {
              onClose={() => setactionModal(false)}
              onSuccess={handleFolderCreationSuccess}
             />
+               <FileFolderModal
+          visible={opencreateuplodModal}
+          onClose={handleclosecreatefolderFileModal}
+          onSuccess={handleFolderCreationSuccess}
+          user={user}
+          folderId={selectedItem}
+        />
+        <AnimationModal
+          visible={showModalAi}
+          onClose={() => setshowmodalAi(false)}
+        />
+         <ImagepreviewModal
+        visible={handleImageViewMidal}
+        workspace={workspaces}
+        onClose={()=>setImageViewModal(false)}
+        imageId={imageId}
+        user={user}
+        />
     </View>
     </SafeAreaView>
   );
@@ -438,7 +431,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundColor,
-    padding:10
+    paddingHorizontal:10
   },
   heading: {
     fontSize: 18,

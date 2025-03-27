@@ -1,3 +1,262 @@
+// import { StyleSheet, Text, View, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+// import React, { useCallback, useEffect, useState } from 'react';
+// import { useDispatch } from 'react-redux';
+// import { makeApihandler } from '../../helper/apiHelper';
+// import { handleLogout } from '../../helper/Logouthelper';
+// import strings from '../../helper/Language/LocalizedStrings';
+// import { useMediaPreview } from '../../components/FileSystemComponent';
+// import FileItem from '../../components/RenderCardListGrid';
+
+// const Home = ({ navigation }) => {
+//   const dispatch = useDispatch();
+//   const workspaces = 0;
+//   const sortingInfo = { sortBy: 'name', sortDir: 'asc' };
+//   const [currentFolderId, setCurrentFolderId] = useState(null);
+//   const [folderStack, setFolderStack] = useState([{ id: null, name: strings.MyFiles }]);
+//   const [isGrid, setIsGrid] = useState(true);
+//   const [driveData, setDriveData] = useState([]);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [pagination, setPagination] = useState({});
+
+//   const showMessageHandler = (message) => {
+//     console.log(message);
+//     // Implement your actual message handler here
+//   };
+
+//   const handleFetchData = async (folderId = currentFolderId) => {
+//     console.log('Fetching data for folder ID:', folderId);
+//     setIsLoading(true);
+
+//     try {
+//       // Based on your response format, this seems to be the correct endpoint
+//       const endpoint = `api/v1/file-entries`;
+//       console.log(`Making request to: ${endpoint} with parent_id: ${folderId}`);
+
+//       const response = await makeApihandler(endpoint, 'GET', {
+//         params: {
+//           parent_id: folderId, // This is the key parameter for filtering by folder
+//           workspaceId: workspaces || 0,
+//           page: 1,
+//           per_page: 100,
+//           orderBy: sortingInfo.sortBy,
+//           orderDir: sortingInfo.sortDir,
+//         },
+//       });
+
+//       // Safely log response without causing errors
+//       console.log('API Response received');
+
+//       // Handle the pagination data structure from your API
+//       if (response && response.pagination && response.pagination.data) {
+//         console.log(`Retrieved ${response.pagination.data.length} items`);
+//         setDriveData(response.pagination.data);
+//         setPagination({
+//           currentPage: response.pagination.current_page,
+//           totalPages: response.pagination.last_page,
+//           totalItems: response.pagination.total
+//         });
+//       } else {
+//         console.error('Unexpected response format:', JSON.stringify(response).substring(0, 200));
+//         setDriveData([]);
+//       }
+//     } catch (error) {
+//       console.error('API Error:', error.message || error);
+
+//       if (error.response && error.response.status === 403) {
+//         showMessageHandler('Token expired, redirecting to login...');
+//         await handleLogout(navigation, dispatch);
+//       } else {
+//         showMessageHandler('Something went wrong. Please try again later.');
+//       }
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     // Initial data fetch when component mounts
+//     handleFetchData();
+//   }, []);
+
+//   const handleMediaPreview = useMediaPreview(navigation);
+
+//   const onItemPress = useCallback((item) => {
+//     console.log('Item pressed:', item.name, 'Type:', item.type, 'ID:', item.id);
+
+//     if (item.type === 'folder') {
+//       // Handle folder navigation
+//       console.log('Navigating to folder:', item.name, 'with ID:', item.id);
+
+//       // Update current folder ID first
+//       setCurrentFolderId(item.id);
+
+//       // Update folder stack for navigation history
+//       setFolderStack((prev) => [...prev, { id: item.id, name: item.name }]);
+
+//       // Fetch data for the selected folder
+//       handleFetchData(item.id);
+//     } else {
+//       // Handle file preview
+//       console.log('Previewing file:', item.name);
+//       handleMediaPreview(item);
+//     }
+//   }, [handleMediaPreview]);
+
+//   const handleBackPress = useCallback(() => {
+//     if (folderStack.length > 1) {
+//       // Remove the current folder from the stack
+//       const newStack = folderStack.slice(0, -1);
+//       setFolderStack(newStack);
+
+//       // Get the parent folder's ID
+//       const parentFolderId = newStack[newStack.length - 1].id;
+//       console.log('Navigating back to folder with ID:', parentFolderId);
+
+//       // Update current folder ID
+//       setCurrentFolderId(parentFolderId);
+
+//       // Fetch data for the parent folder
+//       handleFetchData(parentFolderId);
+//     }
+//   }, [folderStack]);
+
+//   const renderItem = useCallback(
+//     ({ item }) => (
+//       <FileItem
+//         item={item}
+//         grid={isGrid}
+//         handleMediaPreview={() => onItemPress(item)}
+//       />
+//     ),
+//     [isGrid, onItemPress]
+//   );
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Folder navigation breadcrumb */}
+//       <View style={styles.pathContainer}>
+//         {folderStack.length > 1 && (
+//           <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+//             <Text style={styles.backButtonText}>
+//               ← Back to {folderStack[folderStack.length - 2].name}
+//             </Text>
+//           </TouchableOpacity>
+//         )}
+//         <Text style={styles.currentFolderText}>
+//           Current: {folderStack[folderStack.length - 1].name}
+//         </Text>
+//       </View>
+
+//       {/* View toggle button */}
+//       <TouchableOpacity
+//         style={styles.toggleButton}
+//         onPress={() => setIsGrid(!isGrid)}>
+//         <Text style={styles.toggleButtonText}>
+//           {isGrid ? 'Switch to List View' : 'Switch to Grid View'}
+//         </Text>
+//       </TouchableOpacity>
+
+//       {/* File/folder list */}
+//       <FlatList
+//         data={driveData}
+//         keyExtractor={(item) => item.id.toString()}
+//         renderItem={renderItem}
+//         numColumns={isGrid ? 2 : 1}
+//         key={isGrid ? 'grid' : 'list'}
+//         contentContainerStyle={styles.listContainer}
+//         ListFooterComponent={() => (
+//           pagination.totalItems > 0 && (
+//             <Text style={styles.paginationText}>
+//               Showing {driveData.length} of {pagination.totalItems} items
+//             </Text>
+//           )
+//         )}
+//         ListEmptyComponent={() => (
+//           isLoading ? (
+//             <View style={styles.loaderContainer}>
+//               <ActivityIndicator size="large" color="#0000ff" />
+//               <Text style={styles.loadingText}>Loading...</Text>
+//             </View>
+//           ) : (
+//             <View style={styles.emptyContainer}>
+//               <Text style={styles.emptyText}>
+//                 {folderStack.length > 1 ? 'This folder is empty.' : 'No files or folders found.'}
+//               </Text>
+//             </View>
+//           )
+//         )}
+//       />
+//     </View>
+//   );
+// };
+
+// export default Home;
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 10,
+//     backgroundColor: '#fff',
+//   },
+//   pathContainer: {
+//     marginBottom: 10,
+//   },
+//   backButton: {
+//     paddingVertical: 10,
+//   },
+//   backButtonText: {
+//     color: 'blue',
+//     fontSize: 16,
+//     fontWeight: '500',
+//   },
+//   currentFolderText: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     marginBottom: 5,
+//   },
+//   toggleButton: {
+//     backgroundColor: '#f0f0f0',
+//     padding: 10,
+//     borderRadius: 5,
+//     marginBottom: 10,
+//     alignItems: 'center',
+//   },
+//   toggleButtonText: {
+//     color: '#333',
+//     fontWeight: '500',
+//   },
+//   paginationText: {
+//     textAlign: 'center',
+//     color: '#666',
+//     padding: 10,
+//   },
+//   listContainer: {
+//     flexGrow: 1,
+//     paddingBottom: 20,
+//   },
+//   loaderContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     paddingTop: 50,
+//   },
+//   loadingText: {
+//     marginTop: 10,
+//     color: '#666',
+//   },
+//   emptyContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginTop: 50,
+//   },
+//   emptyText: {
+//     fontSize: 16,
+//     color: 'gray',
+//     textAlign: 'center',
+//   },
+// });
+
 import {
   StyleSheet,
   Text,
@@ -19,7 +278,7 @@ import {baseURL, fileColorCode} from '../../utils/constant/settings';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {timeAgo} from '../../helper/functionHelper';
+import {getData, timeAgo} from '../../helper/functionHelper';
 import ModalForUploadAndCreateFile from '../../Modaals/ModalForUpladAndCreateFile';
 import {FastField} from 'formik';
 import HomeHeader from '../../components/HomeHeader';
@@ -36,11 +295,14 @@ import {accessData} from '../../utils/UserAccessData';
 import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
 import UpgradeButton from '../../components/UpgradeButton';
 import WorkspaceModal from '../../Modaals/WorkspaceModal';
+import FileItem from '../../components/RenderCardListGrid';
+import EmptyComponent from '../../components/EmptyComponent';
+import Gridlist from '../../constants/Gridlist';
+import ImagepreviewModal from '../../Modaals/ImagepreviewModal';
 
 const Home = () => {
   const user = useSelector(state => state.auth.user);
   const [hasAccess, setHasAccess] = useState(false);
-  // console.log(user, 'Userki Indformation ');
   const language = useSelector(state => state.language.language);
   const workspaces = useSelector(state => state.workspace.workspace);
   const [folderStack, setFolderStack] = useState([
@@ -49,20 +311,25 @@ const Home = () => {
   const [allData, setAllData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewType, setViewType] = useState('list');
   const [showmodal, setShowmodal] = useState(false);
   const [showModalAi, setshowmodalAi] = useState(false);
   const [actionModal, setactionModal] = useState(false);
   const currentFolderId = folderStack[folderStack.length - 1].id;
   const [selectedItem, setSelectedItem] = useState(null);
   const [showDrodown, setshowdropdown] = useState(false);
-  const [workspacemodal,setshowworkspacemodal]=useState(false)
+  const [workspacemodal, setshowworkspacemodal] = useState(false);
+  const [isGrid, setIsGrid] = useState(true);
+  const [handleImageViewMidal,setImageViewModal]=useState(false)
   const [sortingInfo, setSortingInfo] = useState({
     sortBy: 'updated_at',
     sortDir: 'desc',
   });
   const [isSelectionModeEnabled, setIsSelectionModeEnabled] = useState(false);
+  const [imageId,setImgaeid]=useState(0)
   const navigation = useNavigation();
+  const handleGridListToggle = () => {
+    setIsGrid(!isGrid);
+  };
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -114,8 +381,8 @@ const Home = () => {
         {
           headers: {Authorization: `Bearer ${user?.access_token}`},
           params: {
-            pageId: 0,
-            folderId: currentFolderId, // Use the current folder ID to fetch folder contents
+            pageId: currentFolderId,
+            folderId: currentFolderId,
             page: 1,
             workspaceId: workspaces ? workspaces : 0,
             deletedOnly: false,
@@ -141,34 +408,20 @@ const Home = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, currentFolderId, workspaces]);
+  }, [ currentFolderId, workspaces]);
   const handleSortApply = ({sortBy, sortDir}) => {
     setSortingInfo({sortBy, sortDir}); // Update the state
     fetchData(sortBy, sortDir); // Fetch data with new sort options
     console.log('Sort applied:', sortBy, sortDir);
   };
 
-  // const accessData=(user)=>{
-  //   if (user?.isSubscribed===true) {
-  //     return true;
-  //     }
-  //  else{
-  //   const staticReferenceDate = new Date()
-  //   let createdDate=user?.created_at;
-  //   const differenceInDays=Math.floor((staticReferenceDate - staticReferenceDate) / (1000 * 60 * 60 * 24));
-  //   console.log(createdDate,'sreturn differenceInDay')
-  //   // return differenceInDays <= 15;
-  //  }
-  // }
-  // useEffect(()=>{
-  // accessData(user)
-  // },[])
 
-  useEffect(() => {
-    const hasAccess = accessData(user);
-    setHasAccess(hasAccess);
-    console.log('User has access:', hasAccess);
-  }, [user]);
+
+  // useEffect(() => {
+  //   const hasAccess = accessData(user);
+  //   setHasAccess(hasAccess);
+  //   console.log('User has access:', hasAccess);
+  // }, [user]);
 
   useEffect(() => {
     fetchData();
@@ -191,77 +444,93 @@ const Home = () => {
     fetchData();
   };
 
-  // const handleItemPress = useCallback((item) => {
-  //   if (item.type === 'folder') {
-  //     setFolderStack(prev => [...prev, { id: item.id, name: item.name }]);
-  //   } else {
-  //     console.log('File clicked:', item);
-  //     // Handle file click (e.g., open file, show details, etc.)
-  //   }
-  // }, []);
+  // const handleItemPress = useCallback(
+  //   item => {
+  //     if (item.type === 'folder') {
+  //       setFolderStack(prev => [...prev, {id: item.id, name: item.name}]);
+  //     } else if (
+  //       ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(
+  //         item.extension.toLowerCase(),
+  //       )
+  //     ) {
+  //       // Navigate to ImageViewer if the item is an image
+  //       navigation.navigate('ImageViewer', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (item.type === 'pdf') {
+  //       // Navigate to ImageViewer if the item is an image
+  //       navigation.navigate('PdfView', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)) {
+  //       navigation.navigate('VideoPreview', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)) {
+  //       navigation.navigate('AudioPreview', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (['doc', 'docx'].includes(item.extension)) {
+  //       navigation.navigate('WordPreview', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (['pptx', 'ppt', 'odp'].includes(item.extension)) {
+  //       navigation.navigate('PptPreview', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (['xls', 'xlsx', 'csv', 'ods'].includes(item.extension)) {
+  //       navigation.navigate('SpreadsheetPreview', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (['txt'].includes(item.extension)) {
+  //       navigation.navigate('TextFilePreview', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else if (
+  //       ['zip', 'tar', 'rar', 'exe', 'app', 'apk'].includes(item.extension)
+  //     ) {
+  //       navigation.navigate('Zipapkpreview', {
+  //         filePath: item,
+  //         user: user,
+  //       });
+  //     } else {
+  //       console.log('File clicked:');
+  //     }
+  //   },
+  //   [navigation, user, folderStack],
+  // );
+
   const handleItemPress = useCallback(
-    item => {
+    (item) => {
       if (item.type === 'folder') {
-        setFolderStack(prev => [...prev, {id: item.id, name: item.name}]);
-      } else if (
-        ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(
-          item.extension.toLowerCase(),
-        )
+        setFolderStack((prev) => [...prev, { id: item.id, name: item.name }]);
+      } 
+      else if (
+        ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(item.extension.toLowerCase())
       ) {
-        // Navigate to ImageViewer if the item is an image
-        navigation.navigate('ImageViewer', {
+        console.log('File ID:', item.id);
+        setImgaeid(item?.id)
+        setImageViewModal(true)
+       
+      } 
+      else {
+        navigation.navigate('Previewfiles', {
           filePath: item,
           user: user,
         });
-      } else if (item.type === 'pdf') {
-        // Navigate to ImageViewer if the item is an image
-        navigation.navigate('PdfView', {
-          filePath: item,
-          user: user,
-        });
-      } else if (['mp4', 'avi', 'mkv', 'mov', 'wmv'].includes(item.extension)) {
-        navigation.navigate('VideoPreview', {
-          filePath: item,
-          user: user,
-        });
-      } else if (['mp3', 'wav', 'aac', 'flac'].includes(item.extension)) {
-        navigation.navigate('AudioPreview', {
-          filePath: item,
-          user: user,
-        });
-      } else if (['doc', 'docx'].includes(item.extension)) {
-        navigation.navigate('WordPreview', {
-          filePath: item,
-          user: user,
-        });
-      } else if (['pptx', 'ppt', 'odp'].includes(item.extension)) {
-        navigation.navigate('PptPreview', {
-          filePath: item,
-          user: user,
-        });
-      } else if (['xls', 'xlsx', 'csv', 'ods'].includes(item.extension)) {
-        navigation.navigate('SpreadsheetPreview', {
-          filePath: item,
-          user: user,
-        });
-      } else if (['txt'].includes(item.extension)) {
-        navigation.navigate('TextFilePreview', {
-          filePath: item,
-          user: user,
-        });
-      } else if (
-        ['zip', 'tar', 'rar', 'exe', 'app', 'apk'].includes(item.extension)
-      ) {
-        navigation.navigate('Zipapkpreview', {
-          filePath: item,
-          user: user,
-        });
-      } else {
-        console.log('File clicked:');
       }
     },
-    [navigation, user, folderStack],
+    [navigation, user, folderStack]
   );
+  
 
   const handleBackPress = useCallback(() => {
     if (folderStack.length > 1) {
@@ -274,62 +543,22 @@ const Home = () => {
     setactionModal(!actionModal);
   };
 
-  const renderItemList = ({item}) => (
-    <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
-      <View style={styles.iconContainer}>
-        <Image
-          source={getItemIcon(item)}
-          style={styles.icon}
-          resizeMode="contain"
-        />
-      </View>
-      <View style={{left: 10}}>
-        <Text style={[styles.itemText]}>
-          {item.name.length > 15
-            ? `${item.name.substring(0, 15)}...`
-            : item.name}
-        </Text>
-        <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
-      </View>
-      <TouchableOpacity
-        onPress={() => toggleModalVisible(item)}
-        style={{position: 'absolute', right: 10}}>
-        <Image
-          source={require('../../assets/MoreOption.png')}
-          style={{height: 20, width: 20, tintColor: 'black'}}
-        />
-      </TouchableOpacity>
-    </TouchableOpacity>
+  
+  const renderItem = useCallback(
+    ({item}) => (
+      <FileItem
+        item={item}
+        grid={isGrid}
+        user={user}
+        handleMediaPreview={() => handleItemPress(item)}
+        onOpenModal={toggleModalVisible}
+        workspace={workspaces}
+      />
+    ),
+    [isGrid, handleItemPress],
   );
 
-  const renderItemGrid = ({item}) => (
-    <TouchableOpacity style={styles.grid} onPress={() => handleItemPress(item)}>
-      <View>
-        <View style={styles.iconContainer}>
-          <Image
-            source={getItemIcon(item)}
-            style={styles.icon}
-            resizeMode="contain"
-          />
-        </View>
-        <Text style={styles.itemText}>
-          {item.name.length > 15
-            ? `${item.name.substring(0, 15)}...`
-            : item.name}
-        </Text>
-        <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
-      </View>
-      <TouchableOpacity onPress={() => toggleModalVisible(item)}>
-        <Image
-          source={require('../../assets/MoreOption.png')}
-          style={[
-            styles.moreicon,
-            {height: 30, width: 20, tintColor: COLORS.black},
-          ]}
-        />
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
+
   const handlecreateOpenModal = () => setShowmodal(true);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
@@ -341,34 +570,7 @@ const Home = () => {
           {/* <StorageStatus user={user} usertoken={user?.access_token} /> */}
           {/* <ProgressBar/> */}
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingVertical: 8,
-          }}>
-          <Text style={styles.heading}>{strings.RECENTLY_EDITED}</Text>
-          <View style={{flexDirection: 'row', gap: 10}}>
-            <TouchableOpacity onPress={() => setViewType('list')}>
-              <Image
-                source={require('../../assets/list.png')}
-                style={[
-                  styles.rightImage,
-                  {tintColor: viewType === 'list' ? '#004181' : '#B3B4B6'},
-                ]}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setViewType('grid')}>
-              <Image
-                source={require('../../assets/Grid.png')}
-                style={[
-                  styles.rightImage,
-                  {tintColor: viewType === 'grid' ? '#004181' : '#B3B4B6'},
-                ]}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+       
         <View
           style={{
             borderBottomWidth: 1,
@@ -392,6 +594,8 @@ const Home = () => {
               <Text style={styles.currentFolderText}>{strings.HOME}</Text>
             )}
           </View>
+          <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
+
           <TouchableOpacity
             style={{flexDirection: 'row', alignItems: 'center'}}
             onPress={() => setshowdropdown(true)}>
@@ -401,43 +605,60 @@ const Home = () => {
               style={{height: 25, width: 25, resizeMode: 'contain'}}
             />
           </TouchableOpacity>
+          <Gridlist
+            toggleView={handleGridListToggle}
+            grid={isGrid}
+          />
+          </View>
         </View>
         {isLoading ? (
           <ActivityIndicator size="large" color={COLORS.blue} />
         ) : hasAccess ? ( // Corrected: Moved hasAccess check outside the extra curly braces
           <FlatList
             data={organizedData}
-            renderItem={viewType === 'grid' ? renderItemGrid : renderItemList}
+            renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
-            ListEmptyComponent={
-              <View style={{flex: 1, alignItems: 'center'}}>
-                <Text style={styles.emptyText}>This folder is empty</Text>
-              </View>
-            }
-            numColumns={viewType === 'grid' ? 2 : 1}
+            numColumns={isGrid ? 2 : 1}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            key={viewType === 'grid' ? 'grid' : 'list'}
+            key={isGrid ? 'list' : 'grid'}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={EmptyComponent}
+            contentContainerStyle={styles.listContent}
           />
         ) : (
           <>
-            <Text style={{fontSize:16,fontWeight:'500',textAlign:"center",color:COLORS.red}}>
-  {[strings.Warning_Yourdemoaccounthasexpired, strings.Purchasethepackageyouchoosenowtocontinueyourlife, strings.whichismadeeasierbyConiaCloud].join(' ')}
-</Text>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: '500',
+                textAlign: 'center',
+                color: COLORS.red,
+              }}>
+              {[
+                strings.Warning_Yourdemoaccounthasexpired,
+                strings.Purchasethepackageyouchoosenowtocontinueyourlife,
+                strings.whichismadeeasierbyConiaCloud,
+              ].join(' ')}
+            </Text>
             <SubscriptionAnimation />
-<UpgradeButton/>
+            <UpgradeButton />
           </>
         )}
         {/* <TouchableOpacity style={styles.btn} onPress={() => setShowmodal(true)}>
           <Text style={styles.text}>+</Text>
         </TouchableOpacity> */}
-         {folderStack.length<=1 &&
-      <TouchableOpacity style={styles.btn} 
-      onPress={()=>setshowworkspacemodal(true)}
-      >
+        {folderStack.length <= 1 && (
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => setshowworkspacemodal(true)}>
             {/* <Text style={styles.text}>+</Text> */}
-            <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white}/>
-          </TouchableOpacity>}
+            <Image
+              source={require('../../assets/arrangement.png')}
+              tintColor={COLORS.white}
+            />
+          </TouchableOpacity>
+        )}
         {/* <ModalForUploadAndCreateFile
           visible={showmodal}
           user={user}
@@ -454,11 +675,12 @@ const Home = () => {
           item={selectedItem}
           onSuccess={handleFolderCreationSuccess}
         />
-         <WorkspaceModal
+        <WorkspaceModal
           visible={workspacemodal}
           user={user}
-          // folderId={currentFolderId} 
-          onClose={() => setshowworkspacemodal(false)}/>
+          // folderId={currentFolderId}
+          onClose={() => setshowworkspacemodal(false)}
+        />
         <ShortingModal
           isVisible={showDrodown}
           onClose={() => setshowdropdown(false)}
@@ -473,6 +695,13 @@ const Home = () => {
           onClose={() => setShowmodal(false)}
           onSuccess={handleFolderCreationSuccess}
           // onUploadFile={handleUploadComplete}
+        />
+        <ImagepreviewModal
+        visible={handleImageViewMidal}
+        workspace={workspaces}
+        onClose={()=>setImageViewModal(false)}
+        imageId={imageId}
+        user={user}
         />
       </View>
     </SafeAreaView>

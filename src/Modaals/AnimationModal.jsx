@@ -53,13 +53,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+  //  height:'60%'
   },
   modalContent: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Use your background color
+    // backgroundColor: 'rgba(0, 0, 0, 0.1)', // Use your background color
     borderRadius: 10,
     alignItems: 'center',
     width: Platform.OS=='android'?"90%":'89%',  // Adjust width if necessary
-    height: Platform.OS=='android'?'26%':'26%', // Adjust height if necessary
+    height: Platform.OS=='android'?'28%':'28%', // Adjust height if necessary
     overflow: 'hidden', // Ensures that the Lottie animation doesn't overflow outside the modal
     position: 'relative', // Enable positioning of child elements
   },

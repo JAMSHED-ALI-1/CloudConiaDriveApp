@@ -32,7 +32,7 @@ const Login = () => {
         showMessageHandler("Login Successful", "You have logged in successfully.", "success");
         // Perform any further actions here, like navigating to the dashboard
         navigation.navigate('BottomNavigation');
-        // navigation.navigate('Test');c
+        // navigation.navigate('Test');
       } else {
         // Show failure flash message
         showMessageHandler("Login Failed", "Invalid credentials or user not registered.", "danger");

@@ -4,15 +4,15 @@ import strings from '../helper/Language/LocalizedStrings'
 import { COLORS } from '../utils/Colors'
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const Gridlist = ({setShowDropdown,toggleView,grid}) => {
+const Gridlist = ({setShowDropdown,toggleView,grid,showshort}) => {
   return (
     <View style={styles.toggleContainer}>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} 
+           { showshort ?<TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} 
             onPress={setShowDropdown}
             >
               <Text style={styles.currentFolderText}>{strings.SORT}</Text>
               <Image source={require('./../assets/icon/sorting.png')} style={{ height: 30, width: 30, resizeMode: 'contain' }} />
-            </TouchableOpacity>
+            </TouchableOpacity>:null}
             <TouchableOpacity
               style={[styles.toggleButton, !grid && styles.toggleButtonActive]}
               onPress={toggleView}

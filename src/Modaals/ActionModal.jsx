@@ -2,12 +2,13 @@ import { Modal, StyleSheet, Text, View,TouchableOpacity,Image,Alert } from 'reac
 import React,{useState} from 'react'
 import strings from '../helper/Language/LocalizedStrings';
 import ShareFileModal from './Share';
-import RNFetchBlob from 'rn-fetch-blob';
+import ReactNativeBlobUtil from 'react-native-blob-util'
 import RenameModal from './Rename';
 import { baseURL } from '../utils/constant/settings';
 import { makeApiCall } from '../helper/apiHelper';
 import { COLORS } from '../utils/Colors';
 import { useSelector } from 'react-redux';
+import showMessageHandler from '../utils/constant/ShowMessageHandler';
 const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
   // console.log('----->>>>',item)
   const workspaces = useSelector(state => state.workspace.workspace);
@@ -64,7 +65,7 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
       return;
     }
 
-    const { fs } = RNFetchBlob;
+    const { fs } = ReactNativeBlobUtil;
     const downloadsPath = Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
     const fileName = item.name;
     const localPath = `${downloadsPath}/${fileName}`;
@@ -73,7 +74,7 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
     const downloadUrl = `${baseURL}/api/v1/file-entries/download/${item.hash}?add-preview-token=${user?.access_token}`;
 
     try {
-      const res = await RNFetchBlob
+      const res = await ReactNativeBlobUtil
         .config({
           path: localPath,
           fileCache: true,
@@ -89,15 +90,16 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
         });
 
       console.log('File downloaded and saved locally at:', res.path());
-      Alert.alert('Success', 'File downloaded successfully!');
+      showMessageHandler('Success', 'File downloaded successfully!');
     } catch (error) {
       console.error('Error downloading the file:', error.message);
-      Alert.alert('Error', 'Failed to download the file.');
+      showMessageHandler('Error', 'Failed to download the file.');
     } finally {
       setDownloadProgress(0);
       onClose();
     }
   };
+    
 
   // const deleteFile = async () => {
   //   try {
@@ -133,20 +135,20 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
                 deleteForever: 0,
               };
               await makeApiCall(`/api/v1/file-entries/delete?workspaceId=${workspaces}`, user?.access_token, 'post', data);
-  
-              Alert.alert('Success', 'File deleted successfully!');
-              onClose();
+              showMessageHandler('Success', 'File deleted successfully!');
               onSuccess()
+              onClose();
             } catch (error) {
               console.error('Error deleting file:', error);
-              Alert.alert('Error', 'Error deleting file.');
+              showMessageHandler('Error', 'Error deleting file.');
             }
           },
         },
       ],
-      { cancelable: false } // Ensures the alert must be dismissed by clicking a button
+      { cancelable: false } 
     );
   };
+  
   
 
   return (
@@ -221,13 +223,16 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-end',
         backgroundColor: 'rgba(0,0,0,0.5)',
-        paddingVertical:60
+        // paddingVertical:60
       },
       modalContent: {
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 20,
+        height: '40%',
+    width: '100%',
+    backgroundColor: COLORS.white,
+    borderTopEndRadius: 30,
+    borderTopLeftRadius: 30,
+    paddingTop: 20,
+    paddingHorizontal: 20,
         // paddingVertical:40
         // paddingBottom: Platform.OS==='android'?60:10
       
@@ -281,3 +286,6 @@ const styles = StyleSheet.create({
         fontWeight:'600'
       }
 })
+
+
+

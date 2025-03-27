@@ -17,8 +17,8 @@ export const filefolderApi = createApi({
     getFileFolder: builder.query({
       query: (params = {}) => {
         // Log filters before sending the query
-        console.log('Filters:', encodeURIComponent(params.filters));
-        console.log('Qury',params.query)
+        // console.log('Filters:', encodeURIComponent(params.filters));
+        // console.log('Qury',params.query)
 
         return {
           url: 'drive/file-entries',

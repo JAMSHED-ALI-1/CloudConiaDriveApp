@@ -7,9 +7,10 @@ import axios from 'axios';
 import { COLORS } from '../utils/Colors';
 import { baseURL } from '../utils/constant/settings';
 import strings from '../helper/Language/LocalizedStrings';
+import { handleLogout } from '../helper/Logouthelper';
 
-const ProgressBar = ({ width = 150, color = COLORS.orenge, height = 10, label = '' }) => {
-  const user = useSelector(state => state.auth.user);
+const ProgressBar = ({ width = 150, color = COLORS.orenge, height = 10, label = '' ,user}) => {
+  // console.log(user)
   const [storageInfo, setStorageInfo] = useState({ used: 0, available: 0, percentage: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,6 +47,13 @@ const language = useSelector((state) => state.language.language);
       } else {
         console.error('Error fetching storage data:', error.message);
         setError('Failed to fetch storage data: ' + error.message);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+          })
+        );
+
       }
     } finally {
       setLoading(false);

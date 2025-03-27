@@ -3,8 +3,8 @@ import { AlertNotificationRoot, Dialog, ALERT_TYPE } from 'react-native-alert-no
 import React, { useCallback, useState } from 'react';
 import { makeApiCall } from '../helper/apiHelper';
 import { baseURL } from '../utils/constant/settings';
-import DocumentPicker from 'react-native-document-picker';
-import RNFetchBlob from 'rn-fetch-blob';
+import DocumentPicker from 'react-native-document-picker'; 
+// import RNFetchBlob from 'rn-fetch-blob';
 import { COLORS } from '../utils/Colors';
 import { useSelector } from 'react-redux';
 import strings from '../helper/Language/LocalizedStrings';
@@ -134,11 +134,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   modalContainer: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginBottom:Platform.OS==='android'?65:0
+    height: '20%',
+    width: '100%',
+    backgroundColor: COLORS.white,
+    borderTopEndRadius: 30,
+    borderTopLeftRadius: 30,
+    paddingTop: 20,
+    paddingHorizontal: 20,
   },
   modalItem: {
     flexDirection: 'row',
@@ -188,3 +190,9 @@ const styles = StyleSheet.create({
     color:COLORS.black
   }
 });
+
+
+
+
+
+

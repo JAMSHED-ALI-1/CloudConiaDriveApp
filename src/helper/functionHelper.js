@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export const timeAgo = (date) => {
     const now = new Date();
     const past = new Date(date);
@@ -27,3 +29,23 @@ export const timeAgo = (date) => {
       return seconds + (seconds === 1 ? " second ago" : " seconds ago");
     }
   }
+
+
+  export const storeData = async (value) => {
+    try {
+      const userInfo = JSON.stringify(value);
+      await AsyncStorage.setItem('user', userInfo);
+    } catch (e) {
+      console.log('err From AsyncStorage',e)
+    }
+  };
+
+ export const getData = async () => {
+    try {
+      const userInfo = await AsyncStorage.getItem('user');
+      return userInfo != null ? JSON.parse(userInfo) : null;
+    } catch (e) {
+      console.log(e)
+      return null;
+    }
+  };

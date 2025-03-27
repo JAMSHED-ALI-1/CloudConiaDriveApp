@@ -92,10 +92,10 @@ return (
       })}
     >
     <Tab.Screen name="Home" component={Homescreen} />
+      {/* <Tab.Screen name="Home" component={Home} /> */}
     <Tab.Screen name="My Drive" component={MyDriveScreen} />
     {/* <Tab.Screen name="Shared"component={Sharedscreen} /> */}
     {/* <Tab.Screen name="Trash" component={TrashScreen} /> */}
-      {/* <Tab.Screen name="Home" component={Home} /> */}
       {/* <Tab.Screen name="My Drive" component={MyDrive} /> */}
       <Tab.Screen name="Shared" component={Shared} />
       <Tab.Screen name="Trash" component={Trash} />
