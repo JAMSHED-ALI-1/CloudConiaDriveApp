@@ -1,174 +1,6 @@
-// import { Modal, SafeAreaView, StyleSheet, Text, View } from 'react-native'
-// import React, { useEffect, useState } from 'react'
-// import { useSelector } from 'react-redux';
-// import axios from 'axios';
-// import { baseURL } from '../../utils/constant/settings';
-// import CustomHeader from '../../components/CustomHeader';
-// import { COLORS } from '../../utils/Colors';
-// import strings from '../../helper/Language/LocalizedStrings';
-// import CustomButton from '../../components/CustomButton';
-
-// const ViewPriceProduct = ({ route, navigation }) => {
-//     const { item ,currency} = route.params;
-//     console.log('Currency on ViewPriceProduct screen:', currency);
-//     const user = useSelector((state) => state.auth.user);
-//     const [modalVisible, setModalVisible] = useState(false);
-//     // const [currency, setCurrency] = useState('TRY');  // Default currency set to TRY
-
-//     const getApiHeaders = (token) => ({
-//         Authorization: `Bearer ${token}`,
-//         'Content-Type': 'application/json',
-//         'X-Client-Type': 'mobile',
-//     });
-
-//     // API Call to get Iyzico token
-//     const handleIzeco = async () => {
-//         try {
-//             const response = await axios.post(
-//                 `${baseURL}/payment/iyzico/token`,
-//                 {
-//                     'X-Client-Type': 'mobile',
-//                     product_id: item?.id,
-//                     currency: currency,
-//                 },
-//                 { headers: getApiHeaders(user?.access_token) }
-//             );
-//             console.log("Iyzico Response--->>>:", response);
-//         } catch (error) {
-//             console.error("Error-->>:", error.response?.data || error.message);
-//         }
-//     };
-
-//     // Handle effect on component mount
-//     useEffect(() => {
-//         // Optionally you can invoke handleIzeco if you want the API call to be made when the component is mounted.
-//         // handleIzeco();
-//     }, [currency]);  // Run this effect when currency changes
-
-//     // Calculate space in GB (if available)
-//     const availableSpaceGB = (item?.available_space / (1024 ** 3)).toFixed(2); // Convert to GB
-
-//     // Find the price for the selected currency
-//     const price = item?.prices?.find(p => p.currency === currency)?.amount || 'N/A';
-
-//     return (
-//         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundColor }}>
-//             <View style={styles.container}>
-//                 <CustomHeader
-//                     back={true}
-//                     OnPress={() => navigation.goBack()}
-//                     title={strings.PRICE_LIST}
-//                     left={true}
-//                 />
-//                 <View style={{...styles.card}}>
-
-//                    <Text style={styles.productName}>Summery</Text>
-//                 {/* Display Name */}
-//                 <Text style={styles.productName}>{item?.name}</Text>
-
-//                 {/* Display Available Space */}
-//                 <Text style={styles.spaceText}>Available Space: {availableSpaceGB} GB</Text>
-
-//                 {/* Display Feature List */}
-//                 {item?.feature_list?.map((feature, index) => (
-//                     <Text key={index} style={styles.featureText}>• {feature}</Text>
-//                 ))}
-
-//                 {/* Display Pricing */}
-//                 <Text style={styles.priceText}>
-//                     {/* {currency === 'TRY'
-//                         ? `₺ ${price} /Year`
-//                         : `€ ${price} /Year`} */}
-
-// {item.prices.length > 0 ? (
-//   <Text style={{...styles.price}}>
-//     {currency === 'USD'
-//       ? ` € ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'} /Year `
-//       : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} /Year`}
-//   </Text>
-// ) : (
-//   <Text style={{color:COLORS.black}}>No Pricing Data</Text>
-// )}
-//                 </Text>
-//                 </View>
-
-//              <View style={{...styles.flexDirection}}>
-
-//                 <Text style={{...styles.productName}}>Total Pay:</Text>
-//                 {item.prices.length > 0 ? (
-//   <Text style={{...styles.productName}}>
-//     {currency === 'USD'
-//       ? ` € ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'}  `
-//       : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} `}
-//   </Text>
-// ) : (
-//   <Text style={{color:COLORS.black}}>No Pricing Data</Text>
-// )}
-//              </View>
-//                 <View style={{marginTop:20}}>
-
-//                 <CustomButton buttonTitle={'Pay'}/>
-//                 </View>
-//             </View>
-//     {/* <Modal>
-
-//     </Modal> */}
-
-//         </SafeAreaView>
-//     );
-// };
-
-// export default ViewPriceProduct;
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         padding: 15,
-//         backgroundColor:COLORS.backgroundColor
-//     },
-//     card:{
-//  padding:10,
-//  backgroundColor:COLORS.white,
-//  borderRadius:10,
-//  marginTop:20,
-//  shadowColor: COLORS.blue,
-// shadowOffset: {
-// 	width: 0,
-// 	height: 5,
-// },
-// shadowOpacity: 0.36,
-// shadowRadius: 6.68,
-
-// elevation: 11,
-//     },
-//     productName: {
-//         fontSize: 24,
-//         fontWeight: 'bold',
-//         marginBottom: 10,
-//     },
-//     spaceText: {
-//         fontSize: 16,
-//         marginBottom: 10,
-//     },
-//     featureText: {
-//         fontSize: 14,
-//         color: COLORS.black,
-//         marginBottom: 5,
-//     },
-//     priceText: {
-//         fontSize: 16,
-//         color: COLORS.primary,
-//         marginTop: 20,
-//         fontWeight: 'bold',
-//     },
-//     flexDirection:{
-//         flexDirection:'row',
-//         justifyContent:'space-between'
-//     }
-// });
-
 import {
   ActivityIndicator,
+  Alert,
   Modal,
   SafeAreaView,
   StyleSheet,
@@ -184,7 +16,8 @@ import {COLORS} from '../../utils/Colors';
 import strings from '../../helper/Language/LocalizedStrings';
 import CustomButton from '../../components/CustomButton';
 import WebView from 'react-native-webview';
-import { endEvent } from 'react-native/Libraries/Performance/Systrace';
+import {endEvent} from 'react-native/Libraries/Performance/Systrace';
+import showMessageHandler from '../../utils/constant/ShowMessageHandler';
 
 const ViewPriceProduct = ({route, navigation}) => {
   const {item, currency} = route.params;
@@ -200,22 +33,43 @@ const ViewPriceProduct = ({route, navigation}) => {
     'Content-Type': 'application/json',
     'X-Client-Type': 'mobile',
   });
-  const price = currency === 'EUR'
-      ? item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'
-      : item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A';
-      console.log('first',price)
+  const price =
+    currency === 'EUR'
+      ? item.prices.find(p => p.currency === 'EUR')?.amount || 0
+      : item.prices.find(p => p.currency === 'TRY')?.amount || 0;
+  console.log('first', price);
 
+  useEffect(() => {
+    // Cleanup when unmounting
+    return () => setModalVisible(false);
+  }, []);
 
-const handleConversion= async(price)=>{
-    try {
-        const res=await axios.get(`https://v6.exchangerate-api.com/v6/ca85d4c606285f25bc375250/pair/EUR/TRY/${price}`)
-        return res;
-        // console.log(res)
-    } catch (error) {
-        console.log(error)
+  const handleWebViewNavigation = navState => {
+    console.log('Navigating to:', navState.url);
+
+    // If URL contains "callback" or any success keyword, process payment
+    if (
+      navState.url.includes('payment-callback') ||
+      navState.url.includes('status=success')
+    ) {
+      console.log('Callback detected:', navState.url);
+
+      // Extract token from URL
+      const url = new URL(navState.url);
+      const status = url.searchParams.get('status');
+      const token = url.searchParams.get('token');
+
+      console.log('Status:', status, 'Token:', token);
+
+      setModalVisible(false);
+
+      if (status === 'success') {
+        verifyPayment(token);
+      } else {
+        Alert.alert('Payment Failed', 'Payment was not successful.');
+      }
     }
-}
-
+  };
 
   // API Call to get Iyzico token
   const handleIzeco = async () => {
@@ -226,9 +80,9 @@ const handleConversion= async(price)=>{
         {
           'X-Client-Type': 'mobile',
           product_id: item?.id,
-        // currency : currency=='EUR'?handleConversion()
-        //   currency: 'EUR',
-        currency: 'TRY',
+          // currency : currency=='EUR'?handleConversion()
+          //   currency: 'EUR',
+          currency: 'TRY',
         },
         {headers: getApiHeaders(user?.access_token)},
       );
@@ -248,6 +102,17 @@ const handleConversion= async(price)=>{
 
   console.log('first', price);
   const HandleSubmit = () => {
+    if (price == 0) {
+      showMessageHandler(
+        'Payment is 0',
+        'The price cannot be 0. Please check the pricing details.',
+        [
+          // { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ],
+      );
+      return;
+    }
+
     handleIzeco();
     setModalVisible(true);
   };
@@ -273,21 +138,19 @@ const handleConversion= async(price)=>{
 
           {item?.feature_list?.map((feature, index) => (
             <Text key={index} style={styles.featureText}>
-              • {feature}
+              ✅   {feature}
             </Text>
           ))}
 
           <Text style={styles.priceText}>
-            {item.prices.length > 0 ? (
+            {item.prices.length >= 0 ? (
               <Text style={styles.price}>
                 {currency === 'TRY'
                   ? ` € ${
-                      item.prices.find(p => p.currency === 'EUR')?.amount ||
-                      'N/A'
+                      item.prices.find(p => p.currency === 'EUR')?.amount || 0
                     } /Year `
                   : `₺ ${
-                      item.prices.find(p => p.currency === 'TRY')?.amount ||
-                      'N/A'
+                      item.prices.find(p => p.currency === 'TRY')?.amount || 0
                     } /Year`}
               </Text>
             ) : (
@@ -302,14 +165,17 @@ const handleConversion= async(price)=>{
             <Text style={{...styles.productName}}>
               {currency === 'TRY'
                 ? ` € ${
-                    item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'
+                    item.prices.find(p => p.currency === 'EUR')?.amount || 0
                   } `
                 : `₺ ${
-                    item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'
+                    item.prices.find(p => p.currency === 'TRY')?.amount || 0
                   } `}
             </Text>
           ) : (
-            <Text style={{color: COLORS.black}}>No Pricing Data</Text>
+            <Text
+              style={{color: COLORS.black, fontSize: 18, fontWeight: '800'}}>
+              0
+            </Text>
           )}
         </View>
 
@@ -338,11 +204,59 @@ const handleConversion= async(price)=>{
                 <ActivityIndicator size="large" color="#0000ff" />
               </View>
             ) : (
-              <WebView
-                source={{uri: checkout_url}}
-                style={styles.webview}
-                startInLoadingState={true}
-              />
+              // <WebView
+              //   source={{uri: checkout_url}}
+              //   style={styles.webview}
+              //   startInLoadingState={true}
+              //   javaScriptEnabled={true}
+              //   domStorageEnabled={true}
+              //   onNavigationStateChange={handleWebViewNavigation}
+              // />
+
+              // Add these modifications to your WebView component
+              // Modify your WebView component
+<WebView
+  source={{uri: checkout_url}}
+  onNavigationStateChange={(navState) => {
+    console.log('[PAYMENT] Current URL:', navState.url);
+
+    // 1. Detect successful 3D Secure authentication
+    if (navState.url.includes('iyzipos/checkoutform/callback3ds/success')) {
+      console.log('[PAYMENT] 3DS Success - Closing WebView');
+      
+      // Extract token from URL
+      const token = new URL(navState.url).searchParams.get('token');
+      console.log(token,'new Token')
+      
+      // Immediately close WebView
+      setModalVisible(false);
+      
+      // Verify payment with backend
+      verifyPayment(token);
+      
+      return false; // Block further loading
+    }
+
+    // 2. Block redirects to login/dashboard
+    if (navState.url.includes('coniacloud.com/login') || 
+        navState.url.includes('coniacloud.com/')) {
+      console.log('[PAYMENT] Blocking post-success redirect');
+      setModalVisible(false);
+      return false;
+    }
+
+    return true;
+  }}
+  onShouldStartLoadWithRequest={(request) => {
+    // Block navigation to non-payment URLs
+    if (!request.url.includes('iyzipay') && 
+        !request.url.includes('payment-callback')) {
+      console.log('[SECURITY] Blocked navigation to:', request.url);
+      return false;
+    }
+    return true;
+  }}
+/>
             )}
 
             <View style={styles.buttonContainer}>
@@ -382,12 +296,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    color:COLORS.black
+    color: COLORS.black,
   },
   spaceText: {
     fontSize: 16,
     marginBottom: 10,
-    color:COLORS.black
+    color: COLORS.black,
   },
   featureText: {
     fontSize: 14,
@@ -396,13 +310,14 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: 16,
-    color:COLORS.black,
+    color: COLORS.black,
     marginTop: 20,
     fontWeight: 'bold',
   },
   flexDirection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingTop: 30,
   },
   modalContainer: {
     flex: 1,
@@ -433,6 +348,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     alignSelf: 'center',
-    color:COLORS.black
+    color: COLORS.black,
   },
 });

@@ -42,33 +42,34 @@ return (
             case 'Home':
               iconName = require('../assets/icons/Dashboard.png');
               label = strings.HOME;
-              iconSize = 20;
+              // iconSize = 20;
               break;
             case 'My Drive':
               iconName = require('../assets/MyDrive.png');
               label = strings.MyFiles;
-              iconSize = 20;
+              // iconSize = 20;
               break;
             case 'Shared':
-              iconName = require('../assets/icons/Users.png');
+              iconName = require('../assets/icons/Shared1.png');
               label = strings.Shared;
-              iconSize = 20;
+              // iconSize = 20;
               break;
             case 'Settings':
               iconName = require('../assets/icons/setting.png');
               label = strings.DELETEFILE;
               break;
             case 'User':
-              iconName = require('../assets/icons/user.png');
-              label = 'User';
+              iconName = require('../assets/icons/Settings.png');
+              label = strings.Settings
               break;
             case 'Trash':
-              iconName = require('../assets/icons/trash.png');
+              iconName = require('../assets/icons/Trash1.png');
               label = strings.DELETEFILE;
               break;
             case 'Stared':
-              iconName = require('../assets/icons/Starred.png');
+              iconName = require('../assets/icons/Starred1.png');
               label = strings.STARED_FILES;
+           
               break;
             default:
               break;

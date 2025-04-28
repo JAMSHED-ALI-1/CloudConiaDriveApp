@@ -1,96 +1,201 @@
-// // UpgradeScreen.js
-// import React, { useState } from 'react';
-// import { View, StyleSheet, SafeAreaView,ActivityIndicator } from 'react-native';
-// import { WebView } from 'react-native-webview';
-// import CustomHeader from '../../components/CustomHeader';
-// import { useNavigation } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { COLORS } from '../../utils/Colors';  // Assuming you have a COLORS file
+import CustomHeader from '../../components/CustomHeader';  // Assuming you have a CustomHeader component
+import { baseURL } from '../../utils/constant/settings';
+import axios from 'axios';
+import strings from '../../helper/Language/LocalizedStrings';
 
-// const PrivacyPolicy = () => {
-//     const navigation=useNavigation()
-//     const [isLoading, setIsLoading] = useState(true); 
-//   return (
-//     <SafeAreaView style={styles.container}>
-//         <View style={{flex:1,}}>
-//         <View style={{paddingHorizontal:10}}>
+const PrivacyPolicy = ({ navigation }) => {
 
-// <CustomHeader back={true} left={true} title={'Pricing List'} OnPress={()=>navigation.goBack()}/>
-//   </View>
-//   {isLoading && (
-//     <ActivityIndicator style={styles.activityIndicator}
-//     size="large"
-//     color="#007aff"
-//     />
-//   )}
+const handlePrivacyPolicy = async() => {
+  try {
+    const response = await axios.get(`${baseURL}/policies`);
     
-        
-//       <WebView source={{ uri: 'https://coniacloud.com/en/privacy-policy/' }} style={{ flex: 1 }}
-//        onLoadStart={() => setIsLoading(true)} // Show loader when starting
-//        onLoadEnd={() => setIsLoading(false)} />
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
+    console.log('Privacy Policy Data:', response.data);
+  } catch (error) {
+    console.error('Error fetching privacy policy:', error);
+  }
+}
+useEffect(()=>{
+// handlePrivacyPolicy();
+},[])
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-//   activityIndicator: {
-//     position: 'absolute',
-//     top: '50%',
-//     left: '50%',
-//     transform: [{ translateX: -25 }, { translateY: -25 }], // Center the loader
-//   },
-// });
-
-
-
-// export default PrivacyPolicy
-
-
-// UpgradeScreen.js
-import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView ,ActivityIndicator} from 'react-native';
-import { WebView } from 'react-native-webview';
-import CustomHeader from '../../components/CustomHeader';
-import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../../utils/Colors';
-
-const PrivacyPolicy = () => {
-    const navigation=useNavigation()
-    const [loading,setloading]=useState(true)
 
   return (
-    <SafeAreaView style={styles.container}>
-        <View style={{flex:1,}}>
-          <View style={{paddingHorizontal:10}}>
-
-        <CustomHeader back={true} left={true} title={'Privacy Policy'} OnPress={()=>navigation.goBack()}/>
-          </View>
-    {loading &&(
-      <ActivityIndicator
-      style={styles.activityIndicator}
-      size="large"
-            color="#007aff"
-
+    <View style={styles.container}>
+      <CustomHeader
+        back={true}
+        left={true}
+        title={strings.PrivacyPolicy}
+        OnPress={() => navigation.goBack()}
       />
-    )}
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>ConiaCloud PRIVACY POLICY</Text>
+        <Text style={styles.text}>As CONIASOFT YAZILIM TEKNOLOJİLERİ LİMİTED ŞİRKETİ, we recognize that you trust us to store and manage your information, and we take this responsibility seriously by working diligently to ensure the highest level of security for your data.  
+Through this Privacy Policy, we aim to help you understand what data we collect, why we collect it, and how you can update, manage, share, or delete your information.  
+Please note that by using this site, you acknowledge that you have read and accepted the privacy and security terms and conditions.
+</Text>
 
-      <WebView source={{ uri: 'https://coniacloud.com/en/privacy-policy/' }} style={{ flex: 1 }} 
-       onLoadStart={() => setloading(true)} // Show loader when starting
-       onLoadEnd={() => setloading(false)} />
-      </View>
-    </SafeAreaView>
+        {/* Personal Data We Collect */}
+        <Text style={styles.sectionTitle}>Personal Data We Collect</Text>
+        <Text style={styles.text}>
+          ConiaCloud collects data from you through our products. Some of this data is provided directly by you. Other data is collected based on your interactions, usage of our products, and experiences with them. The data we collect depends on the context of your interactions with ConiaCloud, the choices you make—including your privacy settings—and the products and features you use. Additionally, we may obtain data about you from third parties.
+        </Text>
+
+        <Text style={styles.text}>
+        You have options regarding the technology you use and the data you share. When we ask you to provide personal data, you may decline. Many of our products require some personal data to provide you with services. If you choose not to provide the data necessary for us to deliver a product or feature, you will not be able to use that product or feature. Similarly, if we are required by law to collect personal data or need it to enter into a contract with you, and you do not provide it, we may not be able to enter into the contract or, if it relates to an existing product you use, we may suspend or cancel it. In cases where providing data is optional, if you choose not to share personal data, you will not be able to use features like personalization that rely on that data.  
+
+        </Text>
+
+        <Text style={styles.text}>
+          At ConiaCloud, we use the data we collect to provide you with rich, interactive experiences. Specifically, we use the data for the following purposes:
+        </Text>
+        <Text style={styles.bulletPoint}>- To provide our products, including updating, securing, troubleshooting, and offering support.</Text>
+        <Text style={styles.bulletPoint}>- To improve and develop our products.</Text>
+        <Text style={styles.bulletPoint}>- To personalize our products and make recommendations.</Text>
+        <Text style={styles.bulletPoint}>- For advertising and marketing purposes, including promotional communications, targeted ads, and offers that may interest you.</Text>
+        <Text style={styles.bulletPoint}>- To analyze our performance, fulfill legal obligations, develop our workforce, and conduct research.</Text>
+
+        {/* Information Sharing */}
+        <Text style={styles.sectionTitle}>Information Sharing</Text>
+        <Text style={styles.text}>
+          We do NOT share your information with third parties, we do NOT share your email addresses with sponsors or any third parties, and we do NOT send special “sponsored” emails on behalf of third parties.
+        </Text>
+
+        <Text style={styles.text}>
+          We do not use vulnerability scanning and/or scanning according to PCI standards. We use regular Malware Scanning. Your personal information is stored behind secure networks and is only accessible by a limited number of individuals who have special access rights to such systems and are required to keep the information confidential. Additionally, all sensitive/credit information you provide is encrypted using Secure Socket Layer (SSL) technology.
+        </Text>
+
+        <Text style={styles.text}>
+          We implement various security measures when a user enters, submits, or accesses their information to maintain the safety of your personal data. All transactions are processed through a gateway provider and are not stored or processed on our servers.
+        </Text>
+
+
+        <Text style={styles.text}>
+          However, no security procedure or protocol can be guaranteed to be 100% secure. Therefore, we recommend exercising caution when disclosing personal information online and using readily available tools such as internet firewalls, antivirus and anti-spyware software, and similar technologies to protect yourself online.
+        </Text>
+        <Text style={styles.text}>
+        We only share data WHEN REQUIRED BY LAW or to respond to legal processes, protect our customers, safeguard lives, ensure the security of our products, and protect the rights and property of ConiaCloud and its customers, with affiliates and subsidiaries under ConiaCloud’s control.
+        </Text>
+        {/* Cookies */}
+        <Text style={styles.sectionTitle}>Cookies</Text>
+        <Text style={styles.text}>
+          Cookies are small text files placed on your device to store data that can be retrieved by a web server in the domain that placed the cookie. We use cookies and similar technologies to store and learn about your preferences and settings. This allows you to log in, receive interest-based ads, combat fraud, analyze product performance, and fulfill other legitimate purposes.
+        </Text>
+
+        <Text style={styles.text}>
+          You have many tools to control the data collected by cookies, web beacons, and similar technologies. For example, you can use controls in your internet browser to limit how the websites you visit use cookies, and you can withdraw your consent by clearing or blocking cookies.
+        </Text>
+
+        {/* Credit Card Security */}
+        <Text style={styles.sectionTitle}>Credit Card Security</Text>
+        <Text style={styles.text}>
+          Your credit card information is not stored in our system under any circumstances.
+        </Text>
+
+        <Text style={styles.text}>
+          During shopping, the credit card information used is encrypted and transmitted to the relevant bank independently of our site using the 128-bit SSL (Secure Sockets Layer) protocol.
+        </Text>
+
+        {/* Privacy Agreement */}
+        <Text style={styles.title}>ConiaCloud PRIVACY AGREEMENT</Text>
+        
+        {/* Parties to the Agreement */}
+        <Text style={styles.sectionTitle}>1. Parties to the Agreement</Text>
+        <Text style={styles.text}>
+          This privacy agreement (“Agreement”) has been concluded between the Customer and CONIASOFT YAZILIM TEKNOLOJİLERİ LİMİTED ŞİRKETİ.
+        </Text>
+
+        {/* Subject of the Agreement */}
+        <Text style={styles.sectionTitle}>2. Subject of the Agreement</Text>
+        <Text style={styles.text}>
+          Due to the existing commercial relationship between the Parties, this Agreement will govern how personal and confidential information is handled.
+        </Text>
+
+        {/* Definition of Confidential Information */}
+        <Text style={styles.sectionTitle}>3. Definition of Confidential Information</Text>
+        <Text style={styles.text}>
+          Any ideas, inventions, business methods, patents, trademarks, or any other information shared between the Parties shall be considered Confidential Information.
+        </Text>
+
+        {/* Obligations of the Parties */}
+        <Text style={styles.sectionTitle}>4. Obligations of the Parties</Text>
+        <Text style={styles.text}>
+          The Customer shall bear full responsibility for transactions conducted through authorized users, and the Service Provider shall not be responsible for any unauthorized use of their accounts.
+        </Text>
+        <Text style={styles.text}>
+          The Service Provider undertakes not to disclose Confidential Information shared between the Parties without prior written consent.
+        </Text>
+
+        {/* Permitted Disclosure */}
+        <Text style={styles.sectionTitle}>5. Permitted Disclosure</Text>
+        <Text style={styles.text}>
+          The Service Provider may disclose Confidential Information only if required by law or legal obligations, or with the Customer’s written consent.
+        </Text>
+
+        {/* Amendments */}
+        <Text style={styles.sectionTitle}>6. Amendments</Text>
+        <Text style={styles.text}>
+          Any amendments or changes to this Agreement shall be valid only if made in writing and signed by both Parties.
+        </Text>
+
+        {/* Notifications */}
+        <Text style={styles.sectionTitle}>7. Notifications</Text>
+        <Text style={styles.text}>
+          All notifications under this Agreement shall be made via email, fax, or in person. The Parties shall notify each other in writing of any changes to their contact addresses.
+        </Text>
+
+        {/* Duration and Termination */}
+        <Text style={styles.sectionTitle}>8. Duration and Termination of the Agreement</Text>
+        <Text style={styles.text}>
+          The Agreement will remain in effect unless terminated by either Party. The confidentiality obligations shall continue indefinitely after the termination of the Agreement.
+        </Text>
+
+        {/* Miscellaneous */}
+        <Text style={styles.sectionTitle}>9. Miscellaneous</Text>
+        <Text style={styles.text}>
+          Any fees arising from the signing of this Agreement shall be borne by the Customer.
+        </Text>
+      </ScrollView>
+    </View>
   );
 };
+
+export default PrivacyPolicy;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:COLORS.backgroundColor,
+    backgroundColor: COLORS.backgroundColor,
     padding:15
   },
+  content: {
+    // padding: 15,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: COLORS.primary,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 15,
+    color: COLORS.primary,
+  },
+  text: {
+    fontSize: 14,
+    marginTop: 8,
+    lineHeight: 22,
+    color: COLORS.textColor,
+  },
+  bulletPoint: {
+    fontSize: 14,
+    marginTop: 5,
+    lineHeight: 22,
+    color: COLORS.textColor,
+    paddingLeft: 20,
+  },
 });
-
-export default PrivacyPolicy;
-

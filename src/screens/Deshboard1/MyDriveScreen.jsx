@@ -31,6 +31,16 @@ import UpgradeButton from '../../components/UpgradeButton';
 import ProgressBar from '../../components/ProgressBar';
 import {debounce} from 'lodash';
 import SearchBarCompo from '../../components/SerchBarCompo';
+import folderIcon from '../../assets/icons/folder.png'
+// import folderIcon from '../../assets/icon/folder.png';
+import fileIcon from '../../assets/icon/file.png';
+import pdfIcon from '../../assets/icons/pdf.png';
+import play from '../../assets/icons/pdf.png';
+import video from '../../assets/icon/video.png';
+import wordIcon from '../../assets/icon/word.png';
+import imageIcon from '../../assets/icon/image.png';
+import All from '../../assets/icon/all.png'
+import Filter from '../../components/Filter';
 
 const MyDriveScreen = ({ navigation }) => {
   const [filefolderData, setFileFolderData] = useState([]);
@@ -59,7 +69,13 @@ const MyDriveScreen = ({ navigation }) => {
   const workspaces = useSelector(state => state.workspace.workspace);
 
   const currentFolderID = folderHistory[folderHistory.length - 1];// Assuming you are always working in the root folder or managing this elsewhere
-
+  const FilderData = [
+    { id: 1, Image: folderIcon, title: strings.Folder, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoicGRmIiwiaXNJbmFjdGl2ZSI6ZmFsc2UsIm9wZXJhdG9yIjoiPSIsInZhbHVlS2V5IjoiMDYifV0%3D' },
+    { id: 2, Image: fileIcon, title: strings.File, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoid29yZCIsImlzSW5hY3RpdmUiOmZhbHNlLCJvcGVyYXRvciI6Ij0iLCJ2YWx1ZUtleSI6IjA4In1d' },
+    { id: 3, Image: imageIcon, title: strings.Image, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoiaW1hZ2UiLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNSJ9XQ%3D%3D' },
+    { id: 4, Image: video, title:strings.Video, filters: 'W3sia2V5IjoidHlwZSIsInZhbHVlIjoidmlkZW8iLCJpc0luYWN0aXZlIjpmYWxzZSwib3BlcmF0b3IiOiI9IiwidmFsdWVLZXkiOiIwNCJ9XQ%3D%3D' },
+    { id: 5, Image: All, title:strings.ALL, filters: '' },
+  ];
 
 
    const [showModalAi, setshowmodalAi] = useState(false);
@@ -68,6 +84,7 @@ const MyDriveScreen = ({ navigation }) => {
         const [showDrodown, setshowdropdown] = useState(false);
          const [handleImageViewMidal,setImageViewModal]=useState(false)
           const [imageId,setImgaeid]=useState(0)
+           const [currentFilter, setCurrentFilter] = useState(null);
    const handlecreateOpenModal = () => setShowmodal(true);
 
 
@@ -91,7 +108,7 @@ const MyDriveScreen = ({ navigation }) => {
       // console.log('User has access:', hasAccess);
     }, [user]);
   // Fetch data with pagination
-  const fetchData = useCallback(async (pageNum = 1,sortBy = sortingInfo.sortBy, sortDir = sortingInfo.sortDir) => {
+  const fetchData = useCallback(async (pageNum = 1,sortBy = sortingInfo.sortBy, sortDir = sortingInfo.sortDir,filter = null) => {
     try {
       // console.log('Fetching data for page:', pageNum); // Log page number when fetching data
 
@@ -114,6 +131,7 @@ const MyDriveScreen = ({ navigation }) => {
             orderBy:sortBy,
             orderDir: sortDir,
             query: searchQuery,
+            filters: filter,
           },
         }
       );
@@ -156,6 +174,13 @@ const MyDriveScreen = ({ navigation }) => {
     setPage(1);
     setFileFolderData([]);
   }, [workspaces]); 
+
+ // ✅ Correct - pass filter as 4th parameter
+const handleFilterSelection = (filter) => {
+  setCurrentFilter(filter);
+  // Reset to page 1 when filter changes
+  fetchData(1, sortingInfo.sortBy, sortingInfo.sortDir, filter,);
+};
 
   // Load more data when reaching the end of the list
   const loadMoreData = () => {
@@ -256,6 +281,14 @@ const MyDriveScreen = ({ navigation }) => {
           }}
         />
               </View>
+              {/* <View style={{height:110}}>
+
+<Filter
+       FilterData={FilderData}
+       selectedFilter={currentFilter}
+       handleFilterSelect={handleFilterSelection}
+       />
+</View> */}
 
 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
   

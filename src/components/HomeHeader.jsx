@@ -6,7 +6,8 @@ import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
 const HomeHeader = ({ user, handleIconPress,handlecreateOpenModal }) => {
-  const userAvatar = user?.avatar ? { uri: user.avatar } : require('../assets/150.jpg');
+  // console.log('Hederer',user)
+  const userAvatar = user?.avatar.includes('www.gravatar.com') ? { uri: user.avatar }:{uri:`https://drive.coniacloud.com/${user?.avatar}`} ;
   const navigation=useNavigation()
   const userName = user?.display_name || 'Guest';
   const language = useSelector((state) => state.language.language);
@@ -15,7 +16,7 @@ const HomeHeader = ({ user, handleIconPress,handlecreateOpenModal }) => {
     <View style={styles.headerContainer}>
       <View style={styles.userInfoContainer}>
         <TouchableOpacity style={styles.imgCircle}>
-          <Image source={userAvatar} style={styles.userImage} />
+          <Image source={userAvatar} style={styles.userImage} resizeMethod='contain' />
         </TouchableOpacity>
         <View>
           <Text style={styles.headerNormalText}>{strings.WELCOME_BACK}</Text>
@@ -60,7 +61,9 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 25, // Ensure it's a circle
     backgroundColor: 'white',
-    shadowColor: "#000",
+    shadowColor: COLORS.blue,
+    alignItems:'center',
+    justifyContent:'center',
 shadowOffset: {
 	width: 0,
 	height: 7,
@@ -69,12 +72,13 @@ shadowOpacity: 0.43,
 shadowRadius: 9.51,
 
 elevation: 15,
-borderWidth:0.5
+borderWidth:0
   },
   userImage: {
-    height: '100%',
-    width: '100%',
+    height: '90%',
+    width: '90%',
     borderRadius: 50,
+    resizeMode:'contain'
     
 
   },

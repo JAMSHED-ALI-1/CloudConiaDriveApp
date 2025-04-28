@@ -537,6 +537,7 @@ import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
 import UpgradeButton from '../../components/UpgradeButton';
 import ProgressBar from '../../components/ProgressBar';
 import UnshareModal from '../../Modaals/UnshareModal';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Stared = ({ navigation }) => {
   const [filefolderData, setFileFolderData] = useState([]);
@@ -660,14 +661,22 @@ const Stared = ({ navigation }) => {
         setIsLoadingMore(false);
       }
     },
-    [currentFolderID, workspaces, user]
+    [currentFolderID, workspaces, user,navigation,]
   );
   
 
   useEffect(() => {
     fetchData(page); // Fetch initial data based on current page
-  }, [page, fetchData]); // Dependency on page ensures the useEffect runs when the page changes
+  }, [page, fetchData,]); // Dependency on page ensures the useEffect runs when the page changes
 
+
+  useFocusEffect(
+    useCallback(() => {
+    
+      fetchData(1); 
+    }, [fetchData])
+  );
+  
   // Load more data when reaching the end of the list
   const loadMoreData = () => {
     // console.log('Load more triggered, current page:', page); // Log when load more is triggered
@@ -705,17 +714,7 @@ const Stared = ({ navigation }) => {
   const handleFolderCreationSuccess = () => {
     fetchData(1);
   };
-  // // Render each item in the list
-  // const renderItem = ({ item }) => (
-  //   <TouchableOpacity onPress={() => handleItemClick(item)} style={styles.itemContainer}>
-  //     {item.type === 'folder' ? (
-  //       <Icon name="folder" size={24} color="#f4a261" style={styles.icon} />
-  //     ) : (
-  //       <Icon name="file" size={24} color="#2a9d8f" style={styles.icon} />
-  //     )}
-  //     <Text style={styles.itemText}>{item.name}</Text>
-  //   </TouchableOpacity>
-  // );
+ 
 
   const toggleModalVisible = item => {
     setSelectedItem(item);
@@ -859,9 +858,14 @@ const Stared = ({ navigation }) => {
         imageId={imageId}
         user={user}
         />
-        <UnshareModal
+        {/* <UnshareModal
         visible={actionModal}
-        />
+        // isVisible={actionModal}
+        onClose={() => setactionModal(false)}
+        user={user}
+        item={selectedItem}
+        onSuccess={handleFolderCreationSuccess}
+        /> */}
     </View>
     </SafeAreaView>
   );

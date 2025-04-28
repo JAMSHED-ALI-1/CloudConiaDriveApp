@@ -19,9 +19,9 @@ const UpgradeButton = ({
     <View>
 
     <Text style={{...styles.btnText}}>{strings.NEED_MORE}</Text>
-    <Text style={{...styles.btnText}}>{strings.STORAGECAPACITY}</Text>
+    {/* <Text style={{...styles.btnText}}>{strings.STORAGECAPACITY}</Text> */}
     </View>
-    <Text style={{...styles.btnText}}>{strings.UPGGRADE}</Text>
+    {/* <Text style={{...styles.btnText}}>{strings.UPGGRADE}</Text> */}
 
 
    </TouchableOpacity>
@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     btnText: {
         color: 'white',
         fontWeight: '500',
-        fontSize: 16
+        fontSize: 16,
+        paddingVertical:10
       },
 })

@@ -14,9 +14,14 @@ const Splesh = () => {
      <Image source={ require('../../assets/Splesh1.png')}
      style={{bottom:20}}/>
      <Text style={styles.text}>{strings.Keeplifeandworkorganizedallinoneplace}</Text>
-     <View style={{marginTop:40,width:'90%',}}>
+     <View style={{width:'90%',gap:20,marginTop:20
+
+     }}>
      <CustomButton buttonTitle={strings.LOGIN}
      onPress={()=>navigation.navigate('Login')}
+     />
+     <CustomButton buttonTitle={strings.SIGNUP}
+     onPress={()=>navigation.navigate('Signup')}
      />
      
      </View>

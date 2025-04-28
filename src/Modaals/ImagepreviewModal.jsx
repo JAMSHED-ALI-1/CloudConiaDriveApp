@@ -22,10 +22,11 @@ const img=`https://drive.coniacloud.com/api/v1/file-entries/${imageId}?workspace
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={onClose}
+    
+      // onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <TouchableOpacity style={styles.modalContainer} onPress={onClose}>
+        <TouchableOpacity style={styles.modalContainer}  activeOpacity={1} onPress={onClose}>
         <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
             <Icon name="close" size={30} color={COLORS.black} />
           </TouchableOpacity>

@@ -124,10 +124,10 @@ const FileFolderModal = ({
         {name: 'isSQL', data: 'false'},
         {name: 'disk', data: 'uploads'},
       ];
-
-      console.log('Uploading file...'); // Add this log
       setLottieUrl(require('../assets/data/UploadigAnimation.json'));
       setLottie(true);
+      console.log('Uploading file...'); // Add this log
+     
       setIsrefreshing(true);
       const response = await ReactNativeBlobUtil.fetch(
         'POST',
@@ -141,7 +141,7 @@ const FileFolderModal = ({
 
       // console.log('Upload response:', response.data);
       setIsrefreshing(false); // Add this log
-
+     
       if (
         response.respInfo.status === 200 ||
         response.respInfo.status === 201
@@ -149,8 +149,8 @@ const FileFolderModal = ({
         const responseData = JSON.parse(response.data);
         // console.log('Parsed response data:', responseData); // Add this log
         if (responseData.status === 'success') {
-          setLottieUrl(require('../assets/data/UploadigAnimation.json'));
-          setLottie(true);
+          // setLottieUrl(require('../assets/data/UploadigAnimation.json'));
+          // setLottie(true);
           showMessageHandler('File Uploaded successfully', 'success');
 
           onSuccess();
@@ -202,6 +202,8 @@ const FileFolderModal = ({
       const token = user?.access_token;
 
       setIsrefreshing(true);
+      // setLottieUrl(require('../assets/data/UploadigAnimation.json'))
+      // setLottie(true);
 
       const parentId = folderId ? folderId.toString() : '';
 
@@ -232,15 +234,16 @@ const FileFolderModal = ({
 
       const responseData = await response.json();
       // console.log(responseData,'Mila h')
-
+      setLottieUrl(require('../assets/data/UploadigAnimation.json'))
+      setLottie(true);
       setIsrefreshing(false);
+      
 
       if (response.ok && responseData.status === 'success') {
         showMessageHandler('File Uploaded successfully', 'success');
 
         onSuccess();
-        // setLottieUrl(require('../assets/data/UploadigAnimation.json'))
-        // setLottie(true);
+
         console.log('Upload successful, showing alert');
        
        

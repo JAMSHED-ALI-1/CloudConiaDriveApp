@@ -1665,7 +1665,9 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController (~> 2.7.4)
-  - RNScreens (3.37.0):
+  - RNLocalize (3.4.1):
+    - React-Core
+  - RNScreens (4.9.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1801,6 +1803,7 @@ DEPENDENCIES:
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
+  - RNLocalize (from `../node_modules/react-native-localize`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSound (from `../node_modules/react-native-sound`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -1967,6 +1970,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fs"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
+  RNLocalize:
+    :path: "../node_modules/react-native-localize"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSound:
@@ -2054,7 +2059,8 @@ SPEC CHECKSUMS:
   RNFileViewer: 4b5d83358214347e4ab2d4ca8d5c1c90d869e251
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNImageCropPicker: b0afedeefd8655254a15c34103718455fde6ce59
-  RNScreens: 631b8768411a16e356f7934058d2139d0cc75157
+  RNLocalize: 15463c4d79c7da45230064b4adcf5e9bb984667e
+  RNScreens: 0e8829648c78f4168f3e96cdc2e219213cb1907c
   RNSound: 314cc5226453ef4a3314a196c65e8a65e5106a7b
   RNVectorIcons: 182892e7d1a2f27b52d3c627eca5d2665a22ee28
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d

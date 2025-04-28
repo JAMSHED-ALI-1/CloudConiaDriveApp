@@ -34,6 +34,7 @@ import { getData } from '../helper/functionHelper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Previewfiles from '../screens/preview/Previewfiles';
 import { useUser } from '../redux/context/UserContext';
+import TermandConditions from '../screens/settings/TermandConditions';
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   // const isLoggedIn = useSelector(selectIsLoggedIn);
@@ -102,6 +103,7 @@ const StackNavigation = () => {
 {/* Setting    Etc */}
 <Stack.Screen name="EditProfile" component={EditProfile}  options={{headerShown:false}}/>
 <Stack.Screen name="ChoseLanguage" component={ChoseLanguage}  options={{headerShown:false}}/>
+<Stack.Screen name="TermandConditions" component={TermandConditions}  options={{headerShown:false}}/>
       {/* Notification */}
       <Stack.Screen name="Notification" component={Notification}  options={{headerShown:false}}/>
       <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy}  options={{headerShown:false}}/>

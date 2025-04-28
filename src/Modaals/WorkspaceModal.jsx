@@ -11,6 +11,7 @@ import InputBox from '../components/InputBox';
 import WorkspacemembersModal from './WorkspacemembersModal';
 import axios from 'axios';
 import { baseURL } from '../utils/constant/settings';
+import strings from '../helper/Language/LocalizedStrings';
 
 const WorkspaceModal = ({ visible, onClose }) => {
   const user = useSelector((state) => state.auth.user);
@@ -43,7 +44,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
         params:{workspaceId:0}
       });
   
-      console.log('Full Axios Response:', response.data);
+      // console.log('Full Axios Response:', response.data);
   
       if (response.data && response.data.status === 'success' && response.data.workspaces) {
         setWorkspaceList(response.data.workspaces);
@@ -78,7 +79,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
       });
   
       if (response?.status === 'success' && response?.workspace) {
-        console.log('Workspace created successfully!', response.workspace);
+        // console.log('Workspace created successfully!', response.workspace);
         
         // Add the new workspace to the existing list for immediate display
         const newWorkspace = response.workspace;
@@ -116,10 +117,10 @@ const WorkspaceModal = ({ visible, onClose }) => {
       setShowNameInput(false);
       setIsEditing(false); // Reset editing state when modal opens
     }
-  }, [visible]);
+  }, [visible,]);
 
   const handleDropdownOptionSelect = (workspaceId, optionValue, item) => {
-    console.log(`Selected option ${optionValue} for workspace ${workspaceId}`);
+    // console.log(`Selected option ${optionValue} for workspace ${workspaceId}`);
     
     switch (optionValue) {
       case "1": // Members
@@ -258,7 +259,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
               <View style={styles.createWorkspaceForm}>
                 <TextInput
                   style={styles.workspaceNameInput}
-                  placeholder="Enter workspace name"
+                  placeholder={strings.ENTERWORKSPACENAME}
                   placeholderTextColor={COLORS.black}
                   value={editWorkspaceName}
                   onChangeText={(val) => setEditWorkspaceName(val)}
@@ -270,7 +271,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
                   style={[styles.formButton, styles.cancelButton]}
                   onPress={cancelEditing}
                 >
-                  <Text style={styles.buttonText}>Cancel</Text>
+                  <Text style={styles.buttonText}>{strings.CENCEL}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.formButton, styles.createButton]}
@@ -278,7 +279,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
                   disabled={isLoading}
                 >
                   <Text style={styles.buttonText}>
-                    {isLoading ? 'Updating...' : 'Update'}
+                    {isLoading ? 'Updating...' : strings.UPDATE}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -296,7 +297,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
                   <TextInput
                     style={styles.workspaceNameInput}
                     placeholderTextColor={COLORS.black}
-                    placeholder="Enter workspace name"
+                    placeholder={strings.ENTERWORKSPACENAME}
                     value={newWorkspaceName}
                     onChangeText={(val) => setNewWorkspaceName(val)}
                     autoFocus
@@ -307,7 +308,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
                       onPress={toggleCreateWorkspace}
                       disabled={isCreating}
                     >
-                      <Text style={styles.buttonText}>Cancel</Text>
+                      <Text style={styles.buttonText}>{strings.CENCEL}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
                       style={[styles.formButton, styles.createButton]}
@@ -315,7 +316,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
                       disabled={isCreating}
                     >
                       <Text style={styles.buttonText}>
-                        {isCreating ? 'Creating...' : 'Create'}
+                        {isCreating ? 'Creating...' : strings.CREATE}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -328,7 +329,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
                 >
                   <Icon name='plus' size={20} color={COLORS.white} />
                   <Text style={{...styles.text, color: COLORS.white}}>
-                    Create new workspace
+                    {strings.CREATE_NEW_WORKSPACE}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -346,7 +347,7 @@ const WorkspaceModal = ({ visible, onClose }) => {
                   style={styles.modalIcon}
                 />
                 <Text style={workspaces === 0 ? styles.select : styles.text}>
-                  Private
+                  {strings.PRIVATE}
                 </Text>
               </TouchableOpacity>
 

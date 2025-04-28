@@ -62,7 +62,7 @@ const Login = () => {
 
         <View style={styles.formContainer}>
           <InputBox
-            placeholder="Enter Your Email"
+             placeholder={strings.EnterYourEmail}
             onChangeText={handleChange('email')}
             onBlur={handleBlur('email')}
             value={values.email}
@@ -72,27 +72,31 @@ const Login = () => {
           />
 
           <InputBox
-            placeholder="Enter Your Password"
+            placeholder={strings.Enteryourpassword}
             onChangeText={handleChange('password')}
             onBlur={handleBlur('password')}
             value={values.password}
             touched={touched.password}
             errors={errors.password}
-            // secureTextEntry={!passwordVisible}
+            secureTextEntry={true}
             secure={true}
             icon={require('../../assets/Lock.png')}
           />
 
           <CustomButton
-            buttonTitle="Login"
+            buttonTitle={strings.LOGIN}
             onPress={handleSubmit}
             isLoading={isLoading}
             disabled={!isValid || isLoading}
           />
 
-         <TouchableOpacity style={styles.forgotPassword} 
+         {/* <TouchableOpacity style={styles.forgotPassword} 
          onPress={()=>navigation.navigate('PrivacyPolicy')}>
-              <Text style={styles.forgotPasswordText}>PrivacyPolicy?</Text>
+              <Text style={styles.forgotPasswordText}>{strings.PrivacyPolicy}?</Text>
+            </TouchableOpacity> */}
+            <TouchableOpacity style={styles} 
+         onPress={()=>navigation.navigate('Signup')}>
+              <Text style={styles.signup}>{strings.NOTACCOUNT}?</Text>
             </TouchableOpacity>
         </View>
       </View>
@@ -164,6 +168,12 @@ const styles = StyleSheet.create({
     height:HEIGHT*.10,
     width:WIDTH*0.30,
     resizeMode:'contain'
-  }
+  },
+  signup: {
+    marginTop: 18,
+    alignSelf: 'center',
+    color: '#6C63FF',
+    fontSize: 14,
+  },
 });
 

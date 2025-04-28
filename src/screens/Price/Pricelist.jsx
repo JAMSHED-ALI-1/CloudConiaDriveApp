@@ -212,8 +212,8 @@ const Pricelist = ({ navigation }) => {
 {item.prices.length > 0 ? (
   <Text style={{...styles.price}}>
     {currency === 'TRY'
-      ? ` € ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'} /Year `
-      : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} /Year`}
+      ? ` € ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'} /Year  +Tex Including`
+      : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} /Year +Tex Including`}
   </Text>
 ) : (
   <Text style={{color:COLORS.black}}>No Pricing Data</Text>
@@ -222,11 +222,12 @@ const Pricelist = ({ navigation }) => {
 {/* 
     <Text>{item.price}</Text> */}
     {/* <Text style={{...styles.feature}}>{item.available_space}</Text> */}
-    <Text style={{...styles.headerText}}>{(item.available_space / (1024 ** 3)).toFixed(2)} GB</Text>
+    {/* <Text style={{...styles.headerText}}>{(item.available_space / (1024 ** 3)).toFixed(2)} GB</Text> */}
 
     {/* Mapping feature_list correctly */}
+    <Text style={{fontSize:18,color:COLORS.black,fontWeight:'700',paddingVertical:8}}>What's included</Text>
     {item.feature_list?.map((featureItem, featureIndex) => (
-      <Text key={featureIndex} style={styles.feature}>• {featureItem}</Text>
+      <Text key={featureIndex} style={styles.feature}>✅  {featureItem}</Text>
     ))} 
     <View style={{paddingVertical:25}}>
 
@@ -303,7 +304,9 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   feature: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#555',
+    fontyeight: '500',
+    marginBottom: 5,
   },
 });

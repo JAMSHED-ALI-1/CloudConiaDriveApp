@@ -11,13 +11,15 @@ import { COLORS } from '../../utils/Colors';
 import CustomHeader from '../../components/CustomHeader';
 import strings from '../../helper/Language/LocalizedStrings';
 import { baseURL } from '../../utils/constant/settings';
-import Test from '../../../Test';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/AntDesign'
 import * as Animatable from 'react-native-animatable';
 import UpgradeButton from '../../components/UpgradeButton';
+import LanguageChangeModal from '../../Modaals/LanguageChangeModal';
 const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = '' }) => {
   const [isVisible,setVisible]=useState(false)
+
+  // console.log(userAvatar,'User Avatar')
   const language = useSelector((state) => state.language.language);
   const [storageInfo, setStorageInfo] = useState({ 
     used: 0, 
@@ -27,6 +29,10 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const { user } = useSelector((state) => state.auth);
+  // console.log(user.avatar,'User Avatar')
+  const userAvatar = user?.avatar.includes('www.gravatar.com') ? { uri: user.avatar }:{uri:`https://drive.coniacloud.com/${user?.avatar}`} ;
+  // console.log(userAvatar,'User Avatar')
+  // const userAvatar = user?.avatar.includes('www.gravatar.com') ? { uri: user.avatar }:{uri:`https://drive.coniacloud.com/${user?.avatar}`} ;
   const screenWidth = Dimensions.get('window').width;
   const progressBarWidth = screenWidth * 0.85;
   const dispatch = useDispatch();
@@ -128,15 +134,21 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
      alignItems: 'center',
      gap: 20,
     
+    
       }}>
+        <View style={{width:70,height:70,borderRadius:50,backgroundColor:COLORS.white,borderWidth:1,borderColor:COLORS.black,alignItems:'center',justifyContent:'center'}}> 
+
         <Image 
-          source={{ 
-            uri: user.avatar,
-            headers: { Authorization: `Bearer ${user.access_token}` } 
-          }} 
+          source={userAvatar}
           style={styles.avatar}
-          defaultSource={require('../../assets/notfound.png')}
+            // uri: userAvatar,
+            
+            // headers: { Authorization: `Bearer ${user.access_token}` } 
+          // } 
+          // style={styles.avatar}
+          // defaultSource={require('../../assets/notfound.png')}
         />
+        </View>
         <View>
           <Text style={styles.heading}>
             {user.display_name || 'User'}
@@ -172,18 +184,45 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
     );
   };
 
+  // const navigationData = [
+  //   { id: 1, ImagePath: require('../../assets/icon/fi_user-check.png'), text: strings.ACCOUNT_INFORMATION, navigate: "EditProfile" },
+  //   { id: 2, ImagePath: require('../../assets/icon/Lock.png'), text: strings.CHANGE_PASSWORD, navigate: "UpdatePassword" },
+  //     { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, setVisible(true)},
+  //     // { id: 4, ImagePath: require('../../assets/setting.png'), text: strings.Settings, navigate: "Settings" },
+  // ];
   const navigationData = [
-    { id: 1, ImagePath: require('../../assets/icon/fi_user-check.png'), text: strings.ACCOUNT_INFORMATION, navigate: "EditProfile" },
-    { id: 2, ImagePath: require('../../assets/icon/Lock.png'), text: strings.CHANGE_PASSWORD, navigate: "UpdatePassword" },
-      { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, navigate: "ChoseLanguage" },
-      // { id: 4, ImagePath: require('../../assets/setting.png'), text: strings.Settings, navigate: "Settings" },
+    {
+      id: 1,
+      ImagePath: require('../../assets/icon/fi_user-check.png'),
+      text: strings.ACCOUNT_INFORMATION,
+      onPress: () => navigation.navigate("EditProfile"),
+    },
+    {
+      id: 2,
+      ImagePath: require('../../assets/icon/Lock.png'),
+      text: strings.CHANGE_PASSWORD,
+      onPress: () => navigation.navigate("UpdatePassword"),
+    },
+    {
+      id: 3,
+      ImagePath: require('../../assets/icons/Settings.png'),
+      text: strings.Settings,
+      onPress: () => navigation.navigate("Settings"),
+    },
+    {
+      id: 4,
+      ImagePath: require('../../assets/icon/smallFile.png'),
+      text: strings.CHANGE_LANGUAGE,
+      onPress: () => setVisible(true), // Only called on press
+    },
   ];
+  
 
-  const renderNavigationItem = ({ id, ImagePath, text, navigate }) => (
+  const renderNavigationItem = ({ id, ImagePath, text, onPress }) => (
     <TouchableOpacity
       key={id}
       activeOpacity={0.9}
-      onPress={() => navigation.navigate(navigate)}
+      onPress={onPress}
       disabled={loggingOut}
     >
    <Animatable.View  animation={'fadeInRightBig'} View style={styles.navigationItem}>
@@ -255,6 +294,8 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
       </TouchableOpacity>
       </ScrollView>
     </View>
+   
+      <LanguageChangeModal isvisible={isVisible} onclose={()=>setVisible(false)}/>
    </SafeAreaView>
   );
 };
@@ -306,13 +347,20 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4
+    shadowRadius: 4,
+    
+  
   },
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: COLORS.lightGray
+    width: '90%',
+    height: '90%',
+    borderRadius:30,
+    resizeMode:'contain'
+    // borderRadius: 30,
+    // backgroundColor: COLORS.white,
+  
+   
+  
   },
   heading: {
     fontWeight: '500',

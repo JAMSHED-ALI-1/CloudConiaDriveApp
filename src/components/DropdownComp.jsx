@@ -1,20 +1,9 @@
 import { StyleSheet, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { COLORS } from '../utils/Colors';
 import { Dropdown } from 'react-native-element-dropdown';
-
-const ownerDropdownData = [
-  // { label: "Members", value: "1" },
-  { label: "Rename", value: "2" },
-  { label: "Delete", value: "3" },
- 
-];
-
-const memberDropdownData = [
-  // { label: "Members", value: "1" },
-  { label: "Leave", value: "2" },
-];
+import strings from '../helper/Language/LocalizedStrings';
 
 const DropdownComp = ({ onPress, isOwner }) => {
   const [value, setValue] = useState(null);
@@ -23,15 +12,31 @@ const DropdownComp = ({ onPress, isOwner }) => {
 
   if (!user) return null;
 
+  // 🧠 Recompute dropdown options when language changes
+  const dropdownData = useMemo(() => {
+    return isOwner
+      ? [
+          { label: strings.RENAME, value: "2" },
+          { label: strings.DELETEFILE, value: "3" },
+        ]
+      : [
+          { label: strings.LEAVE, value: "2" },
+        ];
+  }, [isOwner, strings.RENAME, strings.DELETEFILE, strings.LEAVE]);
+
   const handleOptionSelect = (item) => {
-    setValue(item.value);
-    console.log(item.value,'value');
+    setValue(item.value); // We only track the value, not the label
     setIsFocus(false);
 
     if (onPress) {
       onPress(item.value);
     }
   };
+
+  useEffect(() => {
+    // Optionally reset value on language change
+    // setValue(null);
+  }, [strings]);
 
   return (
     <View style={styles.container}>
@@ -40,12 +45,12 @@ const DropdownComp = ({ onPress, isOwner }) => {
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         iconStyle={styles.iconStyle}
-        data={isOwner ? ownerDropdownData : memberDropdownData} // Show data based on ownership
+        data={dropdownData}
         maxHeight={200}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? 'Manage' : '...'}
-        itemTextStyle={{ color: COLORS.black,fontWeight:'600' }}
+        placeholder={!isFocus ? strings.MANAGE : '...'}
+        itemTextStyle={{ color: COLORS.black, fontWeight: '600' }}
         value={value}
         dropdownPosition={'top'}
         onFocus={() => setIsFocus(true)}
@@ -72,12 +77,12 @@ const styles = StyleSheet.create({
   placeholderStyle: {
     fontSize: 16,
     color: COLORS.black,
-    fontWeight:'500'
+    fontWeight: '500'
   },
   selectedTextStyle: {
     fontSize: 16,
     color: COLORS.red,
-     fontWeight:'500'
+    fontWeight: '500'
   },
   iconStyle: {
     width: 20,

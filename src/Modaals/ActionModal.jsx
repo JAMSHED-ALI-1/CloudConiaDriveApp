@@ -7,23 +7,69 @@ import RenameModal from './Rename';
 import { baseURL } from '../utils/constant/settings';
 import { makeApiCall } from '../helper/apiHelper';
 import { COLORS } from '../utils/Colors';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import showMessageHandler from '../utils/constant/ShowMessageHandler';
+import Test from '../../Test';
+import { useNavigation } from '@react-navigation/native';
+import { handleLogout } from '../helper/Logouthelper';
+import ImagepreviewModal from './ImagepreviewModal';
 const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
-  // console.log('----->>>>',item)
+  const navigation=useNavigation()
+  const dispatch = useDispatch();
+  // console.log('Jamshed----->>>>',item.type)
   const workspaces = useSelector(state => state.workspace.workspace);
   const language = useSelector((state) => state.language.language);
   const [isShareModalVisible, setShareModalVisible] = useState(false);
   const [isRenameModalVisible, setRenameModalVisible] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [handleImageViewMidal,setImageViewModal]=useState(false)
+  const [selectedPreviewItem, setSelectedPreviewItem] = useState(null);
+  const [modalOpenKey, setModalOpenKey] = useState(0);
+ 
+
   const openrenameModal=()=>{
     setRenameModalVisible(true)
     onClose()
   }
   const openShareModal = () => {
     setShareModalVisible(true);
+    setModalOpenKey(prev => prev + 1); 
     onClose(); // Close the main modal
   };
+  const handleMakeCopy = async () => {
+    const resolvedWorkspace = workspaces && workspaces !== 0 ? workspaces : null;
+
+    const url = resolvedWorkspace
+      ? `/api/v1/file-entries/duplicate?workspaceId=${resolvedWorkspace}`
+      : `/api/v1/file-entries/duplicate`;
+    
+  
+    console.log('Item ID:', item.id); // Debug check
+  
+    const payload = {
+      entryIds: [item?.id], // Make sure this is a valid array
+    };
+  
+    try {
+      const response = await makeApiCall(
+        `/api/v1/file-entries/duplicate?workspaceId=${workspaces}`,
+        user?.access_token,
+        'post',
+        payload
+      );
+        
+      console.log('✅ Duplication response:', response);
+      if (response?.status === 'success') {
+        showMessageHandler('Success', 'File duplicated successfully!');
+        onSuccess(); // Notify parent to refresh
+        onClose();
+      }
+    } catch (error) {
+      console.log('❌ Duplication error:', error?.response?.data || error);
+    }
+  };
+  
+
 //   const downloadFile = async () => {
 //     try {
 //       // Ensure item.hash and item.name are available
@@ -100,6 +146,50 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
     }
   };
     
+  const makeStarredFile = async () => {
+    try {
+      const data = {
+        entryIds: [item?.id],
+        starred: 1,
+      };
+      const res = await makeApiCall(
+        `/api/v1/file-entries/star?workspaceId=${workspaces}`,
+        user?.access_token,
+        'post',
+        data
+      );
+  
+      if (res?.status === 'success' && res?.tag?.name === 'starred') {
+        showMessageHandler('Success', 'File starred successfully!');
+        onSuccess(); // Notify parent to refresh
+        onClose();
+      } else {
+        showMessageHandler('Error', 'Could not star the file.');
+      }
+    } catch (error) {
+      console.error('Error starring file:', error);
+      showMessageHandler('Error', 'Error starring file.');
+    }
+  };
+  
+const makeUnstarredFile = async () => {
+  try {
+    let data = {  
+      entryIds: [item?.id],
+      starred: 0,
+    };
+   const res= await makeApiCall(`/api/v1/file-entries/unstar?workspaceId=${workspaces}`, user?.access_token, 'post', data);
+    showMessageHandler('Success', 'File unstarred successfully!');
+    console.log(res,'Unshered')
+    onSuccess()
+    onClose();
+  } catch (error) {
+    console.error('Error unstarring file:', error);
+    showMessageHandler('Error', 'Error unstarring file.');
+  }
+}
+
+
 
   // const deleteFile = async () => {
   //   try {
@@ -132,15 +222,17 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
             try {
               let data = {
                 entryIds: [item?.id],
-                deleteForever: 0,
+                deleteForever: false,
               };
-              await makeApiCall(`/api/v1/file-entries/delete?workspaceId=${workspaces}`, user?.access_token, 'post', data);
+             await makeApiCall(`/api/v1/file-entries/delete?workspaceId=${workspaces}`, user?.access_token, 'post', data);
               showMessageHandler('Success', 'File deleted successfully!');
+             
               onSuccess()
               onClose();
             } catch (error) {
               console.error('Error deleting file:', error);
               showMessageHandler('Error', 'Error deleting file.');
+              handleLogout(dispatch,navigation)
             }
           },
         },
@@ -150,6 +242,7 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
   };
   
   
+  const isStarred = item?.tags?.some(tag => tag.name === 'starred');
 
   return (
    <>
@@ -169,42 +262,97 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
         />
       </TouchableOpacity>
     </View>
-        <TouchableOpacity style={styles.itemContainer} 
-       onPress={openShareModal}
+  {item?.type==='image'&& <TouchableOpacity style={styles.itemContainer} 
+  onPress={() => {
+    setSelectedPreviewItem(item);   // Set item before opening modal
+    onClose();                      // Close parent modal
+    setImageViewModal(true);       // Open preview modal
+  }}
+     
+   
         >
-          <Image source={require('../assets/icons/share.png')} style={styles.image} />
-          <Text style={styles.nornalText}>{strings.SHARE}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.itemContainer} 
+          <Image source={require('../assets/icons/Move.png')} style={styles.image} />
+          <Text style={styles.nornalText}>{strings.Preview}</Text>
+
+
+          
+        </TouchableOpacity>}
+        {item?.permissions?.["files.update"] && (
+  <TouchableOpacity style={styles.itemContainer} onPress={openShareModal}>
+    <Image source={require('../assets/icons/Shared.png')} style={styles.image} />
+    <Text style={styles.nornalText}>{strings.SHARE}</Text>
+  </TouchableOpacity>
+)}
+       {item?.permissions?.['files.download'] &&(<TouchableOpacity style={styles.itemContainer} 
       onPress={downloadFile}
         >
-          <Image source={require('../assets/icons/fi_download.png')} style={styles.image} />
+          <Image source={require('../assets/icons/Download.png')} style={styles.image} />
           <Text style={styles.nornalText}>{strings.DOWNLOAD}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>)}
         {downloadProgress > 0 && (
               <View style={styles.progressBar}>
                 <View style={[styles.progress, { width: `${downloadProgress}%` }]} />
               </View>
             )}
-        <TouchableOpacity style={styles.itemContainer} 
+             {item?.permissions?.['files.download'||'files.update'] &&(<TouchableOpacity style={styles.itemContainer} 
+      onPress={handleMakeCopy}
+        >
+          <Image source={require('../assets/icons/Makeacopy.png')} style={styles.image} />
+          <Text style={styles.nornalText}>{strings.MAKE_ACOPY}</Text>
+        </TouchableOpacity>)}
+        {downloadProgress > 0 && (
+              <View style={styles.progressBar}>
+                <View style={[styles.progress, { width: `${downloadProgress}%` }]} />
+              </View>
+            )}
+      {item?.permissions?.['files.update'] && <TouchableOpacity style={styles.itemContainer} 
         onPress={openrenameModal}
         >
-          <Image source={require('../assets/Modalicon/fi_edit-2.png')} style={styles.image} />
+          <Image source={require('../assets/icons/Rename.png')} style={styles.image} />
           <Text style={styles.nornalText}>{strings.RENAME}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.itemContainer} 
+        </TouchableOpacity>}
+        {item?.permissions?.['files.delete']&&<TouchableOpacity style={styles.itemContainer} 
         onPress={deleteFile}
         >
-          <Image source={require('../assets/Modalicon/fi_trash-2.png')} style={styles.image} />
-          <Text style={styles.nornalText}>{strings.DELETEFILE}</Text>
-        </TouchableOpacity>
+          <Image source={require('../assets/icons/Trash.png')} style={styles.image} />
+          <Text style={styles.nornalText}>{strings.REMOVE}</Text>
+        </TouchableOpacity>}
+       
+      {item?.permissions?.['files.update'] &&  <TouchableOpacity
+  style={styles.itemContainer}
+  onPress={() => {
+    if (isStarred) {
+      makeUnstarredFile();
+    } else {
+      makeStarredFile();
+    }
+  }}
+>
+  <Image
+    source={
+      item?.tag?.name === 'starred' || item?.starred === 1
+        ? require('../assets/icons/Starred.png') 
+        : require('../assets/icons/Starred.png')
+    }
+    style={styles.image}
+  />
+  <Text style={styles.nornalText}>
+    {isStarred
+      ? strings.REMOVE_FROM_STAR
+      : strings.ADD_TO_STAR}
+  </Text>
+</TouchableOpacity>}
+
       </View>
     </TouchableOpacity>
   </Modal>
-  <ShareFileModal 
+  <Test 
   isVisible={isShareModalVisible} 
   onClose={()=>setShareModalVisible(false)} 
-  item={item} 
+  item={item}
+  onSuccess={onSuccess}
+  workspace={workspaces} 
+  openKey={modalOpenKey}
   user={user}/>
   <RenameModal 
   isVisible={isRenameModalVisible} 
@@ -212,6 +360,20 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
   item={item} 
   onSuccess={onSuccess}
   user={user}/>
+   {/* <ImagepreviewModal
+          visible={handleImageViewMidal}
+          workspace={workspaces}
+          onClose={()=>setImageViewModal(false)}
+          imageId={item.id}
+          user={user}
+          /> */}
+          <ImagepreviewModal
+  visible={handleImageViewMidal}
+  workspace={workspaces}
+  onClose={() => setImageViewModal(false)}
+  imageId={selectedPreviewItem?.id}   // Now comes from local state
+  user={user}
+/>
    </>
   )
 }
@@ -224,9 +386,11 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         backgroundColor: 'rgba(0,0,0,0.5)',
         // paddingVertical:60
+        
       },
       modalContent: {
-        height: '40%',
+        // height: '60%',
+        paddingBottom:20,
     width: '100%',
     backgroundColor: COLORS.white,
     borderTopEndRadius: 30,
@@ -243,8 +407,8 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
       },
       image: {
-        height: 25,
-        width: 25,
+        height: 35,
+        width: 35,
         resizeMode: 'contain',
         marginRight: 15,
       },
@@ -281,9 +445,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
       },
       nornalText:{
-        fontSize:14,
+        fontSize:16,
         color:COLORS.noermalText,
-        fontWeight:'600'
+        fontWeight:'700'
       }
 })
 
