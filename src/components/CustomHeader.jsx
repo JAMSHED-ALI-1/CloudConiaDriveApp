@@ -1,11 +1,14 @@
 import { Image, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { COLORS } from '../utils/Colors';
+import { useSelector } from 'react-redux';
 
 const Width = Dimensions.get('window').width;
 const Height = Dimensions.get('window').height;
 
 const CustomHeader = ({ title, left, right, back, OnPress, textcolor, bgColor, grid, hadleGidList, ViewType }) => {
+  const currentTheme = useSelector((state) => state.theme.theme);
+  console.log(currentTheme,'sgdjysfdfsfdhfsgdfgh')
    return (
    <View style={[styles.container, { backgroundColor: bgColor }]}>
       <View style={styles.leftContainer}>
@@ -14,7 +17,7 @@ const CustomHeader = ({ title, left, right, back, OnPress, textcolor, bgColor, g
             <Image 
               source={back ? require('../assets/icons/back.png') : require('../assets/Ellipse.png')} 
               style={{ height: 25, width: 25 }} 
-              tintColor={textcolor ? COLORS.white : COLORS.black} 
+              tintColor={currentTheme==='dark' ? COLORS.white : COLORS.black} 
             />
           </TouchableOpacity>
         )}
@@ -22,7 +25,7 @@ const CustomHeader = ({ title, left, right, back, OnPress, textcolor, bgColor, g
 
       <View style={styles.centerContainer}>
         {title && (
-          <Text style={[styles.text, { color: textcolor ? COLORS.white : COLORS.black }]}>
+          <Text style={[styles.text, { color: currentTheme==='dark' ? COLORS.white : COLORS.black }]}>
             {title}
           </Text>
         )}
@@ -38,7 +41,7 @@ const CustomHeader = ({ title, left, right, back, OnPress, textcolor, bgColor, g
                       ? require('../assets/icons/fi_grid.png')
                       : require('../assets/list.png')}
                   style={styles.icon}
-                  tintColor={textcolor ? COLORS.white : COLORS.black}
+                  tintColor={currentTheme==='dark' ? COLORS.white : COLORS.black}
               />
           </TouchableOpacity>
             )}

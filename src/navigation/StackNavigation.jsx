@@ -38,30 +38,12 @@ import TermandConditions from '../screens/settings/TermandConditions';
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   // const isLoggedIn = useSelector(selectIsLoggedIn);
-  // const user = useSelector((state) => state.auth.user);
-  // const [isLoading, setIsLoading] = React.useState(true);
-  
-  const [isLoading, setIsLoading] = React.useState(true);
-  const isLoggedIn = useSelector(selectIsLoggedIn);
-  const dispatch = useDispatch();
-
-  const checkUser = async () => {
-    try {
-      const userData = await getData();  // Check if there's user data in AsyncStorage
-      console.log('User Data:', userData);
-      if (userData) {
-        setIsLoading(false);
-      } else {
-        setIsLoading(false); // Set loading to false if no user data found
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      setIsLoading(false); // Always stop loading if there's an error
-    }
-  };
-  
+  const user = useSelector((state) => state.auth.user);
+  const isLoggedIn = !!user;
  
 
+  
+  const dispatch = useDispatch();
   // useEffect(() => {
   //   checkStorageAfterLogout();  // Check user data when the component mounts
   // }, []);

@@ -5,14 +5,16 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const Filter = ({ FilterData, selectedFilter, handleFilterSelect }) => {
+  console.log(FilterData.title,'')
   return (
-    <ScrollView horizontal style={{ padding: 15 }}>
+    <ScrollView horizontal style={{ padding:10 }} showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
           {FilterData.map((item, id) => (
             <TouchableOpacity 
               key={id} 
               style={{
                 ...styles.filterItemContainer,
-                ...(selectedFilter === item.filters ? styles.selectedFilter : {})
+                ...(selectedFilter === item.filters ? styles.selectedFilter : {}),
+                backgroundColor:item.backgroundColor
               }}
               onPress={() => handleFilterSelect(item.filters)} 
             >
@@ -42,6 +44,8 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         padding: 10,
         borderRadius: 10,
+        // width: windowWidth * 0.2,
+        // height: windowHeight * 0.11,
       },
       selectedFilter: {
         backgroundColor: COLORS.DriveColor,
@@ -65,4 +69,10 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 10,
       },
+      itemTitle:{
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: COLORS.white,
+        marginTop: 5,
+      }
 })

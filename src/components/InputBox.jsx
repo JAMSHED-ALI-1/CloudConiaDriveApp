@@ -101,7 +101,7 @@ elevation: 12,
    
   },
   errorStyle: {
-    color: 'red',
+    color: COLORS.orenge,
     marginTop: 5,
     fontSize: 13,
   },

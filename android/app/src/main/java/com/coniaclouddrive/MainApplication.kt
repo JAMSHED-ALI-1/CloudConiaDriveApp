@@ -1,4 +1,4 @@
-package com.coniaclouddrive
+package com.ConiaCloudD
 
 import android.app.Application
 import com.facebook.react.PackageList

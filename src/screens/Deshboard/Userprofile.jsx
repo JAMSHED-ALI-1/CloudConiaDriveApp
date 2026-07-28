@@ -16,8 +16,11 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import * as Animatable from 'react-native-animatable';
 import UpgradeButton from '../../components/UpgradeButton';
 import LanguageChangeModal from '../../Modaals/LanguageChangeModal';
+import ChangeThmeModal from '../../Modaals/ChangeThmeModal';
+import { handleLogout } from '../../helper/Logouthelper';
 const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = '' }) => {
   const [isVisible,setVisible]=useState(false)
+  const [isThemevisible,setisThemevisisble]=useState(false)
 
   // console.log(userAvatar,'User Avatar')
   const language = useSelector((state) => state.language.language);
@@ -37,6 +40,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   const progressBarWidth = screenWidth * 0.85;
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const currentTheme = useSelector((state) => state.theme.theme);
 
   const fetchStorageData = useCallback(async () => {
     if (!user?.access_token) {
@@ -83,27 +87,24 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
 
 
 
+
+  
   const logoutHandler = async () => {
     setLoggingOut(true);
     try {
-      // 1. Dispatch logout actions first
-      // dispatch(logout());
-      // dispatch(logoutAsync());
-      // dispatch(clearState());
+      // 1. Dispatch logoutAsync to handle API call, AsyncStorage, and redux
+      persistor.purge().then(() => {
+        console.log('Persisted store purged');
+        handleLogout(dispatch,navigation)
+      });
   
-      // 2. Clear AsyncStorage
-      await AsyncStorage.removeItem('user');
-  
-      // 3. Purge persisted store
-      // await persistor.purge();
-  
-      // 4. Reset navigation
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        })
-      );
+      // 3. Reset navigation to Login screen
+      // navigation.dispatch(
+      //   CommonActions.reset({
+      //     index: 0,
+      //     routes: [{ name: 'Login' }],
+      //   })
+      // );
     } catch (error) {
       console.error('Logout Error:', error);
       Alert.alert('Logout Failed', 'Please try again.');
@@ -111,6 +112,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
       setLoggingOut(false);
     }
   };
+  
   
  
   const LoadingView = () => (
@@ -126,7 +128,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
     if (!user) return null;
 
     return (
-      <View style={styles.profileContainer}>
+      <View style={{...styles.profileContainer,}}>
 
    
       <View style={{
@@ -162,7 +164,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
 
       <View style={styles.storageSection}>
         {loading ? (
-          <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />
+          <ActivityIndicator size="large" color={COLORS.primery} style={styles.loader} />
         ) : (
           <>
             <Progress.Bar
@@ -184,12 +186,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
     );
   };
 
-  // const navigationData = [
-  //   { id: 1, ImagePath: require('../../assets/icon/fi_user-check.png'), text: strings.ACCOUNT_INFORMATION, navigate: "EditProfile" },
-  //   { id: 2, ImagePath: require('../../assets/icon/Lock.png'), text: strings.CHANGE_PASSWORD, navigate: "UpdatePassword" },
-  //     { id: 3, ImagePath: require('../../assets/icon/smallFile.png'), text: strings.CHANGE_LANGUAGE, setVisible(true)},
-  //     // { id: 4, ImagePath: require('../../assets/setting.png'), text: strings.Settings, navigate: "Settings" },
-  // ];
+
   const navigationData = [
     {
       id: 1,
@@ -214,6 +211,12 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
       ImagePath: require('../../assets/icon/smallFile.png'),
       text: strings.CHANGE_LANGUAGE,
       onPress: () => setVisible(true), // Only called on press
+    },
+    {
+      id: 5,
+      ImagePath: require('../../assets/icon/themes.png'),
+      text: strings.CHANGETHEME,
+      onPress: () => setisThemevisisble(true), // Only called on press
     },
   ];
   
@@ -246,7 +249,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
   if (loggingOut) return <LoadingView />;
 
   return (
-   <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}> 
+   <SafeAreaView style={{flex:1,backgroundColor:currentTheme==='dark'?COLORS.black:COLORS.backgroundColor}}> 
      <View style={styles.container}>
       <CustomHeader title={strings.PROFILE} />
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -296,6 +299,7 @@ const Userprofile = ({ width = 320, color = COLORS.orenge, height = 10, label = 
     </View>
    
       <LanguageChangeModal isvisible={isVisible} onclose={()=>setVisible(false)}/>
+        <ChangeThmeModal isvisible={isThemevisible} onclose={()=>setisThemevisisble(false)}/>
    </SafeAreaView>
   );
 };

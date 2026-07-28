@@ -48,6 +48,7 @@ const Shared = () => {
     breadcrumbs: []
   });
   const language = useSelector((state) => state.language.language);
+  const currenntThme=useSelector((state)=>state.theme.theme)
   const navigation=useNavigation()
   const [folderStack, setFolderStack] = useState([{ id: null, name: strings.Shared }]);
   const [refreshing, setRefreshing] = useState(false);
@@ -178,10 +179,10 @@ const Shared = () => {
       <View style={styles.breadcrumbContainer}>
         {currentFolder.breadcrumbs.length > 0 && (
           <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-            <Icon name="arrow-back" size={24} color="#000" />
+            <Icon name="arrow-back" size={24} color={currenntThme==='dark'?COLORS.white:COLORS.black}/>
           </TouchableOpacity>
         )}
-        <Text style={styles.breadcrumbText}>
+        <Text style={{...styles.breadcrumbText,fontSize:16,color:currenntThme==='dark'?COLORS.white:COLORS.black}}>
           {currentFolder.breadcrumbs.map(folder => folder.name).join(' > ') || strings.Shared}
         </Text>
         <Gridlist
@@ -219,51 +220,9 @@ const Shared = () => {
    
   }, [navigation, user, folderStack]);
 
-  const renderItemList = useCallback(({ item }) => (
-    <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item,navigation, user, folderStack)}>
- 
-      <View style={styles.iconContainer}>
-      <Image 
-        source={getItemIcon(item)} 
-        style={styles.icon} 
-        resizeMode="contain" 
-      />
-      </View>
-      <View style={{left:10}}>
-      <Text style={[styles.itemText,]}>{item.name.length > 15 ? `${item.name.substring(0, 15)}...` : item.name}</Text>
-      <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
-      </View>
-      <TouchableOpacity
-           onPress={() => toggleModalVisible(item)}
-          style={{position:'absolute',right:10}}>
-            <Image source={require('../../assets/MoreOption.png')} style={[{ height: 20, width: 20,tintColor:COLORS.black }]} />
-          </TouchableOpacity>
-    </TouchableOpacity>
-  ),[handleItemPress]);
 
-  const renderItemGrid = useCallback(({ item }) => (
-    
-    <TouchableOpacity style={styles.grid} onPress={() => handleItemPress(item)}>
-      <View>
 
-    
-      <View style={styles.iconContainer}>
-      <Image 
-        source={getItemIcon(item)} 
-        style={styles.icon} 
-        resizeMode="contain" 
-      />
-      </View>
-      <Text style={styles.itemText}>{item.name.length > 13 ? `${item.name.substring(0, 13)}...` : item.name}</Text>
-      <Text style={styles.filetxtnormal}>{timeAgo(item.created_at)}</Text>
-      </View>
-      <TouchableOpacity
-           onPress={() => toggleModalVisible(item)}
-          >
-            <Image source={require('../../assets/MoreOption.png')} style={[styles.moreicon, { height: 20, width: 20,tintColor:COLORS.black }]} />
-          </TouchableOpacity>
-    </TouchableOpacity>
-  ),[handleItemPress]);
+
 
 
 
@@ -284,7 +243,7 @@ const Shared = () => {
   );
 
   return (
-    <SafeAreaView style={{flex:1,backgroundColor:COLORS.backgroundColor}}>
+    <SafeAreaView style={{flex:1,backgroundColor:currenntThme==='dark'?COLORS.black:COLORS.backgroundColor}}>
 
 <HomeHeader
         user={user}
@@ -379,7 +338,7 @@ const Shared = () => {
             
         
             showsVerticalScrollIndicator={false}
-            ListEmptyComponent={EmptyComponent}
+            ListEmptyComponent={(<EmptyComponent text={strings.THIS_FIEL_FOLDERISEMPTY}/>)}
             contentContainerStyle={styles.listContent}
           />
         ) : (
@@ -430,7 +389,7 @@ const Shared = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundColor,
+    // backgroundColor: COLORS.backgroundColor,
     paddingHorizontal:10
   },
   heading: {
@@ -566,7 +525,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
         // backgroundColor: '#FFFFFF',
-        borderBottomWidth: 1,
+        // borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',
         justifyContent:'space-between'
       },

@@ -129,6 +129,7 @@ const pricelistData = [
 const Pricelist = ({ navigation }) => {
   const [currency, setCurrency] = useState('TRY'); 
   const [feature,setFeature]=useState([])
+  const currenntThme=useSelector(state => state.theme.theme);
   const user = useSelector(state => state.auth.user);
   const [isLoading,setIsLoading]=useState(false)
   // const language = useSelector(state => state.language.language);
@@ -162,7 +163,7 @@ const Pricelist = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-        <View style={{flex:1,padding:15}}>
+        <View style={{flex:1,padding:15,backgroundColor:currenntThme==='dark'?COLORS.black:COLORS.backgroundColor}}>
 
         
       <CustomHeader back={true}   OnPress={() => navigation.goBack()} title={strings.PRICE_LIST}left={true} />
@@ -170,12 +171,12 @@ const Pricelist = ({ navigation }) => {
           <Text style={styles.headerText}>
             Price & Feature List in {currency === 'TRY' ? '€ ' : '₺'}
           </Text>
-          <TouchableOpacity style={{padding:15,backgroundColor:COLORS.BUTTON,borderRadius:10}}
+          {/* <TouchableOpacity style={{padding:15,backgroundColor:COLORS.BUTTON,borderRadius:10}}
                       onPress={toggleCurrency}>
             <Text style={{fontSize:14,color:COLORS.white,fontWeight:'600'}}>
             {`Switch to ${currency === 'TRY' ? 'Turkish Lira (₺)' : 'EUR € '}`}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           {/* <Button
             title={`Switch to ${currency === 'USD' ? 'Turkish Lira (₺)' : 'EUR € '}`}
             onPress={toggleCurrency}
@@ -184,25 +185,7 @@ const Pricelist = ({ navigation }) => {
           { isLoading ?<ActivityIndicator size={'large'} color={COLORS.blue}/>: <ScrollView contentContainerStyle={styles.content}
             showsVerticalScrollIndicator={false}>
 
-        {/* {pricelistData.map((item) => (
-          <View key={item.id} style={styles.card}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.price}>
-              {currency === 'USD' ? item.usdPrice : item.liraPrice}
-            </Text>
-            <View style={styles.divider} />
-            {item.features.map((feature, index) => (
-              <View key={index} style={styles.featureContainer}>
-                <Text style={styles.checkmark}>✓</Text>
-                <Text style={styles.feature}>{feature}</Text>
-              </View>
-            ))}
-            <View style={{width:'80%',alignSelf:'center',padding:15}}>
-            <CustomButton buttonTitle="Get Started" onPress={()=>navigation.navigate('UpgradeScreen')} />
-            </View>
-          
-          </View>
-        ))} */}
+
        {feature.map((item, index) => (
   <View key={item?.id || index} style={{ ...styles.card }}>
     <Text style={{ ...styles.title }}>{item.name}</Text>
@@ -210,11 +193,17 @@ const Pricelist = ({ navigation }) => {
     {/* Mapping prices correctly */}
 
 {item.prices.length > 0 ? (
-  <Text style={{...styles.price}}>
-    {currency === 'TRY'
-      ? ` € ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'} /Year  +Tex Including`
-      : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} /Year +Tex Including`}
-  </Text>
+  <>
+ <Text style={styles.price}>
+ {currency === 'TRY'
+   ? `€ ${item.prices.find(p => p.currency === 'EUR')?.amount || 'N/A'} /Year `
+   : `₺ ${item.prices.find(p => p.currency === 'TRY')?.amount || 'N/A'} /Year `}
+ 
+</Text>
+<Text style={styles.taxNote}>Tax Including</Text>
+   </>
+
+
 ) : (
   <Text style={{color:COLORS.black}}>No Pricing Data</Text>
 )}
@@ -308,5 +297,10 @@ const styles = StyleSheet.create({
     color: '#555',
     fontyeight: '500',
     marginBottom: 5,
+  },
+  taxNote: {
+    fontSize: 14,
+    color:COLORS.blue,
+    fontWeight: '400',
   },
 });

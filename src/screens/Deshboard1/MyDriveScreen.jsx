@@ -67,6 +67,7 @@ const MyDriveScreen = ({ navigation }) => {
 
   const user = useSelector(state => state.auth.user);
   const workspaces = useSelector(state => state.workspace.workspace);
+  const currentthme = useSelector(state => state.theme.theme);
 
   const currentFolderID = folderHistory[folderHistory.length - 1];// Assuming you are always working in the root folder or managing this elsewhere
   const FilderData = [
@@ -261,7 +262,7 @@ const handleFilterSelection = (filter) => {
   return (
     <SafeAreaView style={{
       flex:1,
-      backgroundColor:COLORS.backgroundColor
+      backgroundColor:currentthme === 'dark' ? COLORS.black : COLORS.backgroundColor,
     }}>
 
          <HomeHeader user={user} handleIconPress={() => setshowmodalAi(true)}
@@ -296,7 +297,7 @@ const handleFilterSelection = (filter) => {
       {folderHistory.length > 1 && (
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Icon name="arrow-left" size={24} color="#0071BC" />
-          <Text style={styles.backText}>Back</Text>
+          <Text style={styles.backText}>{strings.Backto}</Text>
         </TouchableOpacity>
       )}
       <View/>
@@ -305,10 +306,11 @@ const handleFilterSelection = (filter) => {
 <TouchableOpacity
   style={{flexDirection: 'row', alignItems: 'center'}}
   onPress={() => setshowdropdown(true)}>
-  <Text style={styles.currentFolderText}>{strings.SORT}</Text>
+  <Text style={{...styles.currentFolderText,color:currentthme === 'dark' ? 'white' : 'black'}}>{strings.SORT}</Text>
   <Image
     source={require('../../assets/icon/sorting.png')}
     style={{height: 25, width: 25, resizeMode: 'contain'}}
+    tintColor={currentthme === 'dark' ? 'white' : 'black'}
   />
 </TouchableOpacity>
 <Gridlist
@@ -332,7 +334,7 @@ const handleFilterSelection = (filter) => {
           // refreshing={refreshing}
           key={isGrid ? 'list' : 'grid'}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={EmptyComponent}
+          ListEmptyComponent={(<EmptyComponent text={strings.THIS_FIEL_FOLDERISEMPTY}/>)}
           contentContainerStyle={styles.listContent}
         />
       ): (
@@ -403,7 +405,7 @@ const handleFilterSelection = (filter) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundColor,
+    // backgroundColor: COLORS.backgroundColor,
     padding: 10,
   },
   headerText: {

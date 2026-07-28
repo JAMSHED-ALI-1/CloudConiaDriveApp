@@ -1,99 +1,4 @@
-// // src/redux/reducers/languageSlice.js
-// import { createSlice } from '@reduxjs/toolkit';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import strings from '../../helper/Language/LocalizedStrings';
 
-// const initialState = {
-//   language: 'eng',
-// };
-
-// export const languageSlice = createSlice({
-//   name: 'language',
-//   initialState,
-//   reducers: {
-//     setLanguage: (state, action) => {
-//       state.language = action.payload;
-//       strings.setLanguage(action.payload); // Assuming this function correctly sets the language
-//     },
-//   },
-// });
-
-// export const { setLanguage } = languageSlice.actions;
-
-// export const loadLanguageFromStorage = () => async (dispatch) => {
-//   try {
-//     const savedLanguage = await AsyncStorage.getItem('language');
-//     if (savedLanguage) {
-//       dispatch(setLanguage(savedLanguage));
-//     }
-//   } catch (error) {
-//     console.error('Error loading language from AsyncStorage:', error);
-//   }
-// };
-
-// export default languageSlice.reducer;
-
-
-
-
-// import { createSlice } from '@reduxjs/toolkit';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import * as RNLocalize from 'react-native-localize';
-// import strings from '../../helper/Language/LocalizedStrings';
-
-// // Default state
-// const initialState = {
-//   language: 'eng',
-// };
-
-// // Auto-detect function
-// const getDefaultLanguage = () => {
-//   const locales = RNLocalize.getLocales();
-//   if (Array.isArray(locales) && locales.length > 0) {
-//     const langCode = locales[0].languageCode;
-//     switch (langCode) {
-//       case 'tr':
-//         return 'tr';
-//       case 'de':
-//         return 'de';
-//       default:
-//         return 'eng';
-//     }
-//   }
-//   return 'eng';
-// };
-
-// export const languageSlice = createSlice({
-//   name: 'language',
-//   initialState,
-//   reducers: {
-//     setLanguage: (state, action) => {
-//       state.language = action.payload;
-//       strings.setLanguage(action.payload); // this updates LocalizedStrings
-//     },
-//   },
-// });
-
-// export const { setLanguage } = languageSlice.actions;
-
-// // Load from storage or fallback to detected language
-// export const loadLanguageFromStorage = () => async (dispatch) => {
-//   try {
-//     const savedLanguage = await AsyncStorage.getItem('language');
-//     const langToUse = savedLanguage || getDefaultLanguage();
-
-//     if (!savedLanguage) {
-//       await AsyncStorage.setItem('language', langToUse);
-//     }
-
-//     dispatch(setLanguage(langToUse));
-//   } catch (error) {
-//     console.error('Error loading language:', error);
-//     dispatch(setLanguage(getDefaultLanguage()));
-//   }
-// };
-
-// export default languageSlice.reducer;
 
 
 
@@ -155,7 +60,7 @@ const inferCountryFromTimezone = (tz) => {
 
 // Initial state
 const initialState = {
-  language: getDefaultLanguage(),
+  language: 'eng', // Default language
 };
 
 const languageSlice = createSlice({

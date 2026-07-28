@@ -42,7 +42,7 @@ import { setLanguage } from '../redux/reducers/languageSlice';
       try {
         await AsyncStorage.setItem('language', selectedLang);
         dispatch(setLanguage(selectedLang));
-        showMessageHandler('Language updated successfully!');
+        showMessageHandler(strings.Languageupdatedsuccessfully);
          onclose(); // Close modal after applying
       } catch (err) {
         console.error('Error setting language:', err);
@@ -58,7 +58,7 @@ import { setLanguage } from '../redux/reducers/languageSlice';
       >
         <TouchableOpacity style={styles.overlay} onPress={onclose} activeOpacity={1}>
           <TouchableOpacity activeOpacity={1} style={styles.whitespace}>
-            <Text style={styles.title}>Select Language</Text>
+            <Text style={styles.title}>{strings.SELECTLANGUAGE}</Text>
   
             {languages.map(lang => (
               <TouchableOpacity

@@ -92,13 +92,13 @@ return (
         },
       })}
     >
-    <Tab.Screen name="Home" component={Homescreen} />
-      {/* <Tab.Screen name="Home" component={Home} /> */}
-    <Tab.Screen name="My Drive" component={MyDriveScreen} />
+    {/* <Tab.Screen name="Home" component={Homescreen} /> */}
+      <Tab.Screen name="Home" component={Home} options={   { unmountOnBlur: true}}/>
+    <Tab.Screen name="My Drive" component={MyDriveScreen} options={   { unmountOnBlur: true}}/>
     {/* <Tab.Screen name="Shared"component={Sharedscreen} /> */}
     {/* <Tab.Screen name="Trash" component={TrashScreen} /> */}
       {/* <Tab.Screen name="My Drive" component={MyDrive} /> */}
-      <Tab.Screen name="Shared" component={Shared} />
+      {/* <Tab.Screen name="Shared" component={Shared} /> */}
       <Tab.Screen name="Trash" component={Trash} />
       <Tab.Screen name="Stared" component={Stared} />
       <Tab.Screen name="User" component={Userprofile} />

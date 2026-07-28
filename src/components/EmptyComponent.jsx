@@ -3,12 +3,15 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../utils/Colors';
 import LottieView from 'lottie-react-native';
+import { useSelector } from 'react-redux';
 
-const EmptyComponent = () => {
+const EmptyComponent = ({text}) => {
+  const currentTheme=useSelector((state)=>state.theme.theme)
   return (
     <View style={styles.emptyContainer}>
         {/* <Icon name="folder-open-outline" size={50} color={COLORS.gray} /> */}
-        <Text style={styles.emptyText}>This folder is empty</Text>
+        <Text style={{...styles.emptyText,color:currentTheme === 'dark' ? COLORS.white : COLORS.black }}>{text}</Text>
+        {/* <Text style={{...styles.emptyText,color:currentTheme === 'dark' ? COLORS.black : COLORS.white }}>This folder is empty</Text> */}
       <LottieView
         source={require('../assets/data/Empty.json')}
         autoPlay
@@ -30,7 +33,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   emptyText: {
-    color: COLORS.black,
+    // color: COLORS.black,
     fontSize: 16,
     textAlign: 'center',
     marginVertical: 10,

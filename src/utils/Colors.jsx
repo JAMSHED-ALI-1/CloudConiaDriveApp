@@ -15,5 +15,9 @@ export const COLORS = {
     boldText:'#071625',
     backgroundColor:"#F1f1f1",
     orenge:"#F16623",
-    DriveColor:'#D7EFFF'
+    DriveColor:'#D7EFFF',
+    darkCard: '#1e1e1e',
+    lightCard: '#24A9E1',
+    DarkCard:'#0071BC',
+    aqua:'#00ffff'
 }

@@ -1,400 +1,140 @@
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { baseURL } from '../../utils/constant/settings';
-import axios from 'axios';
-import { COLORS } from '../../utils/Colors';
-import WorkspaceModal from '../../Modaals/WorkspaceModal';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import HomeHeader from '../../components/HomeHeader';
-import AnimationModal from '../../Modaals/AnimationModal';
-import FileFolderModal from '../../Modaals/FileFolderModal';
-import FileItem from '../../components/RenderCardListGrid';
-import ActionModal from '../../Modaals/ActionModal';
-import EmptyComponent from '../../components/EmptyComponent';
-import strings from '../../helper/Language/LocalizedStrings';
-import Gridlist from '../../constants/Gridlist';
-import ShortingModal from '../../Modaals/ShortingModal';
-import { accessData } from '../../utils/UserAccessData';
-import ImagepreviewModal from '../../Modaals/ImagepreviewModal';
-import SubscriptionAnimation from '../../constants/SubscriptionAnimation';
-import UpgradeButton from '../../components/UpgradeButton';
-import ProgressBar from '../../components/ProgressBar';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {baseURL} from '../../utils/constant/settings';
+import { getCsrfToken } from '../../utils/getCsrfToken';
 
-const Homescreen = ({ navigation }) => {
-  const [filefolderData, setFileFolderData] = useState([]);
-  const [folderHistory, setFolderHistory] = useState([0]);
-   const [hasAccess, setHasAccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isGrid, setIsGrid] = useState(true);
-  const [page, setPage] = useState(1); // Track current page
-  const [totalPages, setTotalPages] = useState(1); // Track total pages
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [workspacemodal, setshowworkspacemodal] = useState(false);
-  const [sortingInfo, setSortingInfo] = useState({
-      sortBy: 'updated_at',
-      sortDir: 'desc',
-    });
-    const sortByOptions = [
-      {key: strings.Size, value: 'file_size'},
-      {key: strings.Name, value: 'name'},
-      {key: strings.LastModified, value: 'updated_at'},
-      {key: strings.UploadDate, value: 'created_at'},
-    ];
-
+const Homescreen = () => {
   const user = useSelector(state => state.auth.user);
-  const workspaces = useSelector(state => state.workspace.workspace);
 
-  const currentFolderID = folderHistory[folderHistory.length - 1];// Assuming you are always working in the root folder or managing this elsewhere
+  const [homeData, setHomeData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-
-
-   const [showModalAi, setshowmodalAi] = useState(false);
-     const [showmodal, setShowmodal] = useState(false);
-       const [actionModal, setactionModal] = useState(false);
-        const [showDrodown, setshowdropdown] = useState(false);
-         const [handleImageViewMidal,setImageViewModal]=useState(false)
-          const [imageId,setImgaeid]=useState(0)
-   const handlecreateOpenModal = () => setShowmodal(true);
-
-
-   const handleGridListToggle = () => {
-    setIsGrid(!isGrid);
-  };
-  const handleSortApply = ({ sortBy, sortDir }) => {
-    setSortingInfo({ sortBy, sortDir }); // Update the state
-    fetchData(1, sortBy, sortDir); // Fetch data immediately with new sorting
-  };
-
-  useEffect(() => {
-      const hasAccess = accessData(user);
-      setHasAccess(hasAccess);
-      // console.log('User has access:', hasAccess);
-    }, [user]);
-  // Fetch data with pagination
-  const fetchData = useCallback(async (pageNum = 1,sortBy = sortingInfo.sortBy, sortDir = sortingInfo.sortDir) => {
-    try {
-      // console.log('Fetching data for page:', pageNum); // Log page number when fetching data
-
-      setIsLoading(pageNum === 1); // Show the loading spinner only when loading the first page
-      setIsLoadingMore(pageNum > 1); // Show "loading more" spinner if loading more data
-
-      const response = await axios.get(
-        `${baseURL}/drive/file-entries?timestamp=${new Date().getTime()}`,
-        {
-          headers: { Authorization: `Bearer ${user?.access_token}` },
-          params: {
-            folderId: currentFolderID,
-            workspaceId: workspaces ? workspaces : 0,
-            deletedOnly: false,
-            starredOnly: false,
-            recentOnly: false,
-            sharedOnly: false,
-            per_page: 30,
-            page: pageNum, // Pagination logic
-            orderBy:sortBy,
-            orderDir: sortDir,
-          },
-        }
-      );
-
-      // console.log('Response data:', response.data); // Log response data
-      // setcurrentPage(response?.data?.current_page)
-      // console.log(response?.data?.current_page,'Current Page')
-      setFileFolderData(prevData => {
-        const newData = pageNum === 1 ? response.data.data : [...prevData, ...response.data.data];
-
-        // Remove duplicates based on 'id'
-        const uniqueData = Array.from(
-          new Map(newData.map(item => [item.id, item])).values()
-        );
-
-        return uniqueData;
-      });
-
-      // Set the total number of pages from the backend response
-      setTotalPages(response.data.last_page);
-
-    } catch (error) {
-      console.log('Error fetching data:', error);
-      if (error.response?.status === 403) {
-        navigation.replace('Login');
-      }
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, [currentFolderID, workspaces, user]);
-
-  useEffect(() => {
-    fetchData(page); // Fetch initial data based on current page
-  }, [page, fetchData]); // Dependency on page ensures the useEffect runs when the page changes
-
-  // Load more data when reaching the end of the list
-  const loadMoreData = () => {
-    // console.log('Load more triggered, current page:', page); // Log when load more is triggered
-    if (!isLoadingMore && page < totalPages) {
-      setPage(prevPage => {
-        const newPage = prevPage + 1;
-        console.log('Loading next page:', newPage); // Log the next page number
-        return newPage;
-      });
-    } else {
-      console.log('No more pages to load or already loading.');
-    }
-  };
-
-  const handleItemClick = item => {
-    if (item.type === 'folder') {
-      setFolderHistory(prevHistory => [...prevHistory, item.id]); // Push new folder ID to history stack
-    }
-    else if (
-      ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(item.extension.toLowerCase())
-    ) {
-      // console.log('File ID:', item.id);
-      setImgaeid(item?.id)
-      setImageViewModal(true)
-     
-    }  else {
-      // Implement file download logic
-      navigation.navigate('Previewfiles', {
-        filePath: item,
-        user: user,
-      });
-    }
-  };
-
-  const handleFolderCreationSuccess = () => {
-    fetchData(1);
-  };
-  // // Render each item in the list
-  // const renderItem = ({ item }) => (
-  //   <TouchableOpacity onPress={() => handleItemClick(item)} style={styles.itemContainer}>
-  //     {item.type === 'folder' ? (
-  //       <Icon name="folder" size={24} color="#f4a261" style={styles.icon} />
-  //     ) : (
-  //       <Icon name="file" size={24} color="#2a9d8f" style={styles.icon} />
-  //     )}
-  //     <Text style={styles.itemText}>{item.name}</Text>
-  //   </TouchableOpacity>
-  // );
-
-  const toggleModalVisible = item => {
-    setSelectedItem(item);
-    setactionModal(!actionModal);
-  };
-  const renderItem = useCallback(
-    ({item}) => (
-      <FileItem
-        item={item}
-        grid={isGrid}
-        user={user}
-        handleMediaPreview={() => handleItemClick(item)}
-        onOpenModal={toggleModalVisible}
-        workspace={workspaces}
-      />
-    ),
-    [isGrid, handleItemClick],
-  );
-  // Key extractor for FlatList
-  const keyExtractor = (item) => {
-    const key = `${item.id}-${item.name}`;
-    return key;
-  };
-  const handleBackPress = () => {
-    if (folderHistory.length > 1) {
-      setFolderHistory(prevHistory => prevHistory.slice(0, -1)); // Remove the last folder ID to go back
-    }
-  };
-  return (
-    <SafeAreaView style={{
-      flex:1,
-      backgroundColor:COLORS.backgroundColor
-    }}>
-
-         <HomeHeader user={user} handleIconPress={() => setshowmodalAi(true)}
-       handlecreateOpenModal={handlecreateOpenModal} />
-    <View style={styles.container}>
-      {/* <Text style={styles.headerText}>📂 My Drive</Text> */}
-       <View style={styles.statusContainer}>
-                {/* <StorageStatus user={user} usertoken={user?.access_token} /> */}
-                <ProgressBar user={user} usertoken={user?.access_token}/>
-              </View>
-
-<View style={{flexDirection:'row',justifyContent:'space-between'}}>
+useEffect(() => {
+  if (!user?.access_token) return;
   
 
-      {folderHistory.length > 1 && (
-        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <Icon name="arrow-left" size={24} color="#0071BC" />
-          <Text style={styles.backText}>Back</Text>
-        </TouchableOpacity>
-      )}
-      <View/>
- <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
+  const fetchHandleHomeData = async () => {
+    setLoading(true);
+    setError(null);
 
-<TouchableOpacity
-  style={{flexDirection: 'row', alignItems: 'center'}}
-  onPress={() => setshowdropdown(true)}>
-  <Text style={styles.currentFolderText}>{strings.SORT}</Text>
-  <Image
-    source={require('../../assets/icon/sorting.png')}
-    style={{height: 25, width: 25, resizeMode: 'contain'}}
-  />
-</TouchableOpacity>
-<Gridlist
-  toggleView={handleGridListToggle}
-  grid={isGrid}
-/>
-</View>
-</View>
-      {isLoading ? (
-        <ActivityIndicator size="large" />
-      ) : hasAccess ? (
-        <FlatList
-          data={filefolderData}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          onEndReached={loadMoreData} // Trigger pagination when user reaches end of list
-          onEndReachedThreshold={0.5} // Trigger when 50% of the list is scrolled
-          ListFooterComponent={isLoadingMore ? <ActivityIndicator size="small" /> : null} // Show "loading more" spinner at the bottom
-          numColumns={isGrid ? 2 : 1}
-          // onRefresh={onRefresh}
-          // refreshing={refreshing}
-          key={isGrid ? 'list' : 'grid'}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={EmptyComponent}
-          contentContainerStyle={styles.listContent}
-        />
-      ): (
-        <>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '500',
-              textAlign: 'center',
-              color: COLORS.red,
-            }}>
-            {[
-              strings.Warning_Yourdemoaccounthasexpired,
-              strings.Purchasethepackageyouchoosenowtocontinueyourlife,
-              strings.whichismadeeasierbyConiaCloud,
-            ].join(' ')}
-          </Text>
-          <SubscriptionAnimation />
-          <UpgradeButton />
-        </>
-      )}
+    try {
+      const query = new URLSearchParams({
+        pageId: '0',
+        folderId: '0',
+        workspaceId: '0',
+        orderBy: 'updated_at',
+        orderDir: 'desc',
+        page: '1',
+      }).toString();
 
-      <TouchableOpacity style={styles.btn} onPress={() => setshowworkspacemodal(true)}>
-        <Image source={require('../../assets/arrangement.png')} tintColor={COLORS.white} />
-      </TouchableOpacity>
 
-      <WorkspaceModal visible={workspacemodal} user={user} onClose={() => setshowworkspacemodal(false)} />
-      <FileFolderModal
-          visible={showmodal}
-          user={user}
-          folderId={currentFolderID}
-          onClose={() => setShowmodal(false)}
-          onSuccess={handleFolderCreationSuccess}
-          // onUploadFile={handleUploadComplete}
-        />
-         <AnimationModal
-          visible={showModalAi}
-          onClose={() => setshowmodalAi(false)}
-        />
-         <ActionModal
-          isVisible={actionModal}
-          onClose={() => setactionModal(false)}
-          user={user}
-          item={selectedItem}
-          onSuccess={handleFolderCreationSuccess}
-        />
-         <ShortingModal
-          isVisible={showDrodown}
-          onClose={() => setshowdropdown(false)}
-          onApply={handleSortApply}
-          sortingOptions={sortByOptions}
-          initialSorting={sortingInfo}
-        />
-         <ImagepreviewModal
-        visible={handleImageViewMidal}
-        workspace={workspaces}
-        onClose={()=>setImageViewModal(false)}
-        imageId={imageId}
-        user={user}
-        />
+      const response = await fetch(
+        `${baseURL}/drive/file-entries?${query}`,
+        {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${user.access_token}`,
+          },
+        },
+      );
+
+      const text = await response.text();
+      console.log('RAW RESPONSE:', text);
+
+      if (!response.ok) {
+        setError(text);
+        return;
+      }
+
+      const data = JSON.parse(text);
+      setHomeData(data?.data || []);
+    } catch (err) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchHandleHomeData();
+}, [user?.access_token]);
+
+
+
+  const renderItem = ({item}) => (
+    <View style={styles.item}>
+      <Text style={styles.title}>{item.name || 'No Name'}</Text>
+      <Text style={styles.subtitle}>
+        {item.updated_at ? new Date(item.updated_at).toLocaleString() : ''}
+      </Text>
     </View>
-    </SafeAreaView>
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text style={{color: 'red', textAlign: 'center'}}>{error}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {homeData.length === 0 ? (
+        <Text style={styles.center}>No recent files found.</Text>
+      ) : (
+        <FlatList
+          data={homeData}
+          keyExtractor={(item, index) =>
+            item.id?.toString() || index.toString()
+          }
+          renderItem={renderItem}
+        />
+      )}
+    </View>
   );
 };
 
-
+export default Homescreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.backgroundColor,
-    padding: 10,
+    padding: 16,
   },
-  headerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  icon: {
-    marginRight: 10,
-  },
-  itemText: {
-    fontSize: 16,
-  },
-  btn: {
-    position: 'absolute',
-    right: 20,
-    bottom: 40,
-    backgroundColor: '#0071BC',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: 'center',
+  center: {
+    flex: 1,
     justifyContent: 'center',
-    zIndex:1,
-  },
-  backButton: {
-    flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
   },
-  backText: {
+  item: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  title: {
     fontSize: 16,
-    color: '#0071BC',
-    marginLeft: 5,
+    fontWeight: '500',
   },
-  statusContainer: {
-    alignItems: 'center',
+  subtitle: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
   },
-  currentFolderText:{
-    color:COLORS.black,
-    fontWeight:'500',
-    fontSize:14
-  }
 });
-
-export default Homescreen
-

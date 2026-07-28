@@ -88,13 +88,13 @@ splits {
     compileSdk rootProject.ext.compileSdkVersion
    
 
-    namespace "com.coniaclouddrive"
+    namespace "com.ConiaCloudD"
     defaultConfig {
-        applicationId "com.coniaclouddrive"
+        applicationId "com.ConiaCloudD"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "0.3"
+        versionCode 5
+        versionName "3.0.3"
     }
     signingConfigs {
 

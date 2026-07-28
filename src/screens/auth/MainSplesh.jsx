@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native'; 
@@ -7,17 +7,22 @@ import { useSelector } from 'react-redux';
 const MainSplesh = () => {
   const navigation = useNavigation();
   const user = useSelector((state) => state.auth.user);
+  const isLoggedIn = !!user;
   const [isLoading, setIsLoading] = useState(true);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const timer = setTimeout(() => {
-        navigation.navigate('Splesh'); 
-      }, 2000);
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      setTimeout(() => {
+        if (isLoggedIn) {
+          navigation.replace('BottomNavigation'); // or 'Test' if testing
+        } else {
+          navigation.replace('Splesh');
+        }
+      }, 1000); // splash delay
+    };
 
-      return () => clearTimeout(timer); 
-    }, [navigation])
-  );
+    checkLoginStatus();
+  }, [isLoggedIn, navigation]);
 
   return (
     <View style={styles.container}>

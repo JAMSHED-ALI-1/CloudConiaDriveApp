@@ -89,6 +89,7 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, Platform, TouchableOpacity, Image } from 'react-native';
 import LottieView from 'lottie-react-native';
+import strings from '../helper/Language/LocalizedStrings';
 
 const LottieModal = ({ visible, onClose }) => {
   return (
@@ -101,7 +102,7 @@ const LottieModal = ({ visible, onClose }) => {
       <TouchableOpacity style={styles.container} onPress={onClose} activeOpacity={1}>
         {/* Lottie as background */}
         <LottieView
-          source={require('../assets/Animation .json')}
+          source={require('../assets/data/Lottie.json')}
           autoPlay
           loop
           style={StyleSheet.absoluteFillObject} // Makes it full-screen and behind everything
@@ -109,12 +110,12 @@ const LottieModal = ({ visible, onClose }) => {
 
         {/* Overlay Content */}
         <View style={styles.overlayContent} onPress={onClose}>
-          <Text style={styles.title}>ConiaSoft Artificial Intelligence - CAI</Text>
+          <Text style={styles.title}>{strings.CAI}</Text>
           <Text style={styles.subtitle}>
-          Artificial Intelligence -powered featured by ConiaSoft are On The Way Experience The Feature of Productivity with our Advance CAI features
+         {strings.CAI_DESCRIPTION}
           </Text>
-          <Text style={styles.email}>Send your request to AI@ConiaSoft.com</Text>
-          <Text style={styles.note}>Stay tuned for the revolutionary update.</Text>
+          <Text style={styles.email}>{strings.CAI_DESCRIPTION_2}</Text>
+          {/* <Text style={styles.note}>Stay tuned for the revolutionary update.</Text> */}
 
           {/* Optional: Close button */}
           {/* <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -185,8 +186,8 @@ const styles = StyleSheet.create({
     // left: '50%', // Center horizontally
     // transform: [{ translateX: -20 }], // Adjust to center the image
     marginTop: 10,
-    width: 40, // Adjust image size
-    height: 40, // Adjust image size
+    width: 60, // Adjust image size
+    height: 60, // Adjust image size
     zIndex: 1, // Ensure it appears above the Lottie animation
   }
 });

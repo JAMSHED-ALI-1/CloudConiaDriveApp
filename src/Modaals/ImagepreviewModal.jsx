@@ -3,6 +3,7 @@ import { Modal, View, StyleSheet, TouchableOpacity, Text, Platform, SafeAreaView
 import FastImage from 'react-native-fast-image';
 import { COLORS } from '../utils/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
 
 const ImagepreviewModal = ({ visible, onClose, imageId, workspace, user }) => {
   const handleImageLoad = () => {
@@ -26,9 +27,14 @@ const img=`https://drive.coniacloud.com/api/v1/file-entries/${imageId}?workspace
       // onRequestClose={onClose}
     >
       <View style={styles.overlay}>
+        <LinearGradient 
+       colors={['#2B65B0','#6CA1E6','#6CA1E6', '#fbc2eb']} 
+        style={{flex:1}}>
+
+        
         <TouchableOpacity style={styles.modalContainer}  activeOpacity={1} onPress={onClose}>
         <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
-            <Icon name="close" size={30} color={COLORS.black} />
+            <Icon name="close" size={30} color={COLORS.white} />
           </TouchableOpacity>
           <FastImage
             style={styles.imageThumbnail}
@@ -43,6 +49,7 @@ const img=`https://drive.coniacloud.com/api/v1/file-entries/${imageId}?workspace
             onLoad={handleImageLoad}
           />
         </TouchableOpacity>
+        </LinearGradient>
       </View>
     </Modal>
     </SafeAreaView>
@@ -61,7 +68,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor:COLORS.white
+    // backgroundColor:COLORS.white
     // padding: 20,
     // backgroundColor:COLORS.white
   },

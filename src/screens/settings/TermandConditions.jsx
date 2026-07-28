@@ -1,13 +1,24 @@
-import React from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, View, Text, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
 import CustomHeader from '../../components/CustomHeader';
+import strings from '../../helper/Language/LocalizedStrings';
+import { useSelector } from 'react-redux';
+import { COLORS } from '../../utils/Colors';
+import WebView from 'react-native-webview';
 
 const ReturnPolicyScreen = ({navigation}) => {
+  const currentTheme = useSelector((state) => state.theme.theme);
+    const [loading, setLoading] = useState(true);
+    const currentlanguage = useSelector((state) => state.language.language);
+    console.log(currentlanguage, 'currentlanguage');
+     const pdfUrl = currentlanguage==='tur'?'https://coniasoft.com/wp-content/uploads/2025/05/TR_rp.pdf':'https://coniasoft.com/wp-content/uploads/2025/05/GER_rp.pdf';
+    const viewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`;
   return (
+    <SafeAreaView style={{flex:1,backgroundColor:currentTheme==='dark'?COLORS.black:COLORS.white}}>
     <View style={{...styles.container}}>
-    <CustomHeader title={'Return Policy'} back={true} left={true} OnPress={()=>navigation.goBack()}/>
-    <ScrollView style={{flex:1}}>
-      <Text style={styles.title}>Return Policy</Text>
+    <CustomHeader title={strings.RETURNPOLICY} back={true} left={true} OnPress={()=>navigation.goBack()}/>
+    {currentlanguage==='eng'?<ScrollView style={{flex:1}}>
+      {/* <Text style={styles.title}>{strings.RETURNPOLICY}</Text> */}
       <Text style={styles.sectionTitle}>Delivery, Return, and Termination Policies for ConiaSoft and ConiaCloud Software Programs</Text>
 
     
@@ -117,9 +128,22 @@ Thank you for choosing ConiaSoft. We look forward to contributing to your succes
         For questions or assistance, please contact us at support@ConiaSoft.com. 
         Our team is ready to support you at every stage of your journey.
       </Text>
-    </ScrollView>
+    </ScrollView>: <View style={{ flex: 1 }}>
+      {loading && (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
+
+      <WebView
+        source={{ uri: viewerUrl }}
+        onLoadEnd={() => setLoading(false)}
+        style={styles.webView}
+      />
+    </View>}
 
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -127,7 +151,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
@@ -153,6 +177,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#555',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  webView: {
+    flex: 1,
   },
 });
 

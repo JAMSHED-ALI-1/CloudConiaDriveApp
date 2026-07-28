@@ -1,4 +1,5 @@
 import * as yup from 'yup'
+import strings from '../../helper/Language/LocalizedStrings';
 
 export const LoginInitialValue = {
     email : '',
@@ -6,8 +7,8 @@ export const LoginInitialValue = {
 }
 
 export const loginValidtionSchema = yup.object().shape({
-    email:yup.string().required('Email is required'),
-    password:yup.string().required('Password is required')
+    email:yup.string().required(strings.Emailisrequired),
+    password:yup.string().required(strings.Passwordisrequired)
 })
 export const profileInitialValue = {
     first_name : '',

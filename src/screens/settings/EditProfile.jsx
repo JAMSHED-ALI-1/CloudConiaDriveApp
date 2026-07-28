@@ -38,6 +38,7 @@ const EditProfile = ({navigation}) => {
   const error = useSelector((state) => state.auth.error);
   const { user } = useSelector((state) => state.auth);
   const language = useSelector((state) => state.language.language);
+  const currentTheme = useSelector((state) => state.theme.theme);
 
   const [showLottie,setShowLottie]=useState(false);
   const [lottieUrl,setLottieUrl]=useState(require('../../assets/data/Successfully.json'));
@@ -105,7 +106,7 @@ const EditProfile = ({navigation}) => {
 
   return (
     <AlertNotificationRoot>
-      <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.backgroundColor }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: currentTheme === 'dark' ? COLORS.black : COLORS.backgroundColor }}>
         <View style={{flex:1,padding:10}}>
 
 

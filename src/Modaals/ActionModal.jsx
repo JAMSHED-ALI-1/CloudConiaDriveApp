@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, View,TouchableOpacity,Image,Alert } from 'react-native'
+import { Modal, StyleSheet, Text, View,TouchableOpacity,Image,Alert, Platform } from 'react-native'
 import React,{useState} from 'react'
 import strings from '../helper/Language/LocalizedStrings';
 import ShareFileModal from './Share';
@@ -9,10 +9,13 @@ import { makeApiCall } from '../helper/apiHelper';
 import { COLORS } from '../utils/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import showMessageHandler from '../utils/constant/ShowMessageHandler';
-import Test from '../../Test';
 import { useNavigation } from '@react-navigation/native';
 import { handleLogout } from '../helper/Logouthelper';
 import ImagepreviewModal from './ImagepreviewModal';
+// import ReactNativeBlobUtil from 'react-native-blob-util';
+import Share from './Share';
+import requestStoragePermission from '../utils/Permission';
+import getMimeType from '../utils/GetmimeType';
 const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
   const navigation=useNavigation()
   const dispatch = useDispatch();
@@ -105,47 +108,140 @@ const ActionModal = ({isVisible, onClose,user,item ,onSuccess}) => {
 //     }
 //     onClose();
 //   };
+  // const downloadFile = async () => {
+  //   if (!item?.hash || !item?.name) {
+  //     Alert.alert('Error', 'File information is missing');
+  //     return;
+  //   }
+  
+  //   const { dirs } = RNFetchBlob.fs;
+  //   const downloadsPath = Platform.OS === 'ios' ? dirs.DocumentDir : dirs.DownloadDir;
+
+  //   console.log(downloadsPath,'path')
+  //   const fileName = item.name;
+  //   const localPath = `${downloadsPath}/${fileName}`;
+
+  //   // Replace this with your actual API URL
+  //   const downloadUrl = `${baseURL}/api/v1/file-entries/download/${item.hash}?add-preview-token=${user?.access_token}`;
+
+  //   try {
+  //     const res = await ReactNativeBlobUtil
+  //       .config({
+  //         path: localPath,
+  //         fileCache: true,
+  //         appendExt: fileName.split('.').pop(),
+  //       })
+  //       .fetch('GET', downloadUrl, {
+  //         // Add any necessary headers here
+  //       })
+  //       .progress((received, total) => {
+  //         const percentage = (received / total) * 100;
+  //         setDownloadProgress(percentage);
+  //         console.log(`Downloaded ${percentage.toFixed(2)}%`);
+  //       });
+
+  //     console.log('File downloaded and saved locally at:', res.path());
+  //     showMessageHandler('Success', 'File downloaded successfully!');
+  //   } catch (error) {
+  //     console.error('Error downloading the file:', error.message);
+  //     showMessageHandler('Error', 'Failed to download the file.');
+  //   } finally {
+  //     setDownloadProgress(0);
+  //     onClose();
+  //   }
+  // };
+    
+
+
+  // const downloadFile = async () => {
+  //   if (!item?.hash || !item?.name) {
+  //     Alert.alert('Error', 'File information is missing');
+  //     return;
+  //   }
+  
+  //   // const hasPermission = await requestStoragePermission();
+  //   // if (!hasPermission) {
+  //   //   Alert.alert('Permission Denied', 'Storage access is required to download files.');
+  //   //   return;
+  //   // }
+  
+  //   const { fs } = ReactNativeBlobUtil;
+  //   const downloadsPath = fs.dirs.DownloadDir;
+  //   const fileName = item.name;
+  //   const filePath = `${downloadsPath}/${fileName}`;
+  //   const fileExt = fileName.split('.').pop();
+  //   const mimeType = `application/${fileExt}`;
+  
+  //   const downloadUrl = `${baseURL}/api/v1/file-entries/download/${item.hash}?add-preview-token=${user?.access_token}`;
+  
+  //   try {
+  //     const res = await ReactNativeBlobUtil.config({
+  //       fileCache: true,
+  //       addAndroidDownloads: {
+  //         useDownloadManager: true,
+  //         notification: true,
+  //         title: fileName,
+  //         path: filePath,
+  //         description: 'Downloading file...',
+  //         mime: mimeType,
+  //         mediaScannable: true,
+  //       },
+  //     })
+  //     .fetch('GET', downloadUrl)
+  //     .progress((received, total) => {
+  //       const percentage = (received / total) * 100;
+  //       setDownloadProgress(percentage);
+  //       console.log(`Downloading: ${percentage.toFixed(2)}%`);
+  //     });
+  
+  //     console.log('Download complete. File saved to:', res.path());
+  //     showMessageHandler('Success', 'File downloaded successfully!');
+  //   } catch (error) {
+  //     console.error('Download error:', error.message);
+  //     showMessageHandler('Error', 'Download failed.');
+  //   } finally {
+  //     setDownloadProgress(0);
+  //     onClose();
+  //   }
+  // };
+
+
+
   const downloadFile = async () => {
-    if (!item?.hash || !item?.name) {
-      Alert.alert('Error', 'File information is missing');
-      return;
-    }
-
     const { fs } = ReactNativeBlobUtil;
-    const downloadsPath = Platform.OS === 'android' ? fs.dirs.DownloadDir : fs.dirs.DocumentDir;
-    const fileName = item.name;
-    const localPath = `${downloadsPath}/${fileName}`;
-
-    // Replace this with your actual API URL
-    const downloadUrl = `${baseURL}/api/v1/file-entries/download/${item.hash}?add-preview-token=${user?.access_token}`;
-
+    const fileName = item.name;  // Get file name
+    const downloadUrl = `${baseURL}/api/v1/file-entries/download/${item.hash}?add-preview-token=${user?.access_token}`; // Replace with your URL
+  
+    const downloadsDir = Platform.Version >= 29
+      ? fs.dirs.LegacyDownloadDir
+      : fs.dirs.DownloadDir;
+  
+    const fullPath = `${downloadsDir}/${fileName}`;
+    console.log('Download path:', fullPath);
+  
+    // Get MIME type dynamically
+    const mimeType = getMimeType(fileName);
+    console.log('Detected MIME type:', mimeType);
+  
     try {
-      const res = await ReactNativeBlobUtil
-        .config({
-          path: localPath,
-          fileCache: true,
-          appendExt: fileName.split('.').pop(),
-        })
-        .fetch('GET', downloadUrl, {
-          // Add any necessary headers here
-        })
-        .progress((received, total) => {
-          const percentage = (received / total) * 100;
-          setDownloadProgress(percentage);
-          console.log(`Downloaded ${percentage.toFixed(2)}%`);
-        });
-
-      console.log('File downloaded and saved locally at:', res.path());
-      showMessageHandler('Success', 'File downloaded successfully!');
-    } catch (error) {
-      console.error('Error downloading the file:', error.message);
-      showMessageHandler('Error', 'Failed to download the file.');
-    } finally {
-      setDownloadProgress(0);
-      onClose();
+      const res = await ReactNativeBlobUtil.config({
+        fileCache: true,
+        addAndroidDownloads: {
+          useDownloadManager: true,
+          notification: true,
+          path: fullPath,
+          title: fileName,
+          description: 'Downloading file...',
+          mediaScannable: true,
+          mime: mimeType,  // Dynamically set MIME type
+        }
+      }).fetch('GET', downloadUrl);
+  
+      console.log('✅ File downloaded to:', res.path());
+    } catch (err) {
+      console.log('❌ Download failed:', err.message);
     }
   };
-    
   const makeStarredFile = async () => {
     try {
       const data = {
@@ -346,7 +442,7 @@ const makeUnstarredFile = async () => {
       </View>
     </TouchableOpacity>
   </Modal>
-  <Test 
+  <Share 
   isVisible={isShareModalVisible} 
   onClose={()=>setShareModalVisible(false)} 
   item={item}

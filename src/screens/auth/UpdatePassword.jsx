@@ -19,6 +19,7 @@ import { getUserData } from '../../utils/constant/GetUser';
 const UpdatePassword = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+  const currentTheme = useSelector((state) => state.theme.theme);
   const dispatch = useDispatch();
   const [profileInitialValue, setProfileInitialValue] = useState({
     current_password:  '',
@@ -108,10 +109,10 @@ const UpdatePassword = () => {
   };
   
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{...styles.container,backgroundColor:currentTheme==='dark'?COLORS.black:COLORS.backgroundColor}}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.loginMainContainer}
+        style={{...styles.loginMainContainer,backgroundColor:currentTheme==='dark'?COLORS.black:COLORS.backgroundColor}}
       >
         <CustomHeader 
           back={true} 
@@ -119,7 +120,7 @@ const UpdatePassword = () => {
           left={true}  
           title={'Update Password'} 
         />
-        <View style={styles.inputContainer}>
+        <View style={{...styles.inputContainer,}}>
           <Formik
             enableReinitialize
             initialValues={profileInitialValue}

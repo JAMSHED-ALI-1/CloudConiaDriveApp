@@ -21,7 +21,7 @@ import showMessageHandler from '../../utils/constant/ShowMessageHandler';
 
 const ViewPriceProduct = ({route, navigation}) => {
   const {item, currency} = route.params;
-
+const currentTheme = useSelector(state => state.theme.theme);
   console.log('Currency on ViewPriceProduct screen:', currency);
   const user = useSelector(state => state.auth.user);
   const [modalVisible, setModalVisible] = useState(false);
@@ -121,8 +121,8 @@ const ViewPriceProduct = ({route, navigation}) => {
     isLoding && <ActivityIndicator size="large" color={COLORS.blue} />;
   }
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.backgroundColor}}>
-      <View style={styles.container}>
+    <SafeAreaView style={{flex: 1,backgroundColor: currentTheme==='dark'?COLORS.black:COLORS.backgroundColor}}>
+      <View style={{...styles.container,backgroundColor:currentTheme==='dark'?COLORS.black:COLORS.backgroundColor}}>
         <CustomHeader
           back={true}
           OnPress={() => navigation.goBack()}

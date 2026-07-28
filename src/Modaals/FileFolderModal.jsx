@@ -189,40 +189,32 @@ const FileFolderModal = ({
 
   const handleFileUpload = async () => {
     try {
-      const file = await ImagePicker.openPicker({
-        multiple: false, // Pick only one file
-        mediaType: 'any', // Allows all file types
+      const file = await DocumentPicker.pickSingle({
+        type: [DocumentPicker.types.allFiles], // Allow all file types
       });
-
-      // console.log('Selected File:', file);
-
-      const fileUri = Platform.OS === 'ios' ? file.path.replace('file://', '') : file.path;
-      const fileName = file.filename || `upload.${file.mime.split('/')[1]}`; // Generate filename if not available
+  
+      const fileUri = Platform.OS === 'ios' ? file.uri.replace('file://', '') : file.uri;
+      const fileName = file.name || `upload.${file.type?.split('/')[1] || 'dat'}`;
       const uploadUrl = `${baseURL}/uploads?workspaceId=${workspaceId}`;
       const token = user?.access_token;
-
+  
       setIsrefreshing(true);
-      // setLottieUrl(require('../assets/data/UploadigAnimation.json'))
-      // setLottie(true);
-
+      setLottieUrl(require('../assets/data/UploadigAnimation.json'));
+      setLottie(true);
+  
       const parentId = folderId ? folderId.toString() : '';
-
+  
       const formData = new FormData();
       formData.append('file', {
         uri: fileUri,
         name: fileName,
-        type: file.mime,
+        type: file.type || 'application/octet-stream',
       });
       formData.append('workspaceId', workspaceId);
       formData.append('parentId', parentId);
       formData.append('isSQL', 'false');
       formData.append('disk', 'uploads');
-
-      console.log('Uploading file...');
-      setLottieUrl(require('../assets/data/UploadigAnimation.json'));
-      setLottie(true);
-      setIsrefreshing(true);
-
+  
       const response = await fetch(uploadUrl, {
         method: 'POST',
         headers: {
@@ -231,32 +223,22 @@ const FileFolderModal = ({
         },
         body: formData,
       });
-
+  
       const responseData = await response.json();
-      // console.log(responseData,'Mila h')
-      setLottieUrl(require('../assets/data/UploadigAnimation.json'))
-      setLottie(true);
       setIsrefreshing(false);
-      
-
+  
       if (response.ok && responseData.status === 'success') {
         showMessageHandler('File Uploaded successfully', 'success');
-
         onSuccess();
-
-        console.log('Upload successful, showing alert');
-       
-       
       } else {
         throw new Error(responseData.message || 'Upload failed');
       }
     } catch (error) {
       console.error('Upload Error:', error);
-      showMessageHandler('FServer responded Error', 'failed');
+      showMessageHandler('Server responded Error', 'failed');
       Alert.alert('Error', 'File upload failed');
-      showMessageHandler(ALERT_TYPE.DANGER, 'Error', errorMessage);
-        setLottieUrl(require('../assets/data/failed.json'));
-        setLottie(true);
+      setLottieUrl(require('../assets/data/failed.json'));
+      setLottie(true);
     } finally {
       setIsrefreshing(false);
       setTimeout(onClose, 700);

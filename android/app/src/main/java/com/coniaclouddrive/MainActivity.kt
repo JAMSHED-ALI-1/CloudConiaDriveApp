@@ -1,4 +1,4 @@
-package com.coniaclouddrive
+package com.ConiaCloudD
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

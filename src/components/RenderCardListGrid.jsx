@@ -3,10 +3,14 @@ import { TouchableOpacity, View, Text, StyleSheet, Image, ActivityIndicator } fr
 import moment from 'moment';
 import getItemIcon from '../constants/GetItemIcon';
 import FastImage from 'react-native-fast-image';
+import LinearGradient from 'react-native-linear-gradient';
+import { COLORS } from '../utils/Colors';
+import { useSelector } from 'react-redux';
 
 const FileItem =React.memo(({ item, grid, handleMediaPreview, onOpenModal, user, workspace }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const currenntThme=useSelector((state)=>state.theme.theme)
 
   const handleImageLoad = () => {
     setIsLoading(false);
@@ -17,67 +21,82 @@ const FileItem =React.memo(({ item, grid, handleMediaPreview, onOpenModal, user,
     setIsLoading(false);
     setHasError(true);
   };
-
+  const getBackgroundColor = () => {
+    if (item.type === 'folder') return '#1a4282';
+    if (item.type?.toLowerCase().includes('image')) return COLORS.orenge;
+    if (item.type?.toLowerCase().includes('video')) return COLORS.green;
+    if (item.type?.toLowerCase().includes('audio')) return COLORS.green;
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(item.extension?.toLowerCase())) return COLORS.lightCard;
+    return COLORS.lightCard; // default fallback
+  };
+  
   const isImage = ['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(item.extension?.toLowerCase()) || item.type?.toLowerCase().includes('image');
 
   return (
-    <TouchableOpacity onPress={() => handleMediaPreview(item)} style={[styles.card, grid && styles.gridCard]}>
-      <View style={styles.iconContainer}>
-        {/* Show loading indicator if the image is still loading */}
+    <TouchableOpacity onPress={() => handleMediaPreview(item)} style={{...styles.cardWrapper}} >
+  <View
+    
+    style={[styles.card, grid && styles.gridCard,
+      { backgroundColor: getBackgroundColor() },
+    ]}
+  >
+    <View style={styles.iconContainer}>
+      {isImage && isLoading && !hasError && <ActivityIndicator size="small" color={COLORS.white} style={styles.loader} />}
+      {isImage && !hasError ? (
+        <FastImage
+          style={styles.imageThumbnail}
+          source={{
+            uri: `https://drive.coniacloud.com/api/v1/file-entries/${item?.id}?workspaceId=${workspace}&thumbnail=true`,
+            headers: { Authorization: `Bearer ${user?.access_token}` },
+            priority: FastImage.priority.high,
+          }}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          resizeMode={FastImage.resizeMode.contain}
+        />
+      ) : (
+        <Image source={getItemIcon(item)} style={styles.icon} resizeMode="contain"  tintColor={COLORS.white}/>
+      )}
+    </View>
 
-        {/* Show image if valid, otherwise fallback to icon */}
-        {isImage && isLoading && !hasError && <ActivityIndicator size="small" color="#007bff" style={styles.loader} />}
-        {isImage && !hasError ? (
-          <FastImage
-            style={styles.imageThumbnail}
-            source={{
-              uri: `https://drive.coniacloud.com/api/v1/file-entries/${item?.id}?workspaceId=${workspace}&thumbnail=true`,
-              headers: { Authorization: `Bearer ${user?.access_token}` },
-              priority: FastImage.priority.high,
-            }}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            resizeMode={FastImage.resizeMode.contain}
-            // resizeMode='contain'
-          />
-        ) : (
-          <Image source={getItemIcon(item)} style={styles.icon} resizeMode="contain" />
-        )}
-      </View>
+    <View style={styles.infoContainer}>
+      <Text style={{...styles.itemName}} numberOfLines={1}>{item.name}</Text>
+      <Text style={styles.itemModified}>{moment(item.updated_at).fromNow()}</Text>
+      {item.file_size > 0 && (
+        <Text style={styles.itemSize}>
+          {(item.file_size / 1024).toFixed(2)} KB
+        </Text>
+      )}
+    </View>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-        <Text style={styles.itemModified}>{moment(item.updated_at).fromNow()}</Text>
-        {item.file_size > 0 && (
-          <Text style={styles.itemSize}>
-            {(item.file_size / 1024).toFixed(2)} KB
-          </Text>
-        )}
-      </View>
-
-      <TouchableOpacity onPress={() => onOpenModal(item)} style={[styles.moreOptions, grid && styles.gridMoreOptions]}>
-        <Image source={require('../assets/MoreOption.png')} style={styles.moreIcon} />
-      </TouchableOpacity>
+    <TouchableOpacity onPress={() => onOpenModal(item)} style={[styles.moreOptions, grid && styles.gridMoreOptions]}>
+      <Image source={require('../assets/MoreOption.png')} style={styles.moreIcon} tintColor={COLORS.white}/>
     </TouchableOpacity>
+  </View>
+</TouchableOpacity>
   );
 });
 
 const styles = StyleSheet.create({
   card: {
+    // flex:1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: 16,
+    borderRadius: 10,
     marginBottom: 10,
     borderRadius: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    // shadowColor: '#000',
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // shadowOffset: { width: 0, height: 2 },
+    // elevation: 2,
   },
   gridCard: {
-    width: '48%',
+    // width: '1%',
+    // width:'50%',
+    flex:1,
     flexDirection: 'column',
     alignItems: 'center',
     marginHorizontal: 4,
@@ -93,15 +112,15 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.white
   },
   itemModified: {
     fontSize: 12,
-    color: '#777',
+    color: COLORS.backgroundColor
   },
   itemSize: {
     fontSize: 10,
-    color: '#777',
+    color: COLORS.backgroundColor
   },
   icon: {
     width: 35,
@@ -126,6 +145,18 @@ const styles = StyleSheet.create({
   loader: {
     position: 'absolute',
   },
+  cardWrapper: {
+    // marginBottom: 10,
+    borderRadius: 10,
+    overflow: 'hidden',
+    // shadowColor: '#000',
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // shadowOffset: { width: 0, height: 2 },
+    // elevation: 2,
+    flex:1
+  }
+  
 });
 
 export default FileItem;

@@ -4,8 +4,11 @@ import { COLORS } from '../utils/Colors';
 import strings from '../helper/Language/LocalizedStrings';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
+import TextCompo from './TextCompo';
 
 const HomeHeader = ({ user, handleIconPress,handlecreateOpenModal }) => {
+  const currentTheme=useSelector((state)=>state.theme.theme)
+  console.log(currentTheme,'Current Theme')
   // console.log('Hederer',user)
   const userAvatar = user?.avatar.includes('www.gravatar.com') ? { uri: user.avatar }:{uri:`https://drive.coniacloud.com/${user?.avatar}`} ;
   const navigation=useNavigation()
@@ -13,20 +16,21 @@ const HomeHeader = ({ user, handleIconPress,handlecreateOpenModal }) => {
   const language = useSelector((state) => state.language.language);
   const [showmodal, setShowmodal] = useState(false);
   return (
-    <View style={styles.headerContainer}>
+    <View style={{...styles.headerContainer, backgroundColor: currentTheme === 'dark' ? COLORS.black : COLORS.white ,}}>
       <View style={styles.userInfoContainer}>
-        <TouchableOpacity style={styles.imgCircle}>
+        <TouchableOpacity style={{...styles.imgCircle,shadowColor:currentTheme === 'dark' ? COLORS.white:COLORS.blue}}>
           <Image source={userAvatar} style={styles.userImage} resizeMethod='contain' />
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerNormalText}>{strings.WELCOME_BACK}</Text>
-          <Text style={{color:COLORS.noermalText}}>{userName}</Text>
+          {/* <Text style={styles.headerNormalText}>{strings.WELCOME_BACK}</Text> */}
+          <TextCompo>{strings.WELCOME_BACK}</TextCompo>
+          <TextCompo >{userName}</TextCompo>
         </View>
       </View>
 
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={handlecreateOpenModal}>
-          <Text style={{...styles.text}}> +</Text>
+          <Text style={{...styles.text,color:currentTheme === 'dark' ? COLORS.white : COLORS.black }}> +</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton} onPress={handleIconPress}>
           <Image source={require('../assets/ConiaSoft_AI_Icon.png')} style={styles.icon} />
@@ -44,8 +48,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomColor:COLORS.backgroundColor,
+    borderBottomWidth:1,
     // marginTop:10,
-    backgroundColor:COLORS.white,
+    // backgroundColor:currentTheme==='dark'?COLORS.black:COLORS.white,
     // borderTopWidth:1,
     padding:10,
     // borderBottomColor:'pink',
@@ -61,7 +67,7 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 25, // Ensure it's a circle
     backgroundColor: 'white',
-    shadowColor: COLORS.blue,
+    // shadowColor: COLORS.blue,
     alignItems:'center',
     justifyContent:'center',
 shadowOffset: {
@@ -90,9 +96,13 @@ borderWidth:0
   iconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+   
   },
   iconButton: {
+
+
   
+      
   },
   icon: {
     width: 28,
@@ -101,7 +111,8 @@ borderWidth:0
     resizeMode: 'contain',
   },
   text: {
-    color: '#111',
+    // color: '#111',
+    color: COLORS.white,
     fontSize: 30,
     fontWeight:'800'
   },

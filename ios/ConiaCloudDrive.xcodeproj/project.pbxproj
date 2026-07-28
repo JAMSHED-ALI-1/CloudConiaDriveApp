@@ -11,10 +11,10 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1F6E81531A581C127E02B105 /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AABA88733043560DD991972C /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a */; };
+		4E0D35E17300EB8FD5A9FD7C /* libPods-ConiaCloudDrive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DE7E9DA556BBE3CE1CE71EE /* libPods-ConiaCloudDrive.a */; };
 		585BB2B4BEB73C15A5116747 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0707C7D39B3391BAE3744E3C /* PrivacyInfo.xcprivacy */; };
-		5864A9CEEFDDCE22223C16D6 /* libPods-ConiaCloudDrive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B3FB45A3BF691328D243775 /* libPods-ConiaCloudDrive.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		E7F81C42A1117269D98E6416 /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8FE6A7921CE76842EFB0B45 /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,14 +39,14 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ConiaCloudDrive/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ConiaCloudDrive/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ConiaCloudDrive/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		5B3FB45A3BF691328D243775 /* libPods-ConiaCloudDrive.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConiaCloudDrive.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		78EDD1D40C1617A6C2EBF26E /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig"; sourceTree = "<group>"; };
+		4C3F2C85FED71691FA693B16 /* Pods-ConiaCloudDrive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive.debug.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive.debug.xcconfig"; sourceTree = "<group>"; };
+		6DE7E9DA556BBE3CE1CE71EE /* libPods-ConiaCloudDrive.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConiaCloudDrive.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ConiaCloudDrive/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9F9F45CEEBBE53E14C87DA03 /* Pods-ConiaCloudDrive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive.release.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive.release.xcconfig"; sourceTree = "<group>"; };
-		C8FE6A7921CE76842EFB0B45 /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConiaCloudDrive-ConiaCloudDriveTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D49B516903573191BFA883AA /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig"; sourceTree = "<group>"; };
-		D832337E6525D57D8B6727FE /* Pods-ConiaCloudDrive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive.debug.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive.debug.xcconfig"; sourceTree = "<group>"; };
+		A1A4D780EAA52D0BBB71A30E /* Pods-ConiaCloudDrive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive.release.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive.release.xcconfig"; sourceTree = "<group>"; };
+		AABA88733043560DD991972C /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ConiaCloudDrive-ConiaCloudDriveTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7CC126766E0036ACA14CBAA /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		EE8031FFF8D8841D80411DD8 /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig"; path = "Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7F81C42A1117269D98E6416 /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a in Frameworks */,
+				1F6E81531A581C127E02B105 /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5864A9CEEFDDCE22223C16D6 /* libPods-ConiaCloudDrive.a in Frameworks */,
+				4E0D35E17300EB8FD5A9FD7C /* libPods-ConiaCloudDrive.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,8 +105,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5B3FB45A3BF691328D243775 /* libPods-ConiaCloudDrive.a */,
-				C8FE6A7921CE76842EFB0B45 /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a */,
+				6DE7E9DA556BBE3CE1CE71EE /* libPods-ConiaCloudDrive.a */,
+				AABA88733043560DD991972C /* libPods-ConiaCloudDrive-ConiaCloudDriveTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -145,10 +145,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				D832337E6525D57D8B6727FE /* Pods-ConiaCloudDrive.debug.xcconfig */,
-				9F9F45CEEBBE53E14C87DA03 /* Pods-ConiaCloudDrive.release.xcconfig */,
-				D49B516903573191BFA883AA /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig */,
-				78EDD1D40C1617A6C2EBF26E /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig */,
+				4C3F2C85FED71691FA693B16 /* Pods-ConiaCloudDrive.debug.xcconfig */,
+				A1A4D780EAA52D0BBB71A30E /* Pods-ConiaCloudDrive.release.xcconfig */,
+				EE8031FFF8D8841D80411DD8 /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig */,
+				C7CC126766E0036ACA14CBAA /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -160,12 +160,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ConiaCloudDriveTests" */;
 			buildPhases = (
-				7F128082FB606B083780EF75 /* [CP] Check Pods Manifest.lock */,
+				DA6A17A5F613CD5A1EC5E92B /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				560A7B6CDEA7F5345DE1B463 /* [CP] Embed Pods Frameworks */,
-				10777D6C06A335B70B860106 /* [CP] Copy Pods Resources */,
+				868ADBECDA6BD6E4898CCB1F /* [CP] Embed Pods Frameworks */,
+				A2B9B7628D2B0CC5A3A76A35 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -181,13 +181,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ConiaCloudDrive" */;
 			buildPhases = (
-				BA2F1551B2C9744EEC4A5E54 /* [CP] Check Pods Manifest.lock */,
+				EC79F31BA1C7C09A6B6A9D45 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				A7EBA58F768ECEB0482B666A /* [CP] Embed Pods Frameworks */,
-				8EF8E8A91FAE345578B66A71 /* [CP] Copy Pods Resources */,
+				99E5BF455AC4473B0F5FB1D5 /* [CP] Embed Pods Frameworks */,
+				39C62D7F4A3C74B4A739B1C9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -271,24 +271,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		10777D6C06A335B70B860106 /* [CP] Copy Pods Resources */ = {
+		39C62D7F4A3C74B4A739B1C9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		560A7B6CDEA7F5345DE1B463 /* [CP] Embed Pods Frameworks */ = {
+		868ADBECDA6BD6E4898CCB1F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -305,7 +305,41 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7F128082FB606B083780EF75 /* [CP] Check Pods Manifest.lock */ = {
+		99E5BF455AC4473B0F5FB1D5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A2B9B7628D2B0CC5A3A76A35 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive-ConiaCloudDriveTests/Pods-ConiaCloudDrive-ConiaCloudDriveTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DA6A17A5F613CD5A1EC5E92B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -327,41 +361,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8EF8E8A91FAE345578B66A71 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A7EBA58F768ECEB0482B666A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ConiaCloudDrive/Pods-ConiaCloudDrive-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BA2F1551B2C9744EEC4A5E54 /* [CP] Check Pods Manifest.lock */ = {
+		EC79F31BA1C7C09A6B6A9D45 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -416,7 +416,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D49B516903573191BFA883AA /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig */;
+			baseConfigurationReference = EE8031FFF8D8841D80411DD8 /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -443,7 +443,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 78EDD1D40C1617A6C2EBF26E /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig */;
+			baseConfigurationReference = C7CC126766E0036ACA14CBAA /* Pods-ConiaCloudDrive-ConiaCloudDriveTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -467,7 +467,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D832337E6525D57D8B6727FE /* Pods-ConiaCloudDrive.debug.xcconfig */;
+			baseConfigurationReference = 4C3F2C85FED71691FA693B16 /* Pods-ConiaCloudDrive.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -498,7 +498,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9F9F45CEEBBE53E14C87DA03 /* Pods-ConiaCloudDrive.release.xcconfig */;
+			baseConfigurationReference = A1A4D780EAA52D0BBB71A30E /* Pods-ConiaCloudDrive.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -513,7 +513,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				 = 2.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

@@ -21,6 +21,7 @@ import CustomHeader from '../../components/CustomHeader';
 import { baseURL } from '../../utils/constant/settings';
 import { AppSettings } from '../../utils/Settings';
 import { COLORS } from '../../utils/Colors';
+import LinearGradient from 'react-native-linear-gradient';
 
 const VideoPreview = ({ route, navigation }) => {
   const { user, filePath } = route.params;
@@ -116,13 +117,13 @@ console.log(filePath?.name.slice(0,20)+'...','apna Path')
   
 
   // Loading state
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={{color:COLORS.black}}>Loading...</Text>
-      </View>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <View style={styles.container}>
+  //       <Text style={{color:COLORS.black}}>Loading...</Text>
+  //     </View>
+  //   );
+  // }
   const Spinner = () => (
     <View style={styles.activityContainer}>
       <ActivityIndicator size="large" color={COLORS.black} />
@@ -139,7 +140,14 @@ console.log(filePath?.name.slice(0,20)+'...','apna Path')
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    {/* Show header only on Android */}
+   <LinearGradient
+   style={{ flex: 1 }}
+   colors={['#2B65B0', '#6CA1E6', '#fbc2eb']} // Customize your gradient colors
+   start={{ x: 0, y: 0 }}
+   end={{ x: 1, y: 1 }}
+   >
+
+  
    
       <View style={{ padding: 10 }}>
         <CustomHeader 
@@ -149,8 +157,7 @@ console.log(filePath?.name.slice(0,20)+'...','apna Path')
           title={filePath?.name.slice(0,13)+'...'+filePath.extension} 
         />
       </View>
-   
-
+     
 {/*     
       <WebView
         source={{ uri: fileUrl }}
@@ -176,7 +183,13 @@ console.log(filePath?.name.slice(0,20)+'...','apna Path')
 
         // onLoadProgress={true}
       /> */}
-    
+    {
+      loading ? (
+        <View style={styles.container}>
+          <Text style={{ color: COLORS.black }}>Loading...</Text>
+        </View>
+      ) : (
+   
 
     <WebView
   source={{ uri: finalFileUrl }}
@@ -206,11 +219,12 @@ console.log(filePath?.name.slice(0,20)+'...','apna Path')
     }
     return false;
   }}
-/>
+/>)}
 
     <View style={styles.fileInfoContainer}>
       <Text style={styles.fileName}>{filePath?.name || 'File'}</Text>
     </View>
+  </LinearGradient>
   </SafeAreaView>
   );
 };

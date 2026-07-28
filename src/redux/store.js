@@ -1,66 +1,47 @@
-// import { configureStore } from '@reduxjs/toolkit';
-// filefolderApi
-// import authReducer from './reducers/authSlice';
-// import workspaceSlice from './reducers/workspaceSlice';
-// import languageSlice, { loadLanguageFromStorage } from './reducers/languageSlice';
-// import folderSlice from './reducers/folderSlice';
-// import AuthSlice from '../redux/reducers/authSlice';
-// // import { filefolderApi } from './reducers/services/filefolderApi';
-// import {createFolderApi} from './reducers/services/createFolder'
-// import { filefolderApi } from './reducers/filefolder';
-// import { fileEntriesApi as searchAndFilterApi } from "./reducers/services/searchAndFilter"; 
-// const store = configureStore({
-//   reducer: {
-//     auth: AuthSlice,
-//     language: languageSlice,
-//     workspace: workspaceSlice,
-//     folderPath: folderSlice,
-//     [filefolderApi.reducerPath]: filefolderApi.reducer, 
-//     [createFolderApi.reducerPath]: createFolderApi.reducer, 
-//     [searchAndFilterApi.reducerPath]: searchAndFilterApi.reducer,
-//   },
-//   middleware: (getDefaultMiddleware) => 
-//     getDefaultMiddleware().concat(
-//       filefolderApi.middleware,
-//       createFolderApi.middleware,
-//       searchAndFilterApi.middleware
-//     ),
-// });
+// store.js or redux/store.js
 
-// store.dispatch(loadLanguageFromStorage());
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persistReducer, persistStore } from 'redux-persist';
 
-// export default store;
-
-
-
-
-
-
-
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './reducers/authSlice';
-import workspaceSlice from './reducers/workspaceSlice';
+import themeSlice from './reducers/themechange';
 import languageSlice, { loadLanguageFromStorage } from './reducers/languageSlice';
+import AuthSlice from './reducers/authSlice';
+import workspaceSlice from './reducers/workspaceSlice';
 import folderSlice from './reducers/folderSlice';
-import AuthSlice from '../redux/reducers/authSlice';
+
 import { filefolderApi } from './reducers/filefolder';
 import { createFolderApi } from './reducers/services/createFolder';
-import { fileEntriesApi as searchAndFilterApi } from "./reducers/services/searchAndFilter"; 
+import { fileEntriesApi as searchAndFilterApi } from './reducers/services/searchAndFilter';
 
+// ✅ Persist configuration
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  whitelist: ['auth', 'language', 'theme','workspace'], // Only persist these reducers
+};
+
+// ✅ Combine reducers
+const rootReducer = combineReducers({
+  auth: AuthSlice,
+  language: languageSlice,
+  theme: themeSlice,
+  workspace: workspaceSlice,
+  folderPath: folderSlice,
+  [filefolderApi.reducerPath]: filefolderApi.reducer,
+  [createFolderApi.reducerPath]: createFolderApi.reducer,
+  [searchAndFilterApi.reducerPath]: searchAndFilterApi.reducer,
+});
+
+// ✅ Wrap with persistReducer
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+// ✅ Configure the store
 const store = configureStore({
-  reducer: {
-    auth: AuthSlice,
-    language: languageSlice,
-    workspace: workspaceSlice,
-    folderPath: folderSlice,
-    [filefolderApi.reducerPath]: filefolderApi.reducer, 
-    [createFolderApi.reducerPath]: createFolderApi.reducer, 
-    [searchAndFilterApi.reducerPath]: searchAndFilterApi.reducer,
-  },
-  middleware: (getDefaultMiddleware) => 
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      // Disable serializable state invariant check
-      serializableCheck: false,
+      serializableCheck: false, 
     }).concat(
       filefolderApi.middleware,
       createFolderApi.middleware,
@@ -68,6 +49,10 @@ const store = configureStore({
     ),
 });
 
+// ✅ Create persistor
+export const persistor = persistStore(store);
+
+// ✅ Load language manually if needed
 store.dispatch(loadLanguageFromStorage());
 
 export default store;

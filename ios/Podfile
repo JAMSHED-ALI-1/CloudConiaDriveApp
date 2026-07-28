@@ -41,4 +41,4 @@ pod 'RNSound', :path => '../node_modules/react-native-sound'
     )
   end
 end
-RNVideoUseVideoCaching = true
+# RNVideoUseVideoCaching = true
